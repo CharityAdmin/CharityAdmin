@@ -1,2 +1,40 @@
-Core
+Schema Proposal
 ====
+
+ClientOpening
+id 			int
+clientId	int
+startDate	date
+endDate		date
+time 		time
+type		varchar(20)
+notes		varchar(255)
+
+ClientOpeningMetadata
+id 					int
+clientOpeningyId	int
+metadata 			varchar(20)
+
+ClientOpeningException
+id 					int
+clientOpeningyId	int
+date 				date
+
+VolunteerCommitment
+id 					int
+volunteerId			int
+clientOpeningyId	int
+startDate			date
+endDate				date
+type				varchar(20) (e.g., opening might recurring every week, volunteer might take every other week)
+notes				varchar(255)
+
+VolunteerCommitmentMetadata (e.g., opening might be every day of the week, the volunteer might take every Monday)
+id 						int
+volunteerCommitmentId	int
+metadata 				varchar(20)
+
+VolunteerCommitmentException
+id 						int
+volunteerCommitmentId	int
+date 					date
