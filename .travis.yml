@@ -5,3 +5,6 @@ env:
   - DJANGO=1.5.4
 install:
   - pip install -q Django==$DJANGO --use-mirrors
+  - pip install pep8 --use-mirrors
+before_script:
+  - "pep8"
