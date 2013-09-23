@@ -23,17 +23,18 @@ DATABASES = {
 
 # Try to import the secret_key from a secret_key.py file (not included in the git repo).
 # If this can't be found, create a new one and fill it as appropriate (with a new random secret key).
+
 def generate_secret_key(filepath):
     from django.utils.crypto import get_random_string
     chars = 'abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*(-_=+)'
-    f = open(filepath,'w')
+    f = open(filepath, 'w')
     f.write("# Make this unique, and don't share it with anybody.\nSECRET_KEY = '" + get_random_string(50, chars) + "'")
 
 try:
     from secret_key import *
 except ImportError:
     import os
-    SETTINGS_DIR=os.path.abspath(os.path.dirname(__file__))
+    SETTINGS_DIR = os.path.abspath(os.path.dirname(__file__))
     generate_secret_key(os.path.join(SETTINGS_DIR, 'secret_key.py'))
     from secret_key import *
 
@@ -104,14 +105,14 @@ STATICFILES_DIRS = (
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
-#    'django.contrib.staticfiles.finders.DefaultStorageFinder',
+    # 'django.contrib.staticfiles.finders.DefaultStorageFinder',
 )
 
 # List of callables that know how to import templates from various sources.
 TEMPLATE_LOADERS = (
     'django.template.loaders.filesystem.Loader',
     'django.template.loaders.app_directories.Loader',
-#     'django.template.loaders.eggs.Loader',
+    # 'django.template.loaders.eggs.Loader',
 )
 
 MIDDLEWARE_CLASSES = (
