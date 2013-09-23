@@ -7,4 +7,4 @@ install:
   - pip install -q Django==$DJANGO --use-mirrors
   - pip install pep8 --use-mirrors
 before_script:
-  - "pep8"
+  - "pep8 paws south timeslots"
