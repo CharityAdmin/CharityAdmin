@@ -5,5 +5,3 @@ env:
   - DJANGO=1.5.4
 install:
   - pip install -q Django==$DJANGO --use-mirrors
-script:
-  - python setup.py test
