@@ -37,6 +37,15 @@ except ImportError:
     generate_secret_key(os.path.join(SETTINGS_DIR, 'secret_key.py'))
     from secret_key import *
 
+# Add the "vendor" project sub-directory to the sys.path, to allow storing 3rd party apps in a separate directory
+import os
+import sys
+
+PROJECT_ROOT = os.path.dirname(__file__)
+VENDOR_PATH = os.path.join(PROJECT_ROOT, 'vendor')
+if VENDOR_PATH not in sys.path:
+    sys.path.insert(0, VENDOR_PATH)
+
 # Hosts/domain names that are valid for this site; required if DEBUG is False
 # See https://docs.djangoproject.com/en/1.5/ref/settings/#allowed-hosts
 ALLOWED_HOSTS = []
