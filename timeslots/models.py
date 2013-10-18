@@ -24,7 +24,7 @@ from django.contrib.auth.models import User
 #         return (self.user.first_name || self.user.last_name) ? self.user.first_name + " " + self.user.last_name : self.user.email
 
 class Volunteer(models.Model):
-    user = models.OneToOneField(User)
+    user = models.OneToOneField(User, db_column='userId')
     trained = models.BooleanField(default=False)
     clients = models.ManyToManyField('Client', related_name='volunteers')
 
@@ -32,7 +32,7 @@ class Volunteer(models.Model):
         return self.user.first_name + " " + self.user.last_name if (self.user.first_name or self.user.last_name) else self.user.email
 
 class Client(models.Model):
-    user = models.OneToOneField(User)
+    user = models.OneToOneField(User, db_column='userId')
 
     def __unicode__(self):
         return self.user.first_name + " " + self.user.last_name if (self.user.first_name or self.user.last_name) else self.user.email
