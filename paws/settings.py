@@ -9,8 +9,12 @@ ADMINS = (
 
 MANAGERS = ADMINS
 
-DATABASES = {
-    'default': {
+ACTIVE_DB = ''
+try:
+    from db_creds import PRODDB
+    ACTIVE_DB = PRODDB
+except ImportError:
+    ACTIVE_DB = {
         'ENGINE': 'django.db.backends.sqlite3',  # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
         'NAME': 'paws/paws.db',                      # Or path to database file if using sqlite3.
         # The following settings are not used with sqlite3:
@@ -19,6 +23,10 @@ DATABASES = {
         'HOST': '',                      # Empty for localhost through domain sockets or '127.0.0.1' for localhost through TCP.
         'PORT': '',                      # Set to empty string for default.
     }
+
+
+DATABASES = {
+    'default': ACTIVE_DB
 }
 
 # Try to import the secret_key from a secret_key.py file (not included in the git repo).
