@@ -38,7 +38,7 @@ class Client(models.Model):
         return self.user.first_name + " " + self.user.last_name if (self.user.first_name or self.user.last_name) else self.user.email
 
 class ClientOpening(models.Model):
-    clientId = models.IntegerField()
+    client = models.ForeignKey(Client, db_column='clientId')
     startDate = models.DateTimeField('Start Date')
     endDate = models.DateTimeField('End Date')
     type = models.CharField(max_length=20)
@@ -66,7 +66,7 @@ class ClientOpeningException(models.Model):
 
 class VolunteerCommitment(models.Model):
     clientOpening = models.ForeignKey(ClientOpening, db_column='clientOpeningId')
-    volunteerId = models.IntegerField()
+    volunteer = models.ForeignKey(Volunteer, db_column='volunteerId')
     startDate = models.DateTimeField('Start Date')
     endDate = models.DateTimeField('End Date')
     type = models.CharField(max_length=20)
@@ -81,7 +81,7 @@ class VolunteerCommitmentMetadata(models.Model):
     metadata = models.CharField(max_length=20)
 
     def __unicode__(self):
-        return "Client opening %s, %s " % (self.clientOpening, self.metadata)
+        return "Volunteer Commitment %s, %s " % (self.volunteerCommitment, self.metadata)
 
 
 class ClientCommitmentException(models.Model):
@@ -89,7 +89,7 @@ class ClientCommitmentException(models.Model):
     date = models.DateTimeField('Exception Date')
 
     def __unicode__(self):
-        return "Client opening %s, %s " % (self.clientOpening, self.date)
+        return "Volunteer Commitment %s, %s " % (self.volunteerCommitment, self.date)
 
 
 
