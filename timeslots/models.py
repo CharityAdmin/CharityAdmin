@@ -1,27 +1,16 @@
+from datetime import datetime
 from django.db import models
 from django.contrib.auth.models import User
 
-# class Profile(models.Model):
-#     TYPE_CHOICES = (
-#         ('Admin', 'Admin'),
-#         ('Volunteer', 'Volunteer'),
-#         ('Client', 'Client'),
-#     )
+SCHEDULE_PATTERN_TYPE_CHOICES = (
+    ('One-Off', 'One-Off'),
+    ('Days of Week', 'Days of Week'),
+    ('Days of Alternating Week', 'Days of Alternating Week'),
+    ('Days of Month', 'Days of Month'),
+)
 
-#     user = models.OneToOneField(User)
-#     type = models.CharField(max_length=9, choices=TYPE_CHOICES, default='Volunteer')
-
-# class Volunteer(Profile):
-#     trained = models.Boolean(default=False)
-#     clients = models.ManyToManyField('Client', related_name='volunteers')
-
-#     def __unicode__(self):
-#         return (self.user.first_name || self.user.last_name) ? self.user.first_name + " " + self.user.last_name : self.user.email
-
-# class Client(Profile):
-
-#     def __unicode__(self):
-#         return (self.user.first_name || self.user.last_name) ? self.user.first_name + " " + self.user.last_name : self.user.email
+dateformat = '{d:%b %d, %Y}'
+datetimeformat = '{d:%b %d, %Y} ({d.hour}:{d.minute:02} {d:%p})'
 
 class Volunteer(models.Model):
     user = models.OneToOneField(User, db_column='userId')
@@ -39,21 +28,20 @@ class Client(models.Model):
 
 class ClientOpening(models.Model):
     client = models.ForeignKey(Client, db_column='clientId')
-    startDate = models.DateTimeField('Start Date')
-    endDate = models.DateTimeField('End Date')
-    type = models.CharField(max_length=20)
-    notes = models.CharField(max_length=255)
+    startDate = models.DateTimeField('Start Date', default=datetime.now)
+    endDate = models.DateTimeField('End Date', blank=True, null=True)
+    type = models.CharField(max_length=20, choices=SCHEDULE_PATTERN_TYPE_CHOICES, default='Days of Week')
+    notes = models.CharField(max_length=255, blank=True)
 
     def __unicode__(self):
-        return "Client %d, Type %s, Start: %s" % (self.clientId, self.type, self.startDate)
-
+        return "%s, %s: %s (%s-%s)" % (self.client, self.type, self.clientopeningmetadata_set.all()[0].metadata, dateformat.format(d=self.startDate), dateformat.format(d=self.endDate) if self.endDate is not None else "")
 
 class ClientOpeningMetadata(models.Model):
     clientOpening = models.ForeignKey(ClientOpening, db_column='clientOpeningId')
     metadata = models.CharField(max_length=20)
 
     def __unicode__(self):
-        return "Client opening %s, %s " % (self.clientOpening, self.metadata)
+        return "%s, %s: %s" % (self.clientOpening.client, self.clientOpening.type, self.metadata)
 
 
 class ClientOpeningException(models.Model):
@@ -61,19 +49,19 @@ class ClientOpeningException(models.Model):
     date = models.DateTimeField('Exception Date')
 
     def __unicode__(self):
-        return "Client opening %s, %s " % (self.clientOpening, self.date)
+        return "On %s, client exception to %s" % (datetimeformat.format(d=self.date), self.clientOpening)
 
 
 class VolunteerCommitment(models.Model):
     clientOpening = models.ForeignKey(ClientOpening, db_column='clientOpeningId')
     volunteer = models.ForeignKey(Volunteer, db_column='volunteerId')
-    startDate = models.DateTimeField('Start Date')
-    endDate = models.DateTimeField('End Date')
-    type = models.CharField(max_length=20)
-    notes = models.CharField(max_length=255)
+    startDate = models.DateTimeField('Start Date', default=datetime.now)
+    endDate = models.DateTimeField('End Date', blank=True, null=True)
+    type = models.CharField(max_length=20, choices=SCHEDULE_PATTERN_TYPE_CHOICES, default='Days of Week')
+    notes = models.CharField(max_length=255, blank=True)
 
     def __unicode__(self):
-        return "Volunteer %d, Type %s, Start: %s" % (self.volunteerId, self.type, self.startDate)
+        return "%s visits %s, %s: %s (%s-%s)" % (self.volunteer, self.clientOpening.client, self.type, self.volunteercommitmentmetadata_set.all()[0].metadata, dateformat.format(d=self.startDate), dateformat.format(d=self.endDate) if self.endDate is not None else "")
 
 
 class VolunteerCommitmentMetadata(models.Model):
@@ -81,15 +69,15 @@ class VolunteerCommitmentMetadata(models.Model):
     metadata = models.CharField(max_length=20)
 
     def __unicode__(self):
-        return "Volunteer Commitment %s, %s " % (self.volunteerCommitment, self.metadata)
+        return "%s visits %s, %s: %s" % (self.volunteerCommitment.volunteer, self.volunteerCommitment.clientOpening.client, self.volunteerCommitment.clientOpening.type, self.metadata)
 
 
-class ClientCommitmentException(models.Model):
+class VolunteerCommitmentException(models.Model):
     volunteerCommitment = models.ForeignKey(VolunteerCommitment, db_column='volunteerCommitmentId')
     date = models.DateTimeField('Exception Date')
 
     def __unicode__(self):
-        return "Volunteer Commitment %s, %s " % (self.volunteerCommitment, self.date)
+        return "On %s, volunteer exception to %s " % (datetimeformat.format(d=self.date), self.volunteerCommitment)
 
 
 
