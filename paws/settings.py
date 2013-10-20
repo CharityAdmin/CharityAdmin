@@ -11,8 +11,7 @@ MANAGERS = ADMINS
 
 ACTIVE_DB = ''
 try:
-    from db_creds import PRODDB
-    ACTIVE_DB = PRODDB
+    from settings_local import *
 except ImportError:
     ACTIVE_DB = {
         'ENGINE': 'django.db.backends.sqlite3',  # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
@@ -24,6 +23,7 @@ except ImportError:
         'PORT': '',                      # Set to empty string for default.
     }
 
+    DEBUG = True
 
 DATABASES = {
     'default': ACTIVE_DB
