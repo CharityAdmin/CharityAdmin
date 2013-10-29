@@ -37,6 +37,7 @@ DATABASES = {
 # Try to import the secret_key from a secret_key.py file (not included in the git repo).
 # If this can't be found, create a new one and fill it as appropriate (with a new random secret key).
 
+
 def generate_secret_key(filepath):
     from django.utils.crypto import get_random_string
     chars = 'abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*(-_=+)'
@@ -50,6 +51,7 @@ except ImportError:
     SETTINGS_DIR = os.path.abspath(os.path.dirname(__file__))
     generate_secret_key(os.path.join(SETTINGS_DIR, 'secret_key.py'))
     from secret_key import *
+
 
 # Add the "vendor" project sub-directory to the sys.path, to allow storing 3rd party apps in a separate directory
 import os

@@ -5,7 +5,8 @@ import timeslots
 from django.contrib import admin
 admin.autodiscover()
 
-urlpatterns = patterns('',
+urlpatterns = patterns(
+    '',
     # Examples:
     # url(r'^$', 'paws.views.home', name='home'),
     # url(r'^paws/', include('paws.foo.urls')),
