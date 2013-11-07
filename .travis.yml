@@ -6,5 +6,5 @@ env:
 install:
   - pip install -q Django==$DJANGO --use-mirrors
   - pip install pep8 --use-mirrors
-before_script:
+script:
   - "pep8 paws timeslots --ignore=E121,E122,E123,E124,E126,E127,E128,E201,E202,E231,E251,E261,E262,W291,E292,W292,W293,E301,E302,E303,W391,E501,E502,E701,E703,E711,E712"
