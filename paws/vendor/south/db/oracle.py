@@ -6,7 +6,6 @@ import re
 import warnings
 import cx_Oracle
 
-
 from django.db import connection, models
 from django.db.backends.util import truncate_name
 from django.core.management.color import no_style
@@ -17,30 +16,31 @@ from django.db.utils import DatabaseError
 # method of DatabaseOperations class. To make code backward-compatible we
 # need to handle both situations.
 try:
-    from django.db.backends.oracle.base import get_sequence_name\
+    from django.db.backends.oracle.base import get_sequence_name \
         as original_get_sequence_name
 except ImportError:
     original_get_sequence_name = None
 
 from south.db import generic
 
-class DatabaseOperations(generic.DatabaseOperations):    
+
+class DatabaseOperations(generic.DatabaseOperations):
     """
     Oracle implementation of database operations.    
     """
     backend_name = 'oracle'
 
-    alter_string_set_type =     'ALTER TABLE %(table_name)s MODIFY %(column)s %(type)s %(nullity)s;'
-    alter_string_set_default =  'ALTER TABLE %(table_name)s MODIFY %(column)s DEFAULT %(default)s;'
+    alter_string_set_type = 'ALTER TABLE %(table_name)s MODIFY %(column)s %(type)s %(nullity)s;'
+    alter_string_set_default = 'ALTER TABLE %(table_name)s MODIFY %(column)s DEFAULT %(default)s;'
     alter_string_update_nulls_to_default = \
-                                'UPDATE %(table_name)s SET %(column)s = %(default)s WHERE %(column)s IS NULL;'
-    add_column_string =         'ALTER TABLE %s ADD %s;'
-    delete_column_string =      'ALTER TABLE %s DROP COLUMN %s;'
-    add_constraint_string =     'ALTER TABLE %(table_name)s ADD CONSTRAINT %(constraint)s %(clause)s'
+        'UPDATE %(table_name)s SET %(column)s = %(default)s WHERE %(column)s IS NULL;'
+    add_column_string = 'ALTER TABLE %s ADD %s;'
+    delete_column_string = 'ALTER TABLE %s DROP COLUMN %s;'
+    add_constraint_string = 'ALTER TABLE %(table_name)s ADD CONSTRAINT %(constraint)s %(clause)s'
 
     allows_combined_alters = False
     has_booleans = False
-    
+
     constraints_dict = {
         'P': 'PRIMARY KEY',
         'U': 'UNIQUE',
@@ -59,15 +59,17 @@ class DatabaseOperations(generic.DatabaseOperations):
     #      e.g. "CHECK MATE" varchar(10) DEFAULT 'NULL'
     def adj_column_sql(self, col):
         # Syntax fixes -- Oracle is picky about clause order
-        col = re.sub('(?P<constr>CHECK \(.*\))(?P<any>.*)(?P<default>DEFAULT \d+)', 
-                     lambda mo: '%s %s%s'%(mo.group('default'), mo.group('constr'), mo.group('any')), col) #syntax fix for boolean/integer field only
+        col = re.sub('(?P<constr>CHECK \(.*\))(?P<any>.*)(?P<default>DEFAULT \d+)',
+                     lambda mo: '%s %s%s' % (mo.group('default'), mo.group('constr'), mo.group('any')),
+                     col) #syntax fix for boolean/integer field only
         col = re.sub('(?P<not_null>(NOT )?NULL) (?P<misc>(.* )?)(?P<default>DEFAULT.+)',
-                     lambda mo: '%s %s %s'%(mo.group('default'),mo.group('not_null'),mo.group('misc') or ''), col) #fix order of NULL/NOT NULL and DEFAULT
+                     lambda mo: '%s %s %s' % (mo.group('default'), mo.group('not_null'), mo.group('misc') or ''),
+                     col) #fix order of NULL/NOT NULL and DEFAULT
         return col
 
     def check_meta(self, table_name):
-        return table_name in [ m._meta.db_table for m in models.get_models() ] #caching provided by Django
-    
+        return table_name in [m._meta.db_table for m in models.get_models()] #caching provided by Django
+
     def normalize_name(self, name):
         """
         Get the properly shortened and uppercased identifier as returned by quote_name(), but without the actual quotes.
@@ -78,19 +80,17 @@ class DatabaseOperations(generic.DatabaseOperations):
         return nn
 
     @generic.invalidate_table_constraints
-    def create_table(self, table_name, fields): 
+    def create_table(self, table_name, fields):
         qn = self.quote_name(table_name)
         columns = []
         autoinc_sql = ''
 
-
         for field_name, field in fields:
-            
+
             field = self._field_sanity(field)
 
             # avoid default values in CREATE TABLE statements (#925)
             field._suppress_default = True
-
 
             col = self.column_sql(table_name, field_name, field)
             if not col:
@@ -116,7 +116,7 @@ class DatabaseOperations(generic.DatabaseOperations):
             self.execute('DROP TABLE %s CASCADE CONSTRAINTS;' % qn)
         else:
             self.execute('DROP TABLE %s;' % qn)
-        
+
         # If the table has an AutoField a sequence was created.
         sequence_sql = """
 DECLARE
@@ -133,7 +133,7 @@ END;
 
     @generic.invalidate_table_constraints
     def alter_column(self, table_name, name, field, explicit_name=True):
-        
+
         if self.dry_run:
             if self.debug:
                 print('   - no dry run output for alter_column() due to dynamic DDL, sorry')
@@ -156,7 +156,7 @@ END;
         # This will actually also add any CHECK constraints needed,
         # since e.g. 'type' for a BooleanField is 'NUMBER(1) CHECK (%(qn_column)s IN (0,1))'
         params = {
-            'table_name':qn,
+            'table_name': qn,
             'column': qn_col,
             'type': self._db_type_for_alter_column(field),
             'nullity': 'NOT NULL',
@@ -179,8 +179,9 @@ END;
                 p = params.copy()
                 p.update(kw)
                 return p
+
             sql_templates[:0] = [
-                (self.alter_string_set_type, change_params(nullity='NULL'),[]),
+                (self.alter_string_set_type, change_params(nullity='NULL'), []),
                 (self.alter_string_update_nulls_to_default, change_params(default="%s"), [field.get_default()]),
             ]
 
@@ -238,7 +239,7 @@ END;
     def _generate_temp_name(self, for_name):
         suffix = hex(hash(for_name)).upper()[1:]
         return self.normalize_name(for_name + "_" + suffix)
-    
+
     @generic.copy_column_constraints #TODO: Appears to be nulled by the delete decorator below...
     @generic.delete_column_constraints
     def rename_column(self, table_name, old, new):
@@ -292,22 +293,23 @@ END;
         """
         if isinstance(field, models.BooleanField) and field.has_default():
             field.default = int(field.to_python(field.get_default()))
-        # On Oracle, empty strings are null
+            # On Oracle, empty strings are null
         if isinstance(field, (models.CharField, models.TextField)):
             field.null = field.empty_strings_allowed
         return field
 
 
     def _default_value_workaround(self, value):
-        from datetime import date,time,datetime
-        if isinstance(value, (date,time,datetime)):
+        from datetime import date, time, datetime
+
+        if isinstance(value, (date, time, datetime)):
             return "'%s'" % value
         else:
             return super(DatabaseOperations, self)._default_value_workaround(value)
 
     def _fill_constraint_cache(self, db_name, table_name):
-        self._constraint_cache.setdefault(db_name, {}) 
-        self._constraint_cache[db_name][table_name] = {} 
+        self._constraint_cache.setdefault(db_name, {})
+        self._constraint_cache[db_name][table_name] = {}
 
         rows = self.execute("""
             SELECT user_cons_columns.constraint_name,

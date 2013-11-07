@@ -6,24 +6,26 @@ from south.db import generic
 from south.db.generic import delete_column_constraints, invalidate_table_constraints, copy_column_constraints
 from south.exceptions import ConstraintDropped
 from south.utils.py3 import string_types
+
 try:
     from django.utils.encoding import smart_text                    # Django >= 1.5
 except ImportError:
     from django.utils.encoding import smart_unicode as smart_text   # Django < 1.5
 from django.core.management.color import no_style
 
+
 class DatabaseOperations(generic.DatabaseOperations):
     """
     django-pyodbc (sql_server.pyodbc) implementation of database operations.
     """
-    
+
     backend_name = "pyodbc"
-    
+
     add_column_string = 'ALTER TABLE %s ADD %s;'
     alter_string_set_type = 'ALTER COLUMN %(column)s %(type)s'
     alter_string_set_null = 'ALTER COLUMN %(column)s %(type)s NULL'
     alter_string_drop_null = 'ALTER COLUMN %(column)s %(type)s NOT NULL'
-    
+
     allows_combined_alters = False
 
     drop_index_string = 'DROP INDEX %(index_name)s ON %(table_name)s'
@@ -35,10 +37,9 @@ class DatabaseOperations(generic.DatabaseOperations):
     create_foreign_key_sql = "ALTER TABLE %(table)s ADD CONSTRAINT %(constraint)s " + \
                              "FOREIGN KEY (%(column)s) REFERENCES %(target)s"
     create_unique_sql = "ALTER TABLE %(table)s ADD CONSTRAINT %(constraint)s UNIQUE (%(columns)s)"
-    
-    
+
     default_schema_name = "dbo"
-    
+
     has_booleans = False
 
 
@@ -47,14 +48,14 @@ class DatabaseOperations(generic.DatabaseOperations):
         q_table_name, q_name = (self.quote_name(table_name), self.quote_name(name))
 
         # Zap the constraints
-        for const in self._find_constraints_for_column(table_name,name):
-            params = {'table_name':q_table_name, 'constraint_name': const}
+        for const in self._find_constraints_for_column(table_name, name):
+            params = {'table_name': q_table_name, 'constraint_name': const}
             sql = self.drop_constraint_string % params
             self.execute(sql, [])
 
         # Zap the indexes
-        for ind in self._find_indexes_for_column(table_name,name):
-            params = {'table_name':q_table_name, 'index_name': ind}
+        for ind in self._find_indexes_for_column(table_name, name):
+            params = {'table_name': q_table_name, 'index_name': ind}
             sql = self.drop_index_string % params
             self.execute(sql, [])
 
@@ -133,15 +134,15 @@ class DatabaseOperations(generic.DatabaseOperations):
         db_name = self._get_setting('name')
         schema_name = self._get_schema_name()
         table = self.execute(sql, [db_name, schema_name, table_name, name])
-        
+
         if just_names:
             return [r[0] for r in table]
-        
+
         all = {}
         for r in table:
             cons_name, type = r[:2]
-            if type=='PRIMARY KEY' or type=='UNIQUE':
-                cons = all.setdefault(cons_name, (type,[]))
+            if type == 'PRIMARY KEY' or type == 'UNIQUE':
+                cons = all.setdefault(cons_name, (type, []))
                 sql = '''
                 SELECT COLUMN_NAME
                 FROM INFORMATION_SCHEMA.CONSTRAINT_COLUMN_USAGE RFD
@@ -152,19 +153,19 @@ class DatabaseOperations(generic.DatabaseOperations):
                 '''
                 columns = self.execute(sql, [db_name, schema_name, table_name, cons_name])
                 cons[1].extend(col for col, in columns)
-            elif type=='CHECK':
+            elif type == 'CHECK':
                 cons = (type, r[2])
-            elif type=='FOREIGN KEY':
+            elif type == 'FOREIGN KEY':
                 if cons_name in all:
                     raise NotImplementedError("Multiple-column foreign keys are not supported")
                 else:
                     cons = (type, r[3:6])
             else:
-                raise NotImplementedError("Don't know how to handle constraints of type "+ type)
+                raise NotImplementedError("Don't know how to handle constraints of type " + type)
             all[cons_name] = cons
         return all
 
-    @invalidate_table_constraints        
+    @invalidate_table_constraints
     def alter_column(self, table_name, name, field, explicit_name=True, ignore_constraints=False):
         """
         Alters the given column name so it will match the given field.
@@ -190,40 +191,41 @@ class DatabaseOperations(generic.DatabaseOperations):
                 pass
             constraints = self._find_constraints_for_column(table_name, name, False)
             for constraint in constraints.keys():
-                params = dict(table_name = table,
-                              constraint_name = qn(constraint))
+                params = dict(table_name=table,
+                              constraint_name=qn(constraint))
                 sql = self.drop_constraint_string % params
                 self.execute(sql, [])
-                
-        ret_val = super(DatabaseOperations, self).alter_column(table_name, name, field, explicit_name, ignore_constraints=True)
-        
+
+        ret_val = super(DatabaseOperations, self).alter_column(table_name, name, field, explicit_name,
+                                                               ignore_constraints=True)
+
         if not ignore_constraints:
-            for cname, (ctype,args) in constraints.items():
-                params = dict(table = table,
-                              constraint = qn(cname))
-                if ctype=='UNIQUE':
-                    params['columns'] = ", ".join(map(qn,args))
+            for cname, (ctype, args) in constraints.items():
+                params = dict(table=table,
+                              constraint=qn(cname))
+                if ctype == 'UNIQUE':
+                    params['columns'] = ", ".join(map(qn, args))
                     sql = self.create_unique_sql % params
-                elif ctype=='PRIMARY KEY':
-                    params['columns'] = ", ".join(map(qn,args))
+                elif ctype == 'PRIMARY KEY':
+                    params['columns'] = ", ".join(map(qn, args))
                     sql = self.create_primary_key_string % params
-                elif ctype=='FOREIGN KEY':
+                elif ctype == 'FOREIGN KEY':
                     continue
                     # Foreign keys taken care of below 
                     #target = "%s.%s(%s)" % tuple(map(qn,args))
                     #params.update(column = qn(name), target = target)
                     #sql = self.create_foreign_key_sql % params
-                elif ctype=='CHECK':
-                    warn(ConstraintDropped("CHECK "+ args, table_name, name))
+                elif ctype == 'CHECK':
+                    warn(ConstraintDropped("CHECK " + args, table_name, name))
                     continue
                     #TODO: Some check constraints should be restored; but not before the generic
                     #      backend restores them.
                     #params['check'] = args
                     #sql = self.create_check_constraint_sql % params
                 else:
-                    raise NotImplementedError("Don't know how to handle constraints of type "+ type)                    
+                    raise NotImplementedError("Don't know how to handle constraints of type " + type)
                 self.execute(sql, [])
-            # Create foreign key if necessary
+                # Create foreign key if necessary
             if field.rel and self.supports_foreign_keys:
                 self.execute(
                     self.foreign_key_sql(
@@ -237,10 +239,9 @@ class DatabaseOperations(generic.DatabaseOperations):
                 for stmt in self._get_connection().creation.sql_indexes_for_field(model, field, no_style()):
                     self.execute(stmt)
 
-
         return ret_val
-    
-    def _alter_set_defaults(self, field, name, params, sqls): 
+
+    def _alter_set_defaults(self, field, name, params, sqls):
         "Subcommand of alter_column that sets default values (overrideable)"
         # Historically, we used to set defaults here.
         # But since South 0.8, we don't ever set defaults on alter-column -- we only
@@ -250,7 +251,7 @@ class DatabaseOperations(generic.DatabaseOperations):
         drop_default = self.drop_column_default_sql(table_name, name)
         if drop_default:
             sqls.append((drop_default, []))
-            
+
     def _value_to_unquoted_literal(self, field, value):
         # Start with the field's own translation
         conn = self._get_connection()
@@ -258,20 +259,21 @@ class DatabaseOperations(generic.DatabaseOperations):
         # This is still a Python object -- nobody expects to need a literal.
         if isinstance(value, string_types):
             return smart_text(value)
-        elif isinstance(value, (date,time,datetime)):
+        elif isinstance(value, (date, time, datetime)):
             return value.isoformat()
         else:
             #TODO: Anybody else needs special translations?
-            return str(value) 
+            return str(value)
+
     def _default_value_workaround(self, value):
-        if isinstance(value, (date,time,datetime)):
+        if isinstance(value, (date, time, datetime)):
             return value.isoformat()
         else:
             return super(DatabaseOperations, self)._default_value_workaround(value)
-        
+
     def _quote_string(self, s):
-        return "'" + s.replace("'","''") + "'"
-    
+        return "'" + s.replace("'", "''") + "'"
+
 
     def drop_column_default_sql(self, table_name, name, q_name=None):
         "MSSQL specific drop default, which is a pain"
@@ -330,7 +332,7 @@ class DatabaseOperations(generic.DatabaseOperations):
         if fragment:
             table_name = self.quote_name(table_name)
             sql = " ".join(["ALTER TABLE", table_name, fragment])
-            self.execute(sql)        
+            self.execute(sql)
 
 
     @invalidate_table_constraints
@@ -369,7 +371,7 @@ class DatabaseOperations(generic.DatabaseOperations):
         db_name = self._get_setting('name')
         schema_name = self._get_schema_name()
         return self.execute(sql, [db_name, schema_name, table_name])
-                
+
     @invalidate_table_constraints
     def delete_table(self, table_name, cascade=True):
         """
@@ -378,14 +380,14 @@ class DatabaseOperations(generic.DatabaseOperations):
         if cascade:
             refing = self._find_referencing_fks(table_name)
             for schmea, table, constraint in refing:
-                table = ".".join(map (self.quote_name, [schmea, table]))
-                params = dict(table_name = table,
-                              constraint_name = self.quote_name(constraint))
+                table = ".".join(map(self.quote_name, [schmea, table]))
+                params = dict(table_name=table,
+                              constraint_name=self.quote_name(constraint))
                 sql = self.drop_constraint_string % params
                 self.execute(sql, [])
             cascade = False
         super(DatabaseOperations, self).delete_table(table_name, cascade)
-            
+
     @copy_column_constraints
     @delete_column_constraints
     def rename_column(self, table_name, old, new):
@@ -396,7 +398,7 @@ class DatabaseOperations(generic.DatabaseOperations):
         if old == new:
             # No Operation
             return
-        # Examples on the MS site show the table name not being quoted...
+            # Examples on the MS site show the table name not being quoted...
         params = (table_name, self.quote_name(old), self.quote_name(new))
         self.execute("EXEC sp_rename '%s.%s', %s, 'COLUMN'" % params)
 
@@ -412,7 +414,7 @@ class DatabaseOperations(generic.DatabaseOperations):
         params = (self.quote_name(old_table_name), self.quote_name(table_name))
         self.execute('EXEC sp_rename %s, %s' % params)
 
-    def _db_type_for_alter_column(self, field): 
+    def _db_type_for_alter_column(self, field):
         return self._db_positive_type_for_alter_column(DatabaseOperations, field)
 
     def _alter_add_column_mods(self, field, name, params, sqls):

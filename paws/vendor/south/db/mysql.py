@@ -12,13 +12,14 @@ def delete_column_constraints(func):
     Decorates column operation functions for MySQL.
     Deletes the constraints from the database and clears local cache.
     """
+
     def _column_rm(self, table_name, column_name, *args, **opts):
         # Delete foreign key constraints
         try:
             self.delete_foreign_key(table_name, column_name)
         except ValueError:
             pass  # If no foreign key on column, OK because it checks first
-        # Delete constraints referring to this column
+            # Delete constraints referring to this column
         try:
             reverse = self._lookup_reverse_constraint(table_name, column_name)
             for cname, rtable, rcolumn in reverse:
@@ -26,6 +27,7 @@ def delete_column_constraints(func):
         except DryRunError:
             pass
         return func(self, table_name, column_name, *args, **opts)
+
     return _column_rm
 
 
@@ -34,6 +36,7 @@ def copy_column_constraints(func):
     Decorates column operation functions for MySQL.
     Determines existing constraints and copies them to a new column
     """
+
     def _column_cp(self, table_name, column_old, column_new, *args, **opts):
         # Copy foreign key constraint
         try:
@@ -41,23 +44,24 @@ def copy_column_constraints(func):
             (ftable, fcolumn) = self._lookup_constraint_references(table_name, constraint)
             if ftable and fcolumn:
                 fk_sql = self.foreign_key_sql(
-                            table_name, column_new, ftable, fcolumn)
+                    table_name, column_new, ftable, fcolumn)
                 get_logger().debug("Foreign key SQL: " + fk_sql)
                 self.add_deferred_sql(fk_sql)
         except IndexError:
             pass  # No constraint exists so ignore
         except DryRunError:
             pass
-        # Copy constraints referring to this column
+            # Copy constraints referring to this column
         try:
             reverse = self._lookup_reverse_constraint(table_name, column_old)
             for cname, rtable, rcolumn in reverse:
                 fk_sql = self.foreign_key_sql(
-                        rtable, rcolumn, table_name, column_new)
+                    rtable, rcolumn, table_name, column_new)
                 self.add_deferred_sql(fk_sql)
         except DryRunError:
             pass
         return func(self, table_name, column_old, column_new, *args, **opts)
+
     return _column_cp
 
 
@@ -67,6 +71,7 @@ def invalidate_table_constraints(func):
     effective.
     It further solves the issues of invalidating referred table constraints.
     """
+
     def _cache_clear(self, table, *args, **opts):
         db_name = self._get_setting('NAME')
         if db_name in self._constraint_cache:
@@ -76,6 +81,7 @@ def invalidate_table_constraints(func):
         if db_name in self._constraint_references:
             del self._constraint_references[db_name]
         return func(self, table, *args, **opts)
+
     return _cache_clear
 
 
@@ -158,19 +164,19 @@ class DatabaseOperations(generic.DatabaseOperations):
                 self._constraint_cache[db_name][table].setdefault(column, set())
                 if kind == 'FOREIGN KEY':
                     self._constraint_cache[db_name][table][column].add((kind,
-                        constraint))
+                                                                        constraint))
                     # Create constraint lookup, see constraint_references
                     self._constraint_references[db_name][(table,
-                        constraint)] = (ref_table, ref_column)
+                                                          constraint)] = (ref_table, ref_column)
                     # Create reverse table lookup, reverse_lookup
                     self._reverse_cache[db_name].setdefault(ref_table, {})
                     self._reverse_cache[db_name][ref_table].setdefault(ref_column,
-                            set())
+                                                                       set())
                     self._reverse_cache[db_name][ref_table][ref_column].add(
-                            (constraint, table, column))
+                        (constraint, table, column))
                 else:
                     self._constraint_cache[db_name][table][column].add((kind,
-                    constraint))
+                                                                        constraint))
 
     def connection_init(self):
         """
@@ -222,7 +228,7 @@ class DatabaseOperations(generic.DatabaseOperations):
     @invalidate_table_constraints
     def rename_table(self, old_table_name, table_name):
         super(DatabaseOperations, self).rename_table(old_table_name,
-                table_name)
+                                                     table_name)
 
     @invalidate_table_constraints
     def delete_table(self, table_name):

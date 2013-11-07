@@ -11,23 +11,23 @@ from django.db import connection, models
 from south.db import db
 from south.logger import close_logger
 
-class TestLogger(unittest.TestCase):
 
+class TestLogger(unittest.TestCase):
     """
     Tests if the logging is working reasonably. Some tests ignored if you don't
     have write permission to the disk.
     """
-    
+
     def setUp(self):
         db.debug = False
         self.test_path = tempfile.mkstemp(suffix=".south.log")[1]
-    
+
     def test_db_execute_logging_nofile(self):
         "Does logging degrade nicely if SOUTH_LOGGING_ON not set?"
         settings.SOUTH_LOGGING_ON = False     # this needs to be set to False
-                                              # to avoid issues where other tests
-                                              # set this to True. settings is shared
-                                              # between these tests.
+        # to avoid issues where other tests
+        # set this to True. settings is shared
+        # between these tests.
         db.create_table("test9", [('email_confirmed', models.BooleanField(default=False))])
 
     def test_db_execute_logging_off_with_basic_config(self):
@@ -60,7 +60,7 @@ class TestLogger(unittest.TestCase):
             return
         else:
             fh.close()
-        # Do an action which logs
+            # Do an action which logs
         db.create_table("test10", [('email_confirmed', models.BooleanField(default=False))])
         # Close the logged file
         close_logger()

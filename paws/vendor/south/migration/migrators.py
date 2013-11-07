@@ -30,7 +30,7 @@ class Migrator(object):
     def print_title(self, target):
         if self.verbosity:
             print(self.title(target))
-        
+
     @staticmethod
     def status(target):
         raise NotImplementedError()
@@ -64,17 +64,17 @@ class Migrator(object):
 
     def run_migration_error(self, migration, extra_info=''):
         return (
-            ' ! Error found during real run of migration! Aborting.\n'
-            '\n'
-            ' ! Since you have a database that does not support running\n'
-            ' ! schema-altering statements in transactions, we have had \n'
-            ' ! to leave it in an interim state between migrations.\n'
-            '%s\n'
-            ' ! The South developers regret this has happened, and would\n'
-            ' ! like to gently persuade you to consider a slightly\n'
-            ' ! easier-to-deal-with DBMS (one that supports DDL transactions)\n'
-            ' ! NOTE: The error which caused the migration to fail is further up.'
-        ) % extra_info
+                   ' ! Error found during real run of migration! Aborting.\n'
+                   '\n'
+                   ' ! Since you have a database that does not support running\n'
+                   ' ! schema-altering statements in transactions, we have had \n'
+                   ' ! to leave it in an interim state between migrations.\n'
+                   '%s\n'
+                   ' ! The South developers regret this has happened, and would\n'
+                   ' ! like to gently persuade you to consider a slightly\n'
+                   ' ! easier-to-deal-with DBMS (one that supports DDL transactions)\n'
+                   ' ! NOTE: The error which caused the migration to fail is further up.'
+               ) % extra_info
 
     def run_migration(self, migration, database):
         migration_function = self.direction(migration)
@@ -98,7 +98,7 @@ class Migrator(object):
             except:
                 print("Error during commit in migration: %s" % migration)
                 raise
-                
+
 
     def run(self, migration, database):
         # Get the correct ORM.
@@ -205,14 +205,13 @@ class FakeMigrator(MigratorWrapper):
 
 
 class LoadInitialDataMigrator(MigratorWrapper):
-    
     def load_initial_data(self, target, db='default'):
         if target is None or target != target.migrations[-1]:
             return
-        # Load initial data, if we ended up at target
+            # Load initial data, if we ended up at target
         if self.verbosity:
             print(" - Loading initial data for %s." % target.app_label())
-        # Override Django's get_apps call temporarily to only load from the
+            # Override Django's get_apps call temporarily to only load from the
         # current app
         old_get_apps = models.get_apps
         new_get_apps = lambda: [models.get_app(target.app_label())]
@@ -264,6 +263,7 @@ class Forwards(Migrator):
         record = MigrationHistory.for_migration(migration, database)
         try:
             from django.utils.timezone import now
+
             record.applied = now()
         except ImportError:
             record.applied = datetime.datetime.utcnow()

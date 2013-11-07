@@ -7,15 +7,15 @@ from south.creator import freezer
 from south.orm import FakeORM
 from south.v2 import SchemaMigration
 
+
 class TestComparison(unittest.TestCase):
-    
     """
     Tests the comparison methods of startmigration.
     """
-    
+
     def test_no_change(self):
         "Test with a completely unchanged definition."
-        
+
         self.assertEqual(
             AutoChanges.different_attributes(
                 ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['southdemo.Lizard']"}),
@@ -23,19 +23,21 @@ class TestComparison(unittest.TestCase):
             ),
             False,
         )
-        
+
         self.assertEqual(
             AutoChanges.different_attributes(
-                ('django.db.models.fields.related.ForeignKey', ['ohhai', 'there'], {'to': "somewhere", "from": "there"}),
-                ('django.db.models.fields.related.ForeignKey', ['ohhai', 'there'], {"from": "there", 'to': "somewhere"}),
+                (
+                'django.db.models.fields.related.ForeignKey', ['ohhai', 'there'], {'to': "somewhere", "from": "there"}),
+                (
+                'django.db.models.fields.related.ForeignKey', ['ohhai', 'there'], {"from": "there", 'to': "somewhere"}),
             ),
             False,
         )
-    
-    
+
+
     def test_pos_change(self):
         "Test with a changed positional argument."
-        
+
         self.assertEqual(
             AutoChanges.different_attributes(
                 ('django.db.models.fields.CharField', ['hi'], {'to': "foo"}),
@@ -43,7 +45,7 @@ class TestComparison(unittest.TestCase):
             ),
             True,
         )
-        
+
         self.assertEqual(
             AutoChanges.different_attributes(
                 ('django.db.models.fields.CharField', [], {'to': "foo"}),
@@ -51,7 +53,7 @@ class TestComparison(unittest.TestCase):
             ),
             True,
         )
-        
+
         self.assertEqual(
             AutoChanges.different_attributes(
                 ('django.db.models.fields.CharField', ['pi'], {'to': "foo"}),
@@ -59,7 +61,7 @@ class TestComparison(unittest.TestCase):
             ),
             False,
         )
-        
+
         self.assertEqual(
             AutoChanges.different_attributes(
                 ('django.db.models.fields.CharField', ['pisdadad'], {'to': "foo"}),
@@ -67,7 +69,7 @@ class TestComparison(unittest.TestCase):
             ),
             True,
         )
-        
+
         self.assertEqual(
             AutoChanges.different_attributes(
                 ('django.db.models.fields.CharField', ['hi'], {}),
@@ -75,7 +77,7 @@ class TestComparison(unittest.TestCase):
             ),
             True,
         )
-        
+
         self.assertEqual(
             AutoChanges.different_attributes(
                 ('django.db.models.fields.CharField', [], {}),
@@ -83,7 +85,7 @@ class TestComparison(unittest.TestCase):
             ),
             True,
         )
-        
+
         self.assertEqual(
             AutoChanges.different_attributes(
                 ('django.db.models.fields.CharField', ['pi'], {}),
@@ -91,7 +93,7 @@ class TestComparison(unittest.TestCase):
             ),
             False,
         )
-        
+
         self.assertEqual(
             AutoChanges.different_attributes(
                 ('django.db.models.fields.CharField', ['pi'], {}),
@@ -99,11 +101,11 @@ class TestComparison(unittest.TestCase):
             ),
             True,
         )
-    
-    
+
+
     def test_kwd_change(self):
         "Test a changed keyword argument"
-        
+
         self.assertEqual(
             AutoChanges.different_attributes(
                 ('django.db.models.fields.CharField', ['pi'], {'to': "foo"}),
@@ -111,7 +113,7 @@ class TestComparison(unittest.TestCase):
             ),
             True,
         )
-        
+
         self.assertEqual(
             AutoChanges.different_attributes(
                 ('django.db.models.fields.CharField', [], {'to': "foo"}),
@@ -119,7 +121,7 @@ class TestComparison(unittest.TestCase):
             ),
             True,
         )
-        
+
         self.assertEqual(
             AutoChanges.different_attributes(
                 ('django.db.models.fields.CharField', ['b'], {'to': "foo"}),
@@ -127,7 +129,7 @@ class TestComparison(unittest.TestCase):
             ),
             True,
         )
-        
+
         self.assertEqual(
             AutoChanges.different_attributes(
                 ('django.db.models.fields.CharField', [], {'to': "foo"}),
@@ -135,7 +137,7 @@ class TestComparison(unittest.TestCase):
             ),
             True,
         )
-        
+
         self.assertEqual(
             AutoChanges.different_attributes(
                 ('django.db.models.fields.CharField', ['a'], {'to': "foo"}),
@@ -143,7 +145,7 @@ class TestComparison(unittest.TestCase):
             ),
             True,
         )
-        
+
         self.assertEqual(
             AutoChanges.different_attributes(
                 ('django.db.models.fields.CharField', [], {}),
@@ -151,7 +153,7 @@ class TestComparison(unittest.TestCase):
             ),
             True,
         )
-        
+
         self.assertEqual(
             AutoChanges.different_attributes(
                 ('django.db.models.fields.CharField', ['a'], {}),
@@ -159,12 +161,11 @@ class TestComparison(unittest.TestCase):
             ),
             True,
         )
-        
-    
-    
+
+
     def test_backcompat_nochange(self):
         "Test that the backwards-compatable comparison is working"
-        
+
         self.assertEqual(
             AutoChanges.different_attributes(
                 ('models.CharField', [], {}),
@@ -172,7 +173,7 @@ class TestComparison(unittest.TestCase):
             ),
             False,
         )
-        
+
         self.assertEqual(
             AutoChanges.different_attributes(
                 ('models.CharField', ['ack'], {}),
@@ -180,65 +181,65 @@ class TestComparison(unittest.TestCase):
             ),
             False,
         )
-        
+
         self.assertEqual(
             AutoChanges.different_attributes(
-                ('models.CharField', [], {'to':'b'}),
-                ('django.db.models.fields.CharField', [], {'to':'b'}),
+                ('models.CharField', [], {'to': 'b'}),
+                ('django.db.models.fields.CharField', [], {'to': 'b'}),
             ),
             False,
         )
-        
+
         self.assertEqual(
             AutoChanges.different_attributes(
-                ('models.CharField', ['hah'], {'to':'you'}),
-                ('django.db.models.fields.CharField', ['hah'], {'to':'you'}),
+                ('models.CharField', ['hah'], {'to': 'you'}),
+                ('django.db.models.fields.CharField', ['hah'], {'to': 'you'}),
             ),
             False,
         )
-        
+
         self.assertEqual(
             AutoChanges.different_attributes(
-                ('models.CharField', ['hah'], {'to':'you'}),
-                ('django.db.models.fields.CharField', ['hah'], {'to':'heh'}),
-            ),
-            True,
-        )
-        
-        self.assertEqual(
-            AutoChanges.different_attributes(
-                ('models.CharField', ['hah'], {}),
-                ('django.db.models.fields.CharField', [], {'to':"orm['appname.hah']"}),
-            ),
-            False,
-        )
-        
-        self.assertEqual(
-            AutoChanges.different_attributes(
-                ('models.CharField', ['hah'], {}),
-                ('django.db.models.fields.CharField', [], {'to':'hah'}),
-            ),
-            True,
-        )
-        
-        self.assertEqual(
-            AutoChanges.different_attributes(
-                ('models.CharField', ['hah'], {}),
-                ('django.db.models.fields.CharField', [], {'to':'rrr'}),
-            ),
-            True,
-        )
-        
-        self.assertEqual(
-            AutoChanges.different_attributes(
-                ('models.CharField', ['hah'], {}),
-                ('django.db.models.fields.IntField', [], {'to':'hah'}),
+                ('models.CharField', ['hah'], {'to': 'you'}),
+                ('django.db.models.fields.CharField', ['hah'], {'to': 'heh'}),
             ),
             True,
         )
 
+        self.assertEqual(
+            AutoChanges.different_attributes(
+                ('models.CharField', ['hah'], {}),
+                ('django.db.models.fields.CharField', [], {'to': "orm['appname.hah']"}),
+            ),
+            False,
+        )
+
+        self.assertEqual(
+            AutoChanges.different_attributes(
+                ('models.CharField', ['hah'], {}),
+                ('django.db.models.fields.CharField', [], {'to': 'hah'}),
+            ),
+            True,
+        )
+
+        self.assertEqual(
+            AutoChanges.different_attributes(
+                ('models.CharField', ['hah'], {}),
+                ('django.db.models.fields.CharField', [], {'to': 'rrr'}),
+            ),
+            True,
+        )
+
+        self.assertEqual(
+            AutoChanges.different_attributes(
+                ('models.CharField', ['hah'], {}),
+                ('django.db.models.fields.IntField', [], {'to': 'hah'}),
+            ),
+            True,
+        )
+
+
 class TestNonManagedIgnored(Monkeypatcher):
-    
     installed_apps = ["non_managed"]
 
     full_defs = {
@@ -248,10 +249,10 @@ class TestNonManagedIgnored(Monkeypatcher):
             'name': ('django.db.models.fields.CharField', [], {'max_length': '10', 'null': 'True'}),
             'size': ('django.db.models.fields.IntegerField', [], {})
         }
-    } 
+    }
 
     def test_not_added_init(self):
-        
+
         migrations = Migrations("non_managed")
         changes = InitialChanges(migrations)
         change_list = changes.get_changes()
@@ -260,27 +261,28 @@ class TestNonManagedIgnored(Monkeypatcher):
 
     def test_not_added_auto(self):
 
-        empty_defs = { }
+        empty_defs = {}
+
         class EmptyMigration(SchemaMigration):
             "Serves as fake previous migration"
-        
+
             def forwards(self, orm):
                 pass
-        
+
             def backwards(self, orm):
                 pass
-        
+
             models = empty_defs
 
             complete_apps = ['non_managed']
-                    
+
         migrations = Migrations("non_managed")
         empty_orm = FakeORM(EmptyMigration, "non_managed")
         changes = AutoChanges(
-            migrations = migrations,
-            old_defs = empty_defs,
-            old_orm = empty_orm,
-            new_defs = self.full_defs,
+            migrations=migrations,
+            old_defs=empty_defs,
+            old_orm=empty_orm,
+            new_defs=self.full_defs,
         )
         change_list = changes.get_changes()
         if list(change_list):
@@ -288,28 +290,29 @@ class TestNonManagedIgnored(Monkeypatcher):
 
     def test_not_deleted_auto(self):
 
-        empty_defs = { }
+        empty_defs = {}
         old_defs = freezer.freeze_apps(["non_managed"])
+
         class InitialMigration(SchemaMigration):
             "Serves as fake previous migration"
-        
+
             def forwards(self, orm):
                 pass
-        
+
             def backwards(self, orm):
                 pass
-        
+
             models = self.full_defs
 
             complete_apps = ['non_managed']
-                    
+
         migrations = Migrations("non_managed")
         initial_orm = FakeORM(InitialMigration, "non_managed")
         changes = AutoChanges(
-            migrations = migrations,
-            old_defs = self.full_defs,
-            old_orm = initial_orm,
-            new_defs = empty_defs,
+            migrations=migrations,
+            old_defs=self.full_defs,
+            old_orm=initial_orm,
+            new_defs=empty_defs,
         )
         change_list = changes.get_changes()
         if list(change_list):
@@ -324,29 +327,30 @@ class TestNonManagedIgnored(Monkeypatcher):
                 'name': ('django.db.models.fields.CharField', [], {'max_length': '10', 'null': 'True'}),
                 #'size': ('django.db.models.fields.IntegerField', [], {}) # The "change" is the addition of this field
             }
-        } 
+        }
+
         class InitialMigration(SchemaMigration):
             "Serves as fake previous migration"
-        
+
             def forwards(self, orm):
                 pass
-        
+
             def backwards(self, orm):
                 pass
-        
+
             models = fake_defs
 
             complete_apps = ['non_managed']
-                    
+
         from non_managed import models as dummy_import_to_force_loading_models # TODO: Does needing this indicate a bug in MokeyPatcher? 
-        
+
         migrations = Migrations("non_managed")
         initial_orm = FakeORM(InitialMigration, "non_managed")
         changes = AutoChanges(
-            migrations = migrations,
-            old_defs = fake_defs,
-            old_orm = initial_orm,
-            new_defs = self.full_defs
+            migrations=migrations,
+            old_defs=fake_defs,
+            old_orm=initial_orm,
+            new_defs=self.full_defs
         )
         change_list = changes.get_changes()
         if list(change_list):
