@@ -1,12 +1,11 @@
 from south.db import generic
 
-    
-class DatabaseOperations(generic.DatabaseOperations):
 
+class DatabaseOperations(generic.DatabaseOperations):
     """
     SQLite3 implementation of database operations.
     """
-    
+
     backend_name = "sqlite3"
 
     # SQLite ignores several constraints. I wish I could.
@@ -20,10 +19,10 @@ class DatabaseOperations(generic.DatabaseOperations):
         """
         # If it's not nullable, and has no default, raise an error (SQLite is picky)
         if (not field.null and
-           (not field.has_default() or field.get_default() is None) and
-           not field.empty_strings_allowed):
+                (not field.has_default() or field.get_default() is None) and
+                not field.empty_strings_allowed):
             raise ValueError("You cannot add a null=False column without a default value.")
-        # Initialise the field.
+            # Initialise the field.
         field.set_attributes_from_name(name)
         # We add columns by remaking the table; even though SQLite supports
         # adding columns, it doesn't support adding PRIMARY KEY or UNIQUE cols.
@@ -46,10 +45,11 @@ class DatabaseOperations(generic.DatabaseOperations):
                  'null_ok': not field[3],
                  'dflt_value': field[4],
                  'pk': field[5]     # undocumented
-                 } for field in cursor.fetchall()]
+                } for field in cursor.fetchall()]
 
     @generic.invalidate_table_constraints
-    def _remake_table(self, table_name, added={}, renames={}, deleted=[], altered={}, primary_key_override=None, uniques_deleted=[]):
+    def _remake_table(self, table_name, added={}, renames={}, deleted=[], altered={}, primary_key_override=None,
+                      uniques_deleted=[]):
         """
         Given a table and three sets of changes (renames, deletes, alters),
         recreates it with the modified schema.
@@ -57,7 +57,7 @@ class DatabaseOperations(generic.DatabaseOperations):
         # Dry runs get skipped completely
         if self.dry_run:
             return
-        # Temporary table's name
+            # Temporary table's name
         temp_name = "_south_new_" + table_name
         # Work out the (possibly new) definitions of each column
         definitions = {}
@@ -70,41 +70,41 @@ class DatabaseOperations(generic.DatabaseOperations):
             name = column_info['name']
             if name in deleted:
                 continue
-            # Get the type, ignoring PRIMARY KEY (we need to be consistent)
+                # Get the type, ignoring PRIMARY KEY (we need to be consistent)
             type = column_info['type'].replace("PRIMARY KEY", "")
             # Add on primary key, not null or unique if needed.
             if (primary_key_override and primary_key_override == name) or \
-               (not primary_key_override and name in indexes and
-                indexes[name]['primary_key']):
+                    (not primary_key_override and name in indexes and
+                         indexes[name]['primary_key']):
                 type += " PRIMARY KEY"
             elif not column_info['null_ok']:
                 type += " NOT NULL"
             if (name in indexes and indexes[name]['unique'] and
-                name not in uniques_deleted):
+                        name not in uniques_deleted):
                 type += " UNIQUE"
             if column_info['dflt_value'] is not None:
                 type += " DEFAULT " + column_info['dflt_value']
-            # Deal with a rename
+                # Deal with a rename
             if name in renames:
                 name = renames[name]
-            # Add to the defs
+                # Add to the defs
             definitions[name] = type
-        # Add on altered columns
+            # Add on altered columns
         for name, type in altered.items():
             if (primary_key_override and primary_key_override == name) or \
-               (not primary_key_override and name in indexes and
-                indexes[name]['primary_key']):
+                    (not primary_key_override and name in indexes and
+                         indexes[name]['primary_key']):
                 type += " PRIMARY KEY"
             if (name in indexes and indexes[name]['unique'] and
-                name not in uniques_deleted):
+                        name not in uniques_deleted):
                 type += " UNIQUE"
             definitions[name] = type
-        # Add on the new columns
-        for name, (type,_) in added.items():
+            # Add on the new columns
+        for name, (type, _) in added.items():
             if (primary_key_override and primary_key_override == name):
                 type += " PRIMARY KEY"
             definitions[name] = type
-        # Alright, Make the table
+            # Alright, Make the table
         self.execute("CREATE TABLE %s (%s)" % (
             self.quote_name(temp_name),
             ", ".join(["%s %s" % (self.quote_name(cname), ctype) for cname, ctype in definitions.items()]),
@@ -117,14 +117,17 @@ class DatabaseOperations(generic.DatabaseOperations):
         # Recreate multi-valued indexes
         # We can't do that before since it's impossible to rename indexes
         # and index name scope is global
-        self._make_multi_indexes(table_name, multi_indexes, renames=renames, deleted=deleted, uniques_deleted=uniques_deleted)
-    
+        self._make_multi_indexes(table_name, multi_indexes, renames=renames, deleted=deleted,
+                                 uniques_deleted=uniques_deleted)
+
     def _copy_data(self, src, dst, field_renames={}, added={}):
         "Used to copy data into a new table"
         # Make a list of all the fields to select
         cursor = self._get_connection().cursor()
-        src_fields = [column_info[0] for column_info in self._get_connection().introspection.get_table_description(cursor, src)]
-        dst_fields = [column_info[0] for column_info in self._get_connection().introspection.get_table_description(cursor, dst)]
+        src_fields = [column_info[0] for column_info in
+                      self._get_connection().introspection.get_table_description(cursor, src)]
+        dst_fields = [column_info[0] for column_info in
+                      self._get_connection().introspection.get_table_description(cursor, dst)]
         src_fields_new = []
         dst_fields_new = []
         for field in src_fields:
@@ -135,12 +138,12 @@ class DatabaseOperations(generic.DatabaseOperations):
             else:
                 continue
             src_fields_new.append(self.quote_name(field))
-        for field, (_,default) in added.items():
+        for field, (_, default) in added.items():
             if default is not None:
                 field = self.quote_name(field)
                 src_fields_new.append("%s as %s" % (default, field))
                 dst_fields_new.append(field)
-        # Copy over the data
+            # Copy over the data
         self.execute("INSERT INTO %s (%s) SELECT %s FROM %s;" % (
             self.quote_name(dst),
             ', '.join(dst_fields_new),
@@ -190,7 +193,7 @@ class DatabaseOperations(generic.DatabaseOperations):
 
             if columns and set(columns) != set(uniques_deleted):
                 self._create_unique(table_name, columns)
-    
+
     def _column_sql_for_create(self, table_name, name, field, explicit_name=True):
         "Given a field and its name, returns the full type for the CREATE TABLE (without unique/pk)"
         field.set_attributes_from_name(name)
@@ -203,7 +206,7 @@ class DatabaseOperations(generic.DatabaseOperations):
         if sql:
             sql = sql.replace("PRIMARY KEY", "")
         return sql
-    
+
     def alter_column(self, table_name, name, field, explicit_name=True, ignore_constraints=False):
         """
         Changes a column's SQL definition.
@@ -217,9 +220,9 @@ class DatabaseOperations(generic.DatabaseOperations):
             params = {
                 "column": self.quote_name(name),
                 "table_name": self.quote_name(table_name)
-            }            
+            }
             self._update_nulls_to_default(params, field)
-        # Remake the table correctly
+            # Remake the table correctly
         field._suppress_default = True
         self._remake_table(table_name, altered={
             name: self._column_sql_for_create(table_name, name, field, explicit_name),
@@ -230,25 +233,25 @@ class DatabaseOperations(generic.DatabaseOperations):
         Deletes a column.
         """
         self._remake_table(table_name, deleted=[column_name])
-    
+
     def rename_column(self, table_name, old, new):
         """
         Renames a column from one name to another.
         """
         self._remake_table(table_name, renames={old: new})
-    
+
     def create_unique(self, table_name, columns):
         """
         Create an unique index on columns
         """
         self._create_unique(table_name, columns)
-    
+
     def delete_unique(self, table_name, columns):
         """
         Delete an unique index
         """
         self._remake_table(table_name, uniques_deleted=columns)
-    
+
     def create_primary_key(self, table_name, columns):
         if not isinstance(columns, (list, tuple)):
             columns = [columns]
@@ -259,7 +262,7 @@ class DatabaseOperations(generic.DatabaseOperations):
     def delete_primary_key(self, table_name):
         # By passing True in, we make sure we wipe all existing PKs.
         self._remake_table(table_name, primary_key_override=True)
-    
+
     # No cascades on deletes
     def delete_table(self, table_name, cascade=True):
         generic.DatabaseOperations.delete_table(self, table_name, False)

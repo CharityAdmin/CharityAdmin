@@ -3,7 +3,6 @@
 # Based on tests by: aarranz
 from south.tests import unittest, skipUnless
 
-
 from south.db import db, generic, mysql
 from django.db import connection, models
 
@@ -13,7 +12,6 @@ from south.utils.py3 import with_metaclass
 # A class decoration may be used in lieu of this when Python 2.5 is the
 # minimum.
 class TestMySQLOperationsMeta(type):
-
     def __new__(mcs, name, bases, dict_):
         decorator = skipUnless(db.backend_name == "mysql", 'MySQL-specific tests')
 
@@ -22,6 +20,7 @@ class TestMySQLOperationsMeta(type):
                 dict_[key] = decorator(method)
 
         return type.__new__(mcs, name, bases, dict_)
+
 
 class TestMySQLOperations(with_metaclass(TestMySQLOperationsMeta, unittest.TestCase)):
     """MySQL-specific tests"""
@@ -40,13 +39,13 @@ class TestMySQLOperations(with_metaclass(TestMySQLOperationsMeta, unittest.TestC
                                 pk_field_type=models.AutoField,
                                 pk_field_args=[])
         db.create_table(reference_name, [
-                ('id', models.AutoField(primary_key=True)),
-            ])
+            ('id', models.AutoField(primary_key=True)),
+        ])
         # Create table with foreign key
         db.create_table(main_name, [
-                ('id', models.AutoField(primary_key=True)),
-                ('foreign', models.ForeignKey(Foreign)),
-            ])
+            ('id', models.AutoField(primary_key=True)),
+            ('foreign', models.ForeignKey(Foreign)),
+        ])
         return Foreign
 
     def test_constraint_references(self):
@@ -138,7 +137,7 @@ class TestMySQLOperations(with_metaclass(TestMySQLOperationsMeta, unittest.TestC
         constraints = db._find_foreign_constraints(renamed_table, 'foreign_id')
         self.assertEquals(len(constraints), 1)
         (rtable, rcolumn) = db._lookup_constraint_references(
-                renamed_table, constraints[0])
+            renamed_table, constraints[0])
         self.assertEquals(rcolumn, 'id')
         db.delete_table(renamed_table)
         db.delete_table(ref_table)
@@ -157,7 +156,7 @@ class TestMySQLOperations(with_metaclass(TestMySQLOperationsMeta, unittest.TestC
         constraints = db._find_foreign_constraints(main_table, 'foreign_id')
         self.assertEquals(len(constraints), 1)
         (rtable, rcolumn) = db._lookup_constraint_references(
-                main_table, constraints[0])
+            main_table, constraints[0])
         self.assertEquals(renamed_table, rtable)
         db.delete_table(main_table)
         db.delete_table(renamed_table)

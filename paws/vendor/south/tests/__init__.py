@@ -28,8 +28,10 @@ except AttributeError:
                     testfunc(self)
                 else:
                     # The skip exceptions are not available either...
-                    print("Skipping", testfunc.__name__,"--", message)
+                    print("Skipping", testfunc.__name__, "--", message)
+
             return wrapper
+
         return decorator
 
 # ditto for skipIf
@@ -41,11 +43,13 @@ except AttributeError:
             @wraps(testfunc)
             def wrapper(self):
                 if condition:
-                    print("Skipping", testfunc.__name__,"--", message)
+                    print("Skipping", testfunc.__name__, "--", message)
                 else:
                     # Apply method
                     testfunc(self)
+
             return wrapper
+
         return decorator
 
 # Add the tests directory so fakeapp is on sys.path
@@ -55,16 +59,15 @@ sys.path.append(test_root)
 # Note: the individual test files are imported below this.
 
 class Monkeypatcher(unittest.TestCase):
-
     """
     Base test class for tests that play with the INSTALLED_APPS setting at runtime.
     """
 
     def create_fake_app(self, name):
-        
+
         class Fake:
             pass
-        
+
         fake = Fake()
         fake.__name__ = name
         try:

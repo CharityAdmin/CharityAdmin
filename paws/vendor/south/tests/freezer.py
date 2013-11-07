@@ -3,6 +3,7 @@ from south.tests import unittest
 from south.creator.freezer import model_dependencies
 from south.tests.fakeapp import models
 
+
 class TestFreezer(unittest.TestCase):
     def test_dependencies(self):
         self.assertEqual(set(model_dependencies(models.SubModel)),

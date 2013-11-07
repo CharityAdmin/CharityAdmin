@@ -11,10 +11,11 @@ from django.db.utils import DatabaseError
 from south.db import generic
 from south.utils.py3 import string_types
 
+
 class DatabaseOperations(generic.DatabaseOperations):
     backend_name = 'firebird'
     alter_string_set_type = 'ALTER %(column)s TYPE %(type)s'
-    alter_string_set_default =  'ALTER %(column)s SET DEFAULT %(default)s;'
+    alter_string_set_default = 'ALTER %(column)s SET DEFAULT %(default)s;'
     alter_string_drop_null = ''
     add_column_string = 'ALTER TABLE %s ADD %s;'
     delete_column_string = 'ALTER TABLE %s DROP %s;'
@@ -41,8 +42,8 @@ class DatabaseOperations(generic.DatabaseOperations):
             """ % table_name)
 
         for constraint, kind, column in rows:
-           self._constraint_cache[db_name][table_name].setdefault(column, set())
-           self._constraint_cache[db_name][table_name][column].add((kind, constraint))
+            self._constraint_cache[db_name][table_name].setdefault(column, set())
+            self._constraint_cache[db_name][table_name][column].add((kind, constraint))
         return
 
     def _alter_column_set_null(self, table_name, column_name, is_null):
@@ -171,25 +172,25 @@ class DatabaseOperations(generic.DatabaseOperations):
                         # If the default is a callable, then call it!
                         if callable(default):
                             default = default()
-                        # Now do some very cheap quoting. TODO: Redesign return values to avoid this.
+                            # Now do some very cheap quoting. TODO: Redesign return values to avoid this.
                         if isinstance(default, string_types):
                             default = "'%s'" % default.replace("'", "''")
                         elif isinstance(default, (datetime.date, datetime.time, datetime.datetime)):
                             default = "'%s'" % default
                         elif isinstance(default, bool):
                             default = int(default)
-                        # Escape any % signs in the output (bug #317)
+                            # Escape any % signs in the output (bug #317)
                         if isinstance(default, string_types):
                             default = default.replace("%", "%%")
-                        # Add it in
+                            # Add it in
                         sql += " DEFAULT %s"
                         sqlparams = (default)
                 elif (not field.null and field.blank) or (field.get_default() == ''):
                     if field.empty_strings_allowed and self._get_connection().features.interprets_empty_strings_as_nulls:
                         sql += " DEFAULT ''"
-                    # Error here would be nice, but doesn't seem to play fair.
-                    #else:
-                    #    raise ValueError("Attempting to add a non null column that isn't character based without an explicit default value.")
+                        # Error here would be nice, but doesn't seem to play fair.
+                        #else:
+                        #    raise ValueError("Attempting to add a non null column that isn't character based without an explicit default value.")
 
             # Firebird need set not null after of default value keyword
             if not field.primary_key and not field.null:

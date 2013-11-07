@@ -12,6 +12,7 @@ if PY3:
     raw_input = input
 
     import io
+
     StringIO = io.StringIO
 
 else:
@@ -20,6 +21,7 @@ else:
     raw_input = raw_input
 
     import cStringIO
+
     StringIO = cStringIO.StringIO
 
 

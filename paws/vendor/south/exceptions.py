@@ -2,11 +2,14 @@ from __future__ import print_function
 
 from traceback import format_exception, format_exc
 
+
 class SouthError(RuntimeError):
     pass
 
+
 class SouthWarning(RuntimeWarning):
     pass
+
 
 class BrokenMigration(SouthError):
     def __init__(self, migration, exc_info):
@@ -32,9 +35,10 @@ class InvalidMigrationModule(SouthError):
     def __init__(self, application, module):
         self.application = application
         self.module = module
-    
+
     def __str__(self):
-        return ('The migration module specified for %(application)s, %(module)r, is invalid; the parent module does not exist.' % self.__dict__)
+        return (
+        'The migration module specified for %(application)s, %(module)r, is invalid; the parent module does not exist.' % self.__dict__)
 
 
 class NoMigrations(SouthError):
@@ -142,6 +146,7 @@ class ImpossibleORMUnfreeze(SouthError):
     """Raised if the ORM can't manage to unfreeze all the models in a linear fashion."""
     pass
 
+
 class ConstraintDropped(SouthWarning):
     def __init__(self, constraint, table, column=None):
         self.table = table
@@ -150,6 +155,6 @@ class ConstraintDropped(SouthWarning):
         else:
             self.column = ""
         self.constraint = constraint
-    
+
     def __str__(self):
         return "Constraint %(constraint)s was dropped from %(table)s%(column)s -- was this intended?" % self.__dict__  

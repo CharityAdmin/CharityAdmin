@@ -6,77 +6,109 @@
 </head>
 
 <body>
-    <div class="container-outer header-outer-wrapper">
-        <div class="container-outer header-outer">
-            <div class="container-inner header-inner">
-                <header class="header">
-                    <h1 class="logo">
-                        <a href="http://pawsny.org/">
-                            <img src="http://pawsny.org/wp-content/uploads/2012/04/logo.png" width="470" height="81" class="scale-with-grid" alt="PAWS NY">
-                        </a>
-                    </h1>
-                    <p class="desktop tagline">
-                        PAWS NY is a 501(c)3 nonprofit organization.  Our mission is to preserve, support, and nurture the human-animal bond for New York City’s most vulnerable residents.
+<div class="container-outer header-outer-wrapper">
+    <div class="container-outer header-outer">
+        <div class="container-inner header-inner">
+            <header class="header">
+                <h1 class="logo">
+                    <a href="http://pawsny.org/">
+                        <img src="http://pawsny.org/wp-content/uploads/2012/04/logo.png" width="470" height="81"
+                             class="scale-with-grid" alt="PAWS NY">
+                    </a>
+                </h1>
 
-                        To make a donation to support our work, please visit our Get Involved/Donate page.
-                    </p>
-                </header><!-- #header -->
-            </div><!-- #header-inner -->
-        </div><!-- #header-outer -->
+                <p class="desktop tagline">
+                    PAWS NY is a 501(c)3 nonprofit organization. Our mission is to preserve, support, and nurture the
+                    human-animal bond for New York City’s most vulnerable residents.
+
+                    To make a donation to support our work, please visit our Get Involved/Donate page.
+                </p>
+            </header>
+            <!-- #header -->
+        </div>
+        <!-- #header-inner -->
+    </div>
+    <!-- #header-outer -->
+</div>
+
+<div class="pagebody">
+    <div class="nav-primary-outer-wrapper">
+        <div class="nav-primary-inner-wrapper">
+            <nav class="nav-primary">
+                <div class="menu-header-navigation menu">
+                    {% block sidebar %}
+                    <ul>
+                        <li><a href="{% url 'timeslots_home' %}">Home</a></li>
+                        <li><a href="{% url 'paws_login' %}">Log in</a></li>
+                        <li><a href="{% url 'paws_signup' %}">Sign up</a></li>
+                    </ul>
+                    {% endblock %}
+                </div>
+            </nav>
+        </div>
     </div>
 
-    <div class="pagebody">
-        <div class="nav-primary-outer-wrapper">
-            <div class="nav-primary-inner-wrapper">
-                <nav class="nav-primary">
-                    <div class="menu-header-navigation menu">
-                        {% block sidebar %}
-                        <ul>
-                            <li><a href="{% url 'timeslots_home' %}">Home</a></li>
-                            <li><a href="{% url 'paws_login' %}">Log in</a></li>
-                            <li><a href="{% url 'paws_signup' %}">Sign up</a></li>
-                        </ul>
-                        {% endblock %}
-                    </div>
+    <div class="content white-container">
+        {% block content %}{% endblock %}
+    </div>
+</div>
+
+<div class="container-outer footer-wrapper">
+
+    <div class="container-inner">
+
+        <footer class="footer">
+
+            <nav class="mobile sixteen columns nav-footer-alt">
+                <select class="mobile-select nav-footer-select">
+                    <option>Navigation</option>
+                    <option value="http://pawsny.org/">Home</option>
+                    <option value="http://pawsny.org/our-services/">Our Services</option>
+                    <option value="http://pawsny.org/about-us/">About Us</option>
+                    <option value="http://pawsny.org/donate/">Donate</option>
+                    <option value="http://pawsny.org/category/news/">News</option>
+                    <option value="http://pawsny.org/events/">Events</option>
+                    <option value="http://pawsny.org/contact-us/">Contact Us</option>
+                </select>
+            </nav>
+
+            <div class="three columns source-org vcard copyright">
+                <p>© 2013 PAWS NY</p>
+            </div>
+            <!-- .copyright -->
+
+            <div class="thirteen columns">
+                <nav class="desktop clearfix nav-footer">
+                    <ul class="menu-footer-navigation menu">
+                        <li class="menu-item-80 menu-item menu-item-type-post_type menu-item-object-page menu-item-80">
+                            <a href="http://pawsny.org/">Home</a></li>
+                        <li id="menu-item-222"
+                            class="menu-item menu-item-type-post_type menu-item-object-page menu-item-222"><a
+                                href="http://pawsny.org/our-services/">Our Services</a></li>
+                        <li id="menu-item-220"
+                            class="menu-item menu-item-type-post_type menu-item-object-page menu-item-220"><a
+                                href="http://pawsny.org/about-us/">About Us</a></li>
+                        <li id="menu-item-218"
+                            class="menu-item menu-item-type-post_type menu-item-object-page menu-item-218"><a
+                                href="http://pawsny.org/donate/">Donate</a></li>
+                        <li id="menu-item-81"
+                            class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-81"><a
+                                href="http://pawsny.org/category/news/">News</a></li>
+                        <li id="menu-item-221"
+                            class="menu-item menu-item-type-post_type menu-item-object-page menu-item-221"><a
+                                href="http://pawsny.org/events/">Events</a></li>
+                        <li id="menu-item-219"
+                            class="menu-item menu-item-type-post_type menu-item-object-page menu-item-219"><a
+                                href="http://pawsny.org/contact-us/">Contact Us</a></li>
+                    </ul>
                 </nav>
             </div>
-        </div>
-
-        <div class="content white-container">
-            {% block content %}{% endblock %}
-        </div>
+        </footer>
+        <!-- #footer -->
     </div>
+    <!-- .container-inner -->
+</div>
 
-    <div class="container-outer footer-wrapper">
-
-        <div class="container-inner">
-
-            <footer class="footer">
-
-                <nav class="mobile sixteen columns nav-footer-alt">
-                    <select class="mobile-select nav-footer-select"><option>Navigation</option><option value="http://pawsny.org/">Home</option><option value="http://pawsny.org/our-services/">Our Services</option><option value="http://pawsny.org/about-us/">About Us</option><option value="http://pawsny.org/donate/">Donate</option><option value="http://pawsny.org/category/news/">News</option><option value="http://pawsny.org/events/">Events</option><option value="http://pawsny.org/contact-us/">Contact Us</option></select>
-                </nav>
-
-                <div class="three columns source-org vcard copyright">
-                    <p>© 2013 PAWS NY</p>
-                </div><!-- .copyright -->
-
-                <div class="thirteen columns">
-                    <nav class="desktop clearfix nav-footer">
-                        <ul class="menu-footer-navigation menu"><li class="menu-item-80 menu-item menu-item-type-post_type menu-item-object-page menu-item-80"><a href="http://pawsny.org/">Home</a></li>
-                            <li id="menu-item-222" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-222"><a href="http://pawsny.org/our-services/">Our Services</a></li>
-                            <li id="menu-item-220" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-220"><a href="http://pawsny.org/about-us/">About Us</a></li>
-                            <li id="menu-item-218" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-218"><a href="http://pawsny.org/donate/">Donate</a></li>
-                            <li id="menu-item-81" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-81"><a href="http://pawsny.org/category/news/">News</a></li>
-                            <li id="menu-item-221" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-221"><a href="http://pawsny.org/events/">Events</a></li>
-                            <li id="menu-item-219" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-219"><a href="http://pawsny.org/contact-us/">Contact Us</a></li>
-                        </ul>
-                    </nav>
-                </div>
-            </footer><!-- #footer -->
-        </div><!-- .container-inner -->
-    </div>
-
-    {% include "paws/scripts.html" %}
+{% include "paws/scripts.html" %}
 </body>
 </html>

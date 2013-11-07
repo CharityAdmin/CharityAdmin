@@ -19,14 +19,16 @@ class Volunteer(models.Model):
     clients = models.ManyToManyField('Client', related_name='volunteers')
 
     def __unicode__(self):
-        return self.user.first_name + " " + self.user.last_name if (self.user.first_name or self.user.last_name) else self.user.email
+        return self.user.first_name + " " + self.user.last_name if (
+        self.user.first_name or self.user.last_name) else self.user.email
 
 
 class Client(models.Model):
     user = models.OneToOneField(User, db_column='userId')
 
     def __unicode__(self):
-        return self.user.first_name + " " + self.user.last_name if (self.user.first_name or self.user.last_name) else self.user.email
+        return self.user.first_name + " " + self.user.last_name if (
+        self.user.first_name or self.user.last_name) else self.user.email
 
 
 class ClientOpening(models.Model):
@@ -37,7 +39,9 @@ class ClientOpening(models.Model):
     notes = models.CharField(max_length=255, blank=True)
 
     def __unicode__(self):
-        return "%s, %s: %s (%s-%s)" % (self.client, self.type, self.clientopeningmetadata_set.all()[0].metadata, dateformat.format(d=self.startDate), dateformat.format(d=self.endDate) if self.endDate is not None else "")
+        return "%s, %s: %s (%s-%s)" % (
+        self.client, self.type, self.clientopeningmetadata_set.all()[0].metadata, dateformat.format(d=self.startDate),
+        dateformat.format(d=self.endDate) if self.endDate is not None else "")
 
 
 class ClientOpeningMetadata(models.Model):
@@ -65,7 +69,9 @@ class VolunteerCommitment(models.Model):
     notes = models.CharField(max_length=255, blank=True)
 
     def __unicode__(self):
-        return "%s visits %s, %s: %s (%s-%s)" % (self.volunteer, self.clientOpening.client, self.type, self.volunteercommitmentmetadata_set.all()[0].metadata, dateformat.format(d=self.startDate), dateformat.format(d=self.endDate) if self.endDate is not None else "")
+        return "%s visits %s, %s: %s (%s-%s)" % (
+        self.volunteer, self.clientOpening.client, self.type, self.volunteercommitmentmetadata_set.all()[0].metadata,
+        dateformat.format(d=self.startDate), dateformat.format(d=self.endDate) if self.endDate is not None else "")
 
 
 class VolunteerCommitmentMetadata(models.Model):
@@ -73,7 +79,9 @@ class VolunteerCommitmentMetadata(models.Model):
     metadata = models.CharField(max_length=20)
 
     def __unicode__(self):
-        return "%s visits %s, %s: %s" % (self.volunteerCommitment.volunteer, self.volunteerCommitment.clientOpening.client, self.volunteerCommitment.clientOpening.type, self.metadata)
+        return "%s visits %s, %s: %s" % (
+        self.volunteerCommitment.volunteer, self.volunteerCommitment.clientOpening.client,
+        self.volunteerCommitment.clientOpening.type, self.metadata)
 
 
 class VolunteerCommitmentException(models.Model):

@@ -16,9 +16,9 @@ if django.VERSION[:2] >= (1, 4) and getattr(settings, 'USE_TZ', False):
         It basically adds the default timezone (as configured in Django's
         settings) automatically if no tzinfo is given.
         """
+
         def __new__(cls, year, month, day,
                     hour=0, minute=0, second=0, microsecond=0, tzinfo=None):
-
             dt = _datetime(year, month, day,
                            hour, minute, second, microsecond,
                            tzinfo=tzinfo)

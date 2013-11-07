@@ -1,45 +1,43 @@
-
 from south.tests import Monkeypatcher, skipUnless
 from south.modelsinspector import (convert_on_delete_handler, get_value,
-    IsDefault, models, value_clean)
+                                   IsDefault, models, value_clean)
 
 from fakeapp.models import HorribleModel, get_sentinel_object
 
 
 on_delete_is_available = hasattr(models, "PROTECT") # models here is django.db.models
-skipUnlessOnDeleteAvailable = skipUnless(on_delete_is_available, "not testing on_delete -- not available on Django<1.3")                    
+skipUnlessOnDeleteAvailable = skipUnless(on_delete_is_available, "not testing on_delete -- not available on Django<1.3")
+
 
 class TestModelInspector(Monkeypatcher):
-
     """
     Tests if the various parts of the modelinspector work.
     """
-    
+
     def test_get_value(self):
-        
         # Let's start nicely.
         name = HorribleModel._meta.get_field_by_name("name")[0]
         slug = HorribleModel._meta.get_field_by_name("slug")[0]
         user = HorribleModel._meta.get_field_by_name("user")[0]
-        
+
         # Simple int retrieval
         self.assertEqual(
             get_value(name, ["max_length", {}]),
             "255",
         )
-        
+
         # Bool retrieval
         self.assertEqual(
             get_value(slug, ["unique", {}]),
             "True",
         )
-        
+
         # String retrieval
         self.assertEqual(
             get_value(user, ["rel.related_name", {}]),
             "'horribles'",
         )
-        
+
         # Default triggering
         self.assertEqual(
             get_value(slug, ["unique", {"default": False}]),
@@ -54,7 +52,6 @@ class TestModelInspector(Monkeypatcher):
 
     @skipUnlessOnDeleteAvailable
     def test_get_value_on_delete(self):
-
         # First validate the FK fields with on_delete options
         o_set_null_on_delete = HorribleModel._meta.get_field_by_name("o_set_null_on_delete")[0]
         o_cascade_delete = HorribleModel._meta.get_field_by_name("o_cascade_delete")[0]
@@ -66,8 +63,9 @@ class TestModelInspector(Monkeypatcher):
         # TODO this is repeated from the introspection_details in modelsinspector:
         # better to refactor that so we can reference these settings, in case they
         # must change at some point.
-        on_delete = ["rel.on_delete", {"default": models.CASCADE, "is_django_function": True, "converter": convert_on_delete_handler, }]
-        
+        on_delete = ["rel.on_delete",
+                     {"default": models.CASCADE, "is_django_function": True, "converter": convert_on_delete_handler, }]
+
         # Foreign Key cascade update/delete
         self.assertRaises(
             IsDefault,

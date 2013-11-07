@@ -17,5 +17,5 @@ if "timezones" in settings.INSTALLED_APPS:
                 },
             ),
         ]
-        add_introspection_rules(rules, ["^timezones\.fields",])
+        add_introspection_rules(rules, ["^timezones\.fields", ])
 

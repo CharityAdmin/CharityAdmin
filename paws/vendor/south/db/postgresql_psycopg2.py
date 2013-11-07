@@ -6,7 +6,6 @@ from south.db import generic
 
 
 class DatabaseOperations(generic.DatabaseOperations):
-
     """
     PsycoPG2 implementation of database operations.
     """
@@ -50,12 +49,12 @@ class DatabaseOperations(generic.DatabaseOperations):
         # (if you're using other AutoFields... your problem, unfortunately)
 
         if self.execute(
-            """
-            SELECT 1
-            FROM information_schema.sequences
-            WHERE sequence_name = %s
-            """,
-            [old_table_name + '_id_seq']
+                """
+                SELECT 1
+                FROM information_schema.sequences
+                WHERE sequence_name = %s
+                """,
+                [old_table_name + '_id_seq']
         ):
             generic.DatabaseOperations.rename_table(self, old_table_name + "_id_seq", table_name + "_id_seq")
 

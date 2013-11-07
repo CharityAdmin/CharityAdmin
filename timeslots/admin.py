@@ -1,5 +1,6 @@
 from django.contrib import admin
 from timeslots.models import *
+
 admin.site.register(Volunteer)
 admin.site.register(Client)
 admin.site.register(ClientOpening)
