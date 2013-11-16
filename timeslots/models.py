@@ -22,6 +22,12 @@ class Volunteer(models.Model):
         return self.user.first_name + " " + self.user.last_name if (
         self.user.first_name or self.user.last_name) else self.user.email
 
+    def get_current_commitments(self):
+        from django.db.models import Q
+
+        today = datetime.datetime.today()
+        return  self.commitments.filter(Q(endDate__gte=today) | Q(endDate__isnull=True), startDate__lte=today)
+
 
 class Client(models.Model):
     user = models.OneToOneField(User, db_column='userId')
@@ -41,7 +47,8 @@ class ClientOpening(models.Model):
     def __unicode__(self):
         return "%s, %s: %s (%s-%s)" % (self.client, self.type, self.get_all_metadata_string(), dateformat.format(d=self.startDate), dateformat.format(d=self.endDate) if self.endDate is not None else "")
 
-    def get_list_title(self):
+    def client_title(self):
+        # For use in the context of a particular client. Same as the __unicode__ title, but missing the "[client name]: " at the beginning
         return "%s: %s (%s-%s)" % (self.type, self.get_all_metadata_string(), dateformat.format(d=self.startDate), dateformat.format(d=self.endDate) if self.endDate is not None else "")
 
     def get_next_unfilled(self):
@@ -133,9 +140,16 @@ class VolunteerCommitment(models.Model):
         self.volunteer, self.clientOpening.client, self.type, self.volunteercommitmentmetadata_set.all()[0].metadata,
         dateformat.format(d=self.startDate), dateformat.format(d=self.endDate) if self.endDate is not None else "")
 
+    def pattern_description(self, prefix="Visit "):
+        # displays just the Type, Metadata, and Start/End Dates
+        return "%s: %s (%s-%s)" % (self.type, self.volunteercommitmentmetadata_set.all()[0].metadata, dateformat.format(d=self.startDate), dateformat.format(d=self.endDate) if self.endDate is not None else "")
+
 
 class VolunteerCommitmentMetadata(models.Model):
     volunteerCommitment = models.ForeignKey(VolunteerCommitment, db_column='volunteerCommitmentId')
+    # FEATURE REQUEST: prettify/validate the metadata field:
+    #                  use a select box when the volunteerCommitment is set to day of week,
+    #                  calendar when day of month or one-off date
     metadata = models.CharField(max_length=20)
 
     def __unicode__(self):

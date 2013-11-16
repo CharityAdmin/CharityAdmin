@@ -1,3 +1,4 @@
+import datetime
 from django.http import Http404
 from django.shortcuts import render_to_response
 from django.contrib.auth.decorators import login_required
@@ -13,7 +14,7 @@ def volunteer_dashboard(request):
 	clients = None
 	if volunteer is not None:
 		clients = volunteer.clients.all()
-	return render_to_response('timeslots/volunteer_dashboard.html', { "volunteer": volunteer, "clients": clients }, context_instance = RequestContext(request))
+	return render_to_response('timeslots/volunteer_dashboard.html', { "clients": clients }, context_instance = RequestContext(request))
 
 @login_required
 def upcoming_openings(request):
@@ -21,7 +22,8 @@ def upcoming_openings(request):
 
 @login_required
 def upcoming_commitments(request):
-	return render_to_response('timeslots/upcoming_commitments.html', context_instance = RequestContext(request))
+	commitments = request.user.volunteer.get_current_commitments()
+	return render_to_response('timeslots/upcoming_commitments.html', { "commitments": commitments }, context_instance = RequestContext(request))
 
 @login_required
 def client_view(request, clientname):

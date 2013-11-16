@@ -51,7 +51,7 @@
                                     </li>
                                     <li>
                                         <a href="{% url 'timeslots_upcoming_openings' %}">
-                                            {% if not user.is_staff %}Your {% endif %}Upcoming Openings
+                                            {% if not user.is_staff %}Your {% endif %}Clients' Upcoming Openings
                                         </a>
                                     </li>
                                     {% block navigation_authenticated_additional %}{% endblock %}
