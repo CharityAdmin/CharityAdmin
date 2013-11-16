@@ -26,7 +26,7 @@ class Volunteer(models.Model):
         from django.db.models import Q
 
         today = datetime.datetime.today()
-        return  self.commitments.filter(Q(endDate__gte=today) | Q(endDate__isnull=True), startDate__lte=today)
+        return self.commitments.filter(Q(endDate__gte=today) | Q(endDate__isnull=True), startDate__lte=today)
 
 
 class Client(models.Model):
@@ -73,7 +73,7 @@ class ClientOpening(models.Model):
                         # adjust the time to match the startDate time
                         next_opening = next_opening.replace(hour=self.startDate.hour, minute=self.startDate.minute, second=self.startDate.second)
                         # adjust the datetime based on the day of the week
-                        next_opening = next_opening + datetime.timedelta(days=idx-now.weekday())
+                        next_opening = next_opening + datetime.timedelta(days=idx - now.weekday())
                         if now.weekday() >= idx:
                             # if we've passed the correct day, we want the same day next week
                             next_opening = next_opening + datetime.timedelta(weeks=1)
@@ -94,10 +94,10 @@ class ClientOpening(models.Model):
         return self.next_opening
 
     def get_all_metadata_set(self):
-        return set([ metadataobj.metadata for metadataobj in self.clientopeningmetadata_set.all() ])
+        return set([metadataobj.metadata for metadataobj in self.clientopeningmetadata_set.all()])
 
     def get_unfilled_metadata_set(self):
-        return set([ metadataobj.metadata for metadataobj in self.clientopeningmetadata_set.all() if not metadataobj.is_filled() ])
+        return set([metadataobj.metadata for metadataobj in self.clientopeningmetadata_set.all() if not metadataobj.is_filled()])
 
     def get_all_metadata_string(self):
         if self.type in ["Days of Week", "Days of Alternating Week"]:
