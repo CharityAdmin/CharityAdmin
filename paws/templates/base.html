@@ -31,27 +31,48 @@
     <!-- #header-outer -->
 </div>
 
-<div class="pagebody">
-    <div class="nav-primary-outer-wrapper">
-        <div class="nav-primary-inner-wrapper">
-            <nav class="nav-primary">
-                <div class="menu-header-navigation menu">
-                    {% block sidebar %}
-                    <ul>
-                        <li><a href="{% url 'timeslots_home' %}">Home</a></li>
-                        <li><a href="{% url 'paws_login' %}">Log in</a></li>
-                        <li><a href="{% url 'paws_signup' %}">Sign up</a></li>
-                    </ul>
-                    {% endblock %}
-                </div>
-            </nav>
+    <div class="pagebody">
+        <div class="nav-primary-outer-wrapper">
+            <div class="nav-primary-inner-wrapper">
+                <nav class="nav-primary">
+                    <div class="menu-header-navigation menu">
+                        {% block navigation %}
+                        <ul>
+                            <li><a href="{% url 'timeslots_home' %}">Home</a></li>
+                            {% if not user.is_authenticated %}
+                                <li><a href="{% url 'paws_login' %}">Log in</a></li>
+                                <li><a href="{% url 'paws_signup' %}">Sign up</a></li>
+                            {% else %}
+                                {% block navigation_authenticated %}
+                                    <li>
+                                        <a href="{% url 'timeslots_upcoming_commitments' %}">
+                                            {% if not user.is_staff %}Your {% endif %}Upcoming Commitments
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="{% url 'timeslots_upcoming_openings' %}">
+                                            {% if not user.is_staff %}Your {% endif %}Upcoming Openings
+                                        </a>
+                                    </li>
+                                    {% block navigation_authenticated_additional %}{% endblock %}
+                                    <li class="pull-right">
+                                        <a href="{% url 'paws_logout' %}">Log out</a>
+                                    </li>
+                                {% endblock %}
+                            {% endif %}
+                        </ul>
+                        {% endblock %}
+                    </div>
+                </nav>
+            </div>
+        </div>
+
+        <div class="white-container">
+            <div class="content-container">
+                {% block content %}{% endblock %}
+            </div>
         </div>
     </div>
-
-    <div class="content white-container">
-        {% block content %}{% endblock %}
-    </div>
-</div>
 
 <div class="container-outer footer-wrapper">
 

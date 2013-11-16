@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block content %}
+	<div class="dashboard">
+		<h1>Volunteer Dashboard (JUST A STUMP)</h1>
+		<div class="block">
+			<h3>Upcoming Commitments for You</h3>
+			<ul class="well">
+				<li>Visit <a href="#">Client Name 1</a> on <a href="#">Tuesday, 10/31/13 at 3 PM</a></li>
+				<li>Visit <a href="#">Client Name 3</a> on <a href="#">Sunday, 11/4/13 at 9 AM</a></li>
+				<li>Visit <a href="#">Client Name 2</a> on <a href="#">Monday, 11/8/13 at 5 PM</a></li>
+			</ul>
+			<a class="more-link" href="{% url 'timeslots_upcoming_commitments' %}">view all upcoming commitments</a>
+		</div>
+
+		<div class="block">
+			<h3>Upcoming Openings for Your Clients</h3>
+			<ul class="well">
+				<li><a href="#">Opening for Client Name 1 on Tuesday, 10/31/13 at 3 PM</a></li>
+				<li><a href="#">Opening for Client Name 1 on Tuesday, 10/31/13 at 3 PM</a></li>
+				<li><a href="#">Opening for Client Name 1 on Tuesday, 10/31/13 at 3 PM</a></li>
+			</ul>
+			<a class="more-link" href="{% url 'timeslots_upcoming_openings' %}">view all upcoming openings for your clients</a>
+		</div>
+
+		<div class="block">
+			<h3>Your Clients</h3>
+			<ul class="well">
+				{% for client in clients %}
+					<li><a href="{% url 'timeslots_client_view' client.user.username %}">{{ client.user.username }}</a></li>
+				{% endfor %}
+			</ul>
+		</div>
+	</div>
+{% endblock content %}

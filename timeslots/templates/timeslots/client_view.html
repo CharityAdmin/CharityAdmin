@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+
+{% block content %}
+	<h1>{{ client }}</h1>
+
+	<div class="list-wrapper client-openings-wrapper">
+		<h3>Upcoming openings</h3>
+		{% for opening in client.openings.all %}
+			{{ opening.get_next_unfilled }}
+		{% endfor %}
+	</div>
+
+{% endblock %}

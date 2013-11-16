@@ -6,7 +6,7 @@ SCHEDULE_PATTERN_TYPE_CHOICES = (
     ('One-Off', 'One-Off'),
     ('Days of Week', 'Days of Week'),
     ('Days of Alternating Week', 'Days of Alternating Week'),
-    ('Days of Month', 'Days of Month'),
+    ('Day of Month', 'Day of Month'),
 )
 
 dateformat = '{d:%b %d, %Y}'

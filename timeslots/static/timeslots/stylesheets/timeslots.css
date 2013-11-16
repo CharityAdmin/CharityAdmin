@@ -1,0 +1,39 @@
+/* line 18, ../sass/timeslots.scss */
+.content-container {
+  max-width: 1170px;
+}
+
+/* line 22, ../sass/timeslots.scss */
+.well {
+  margin: 0;
+  padding: 1.25em 1.25em .75em;
+  border: 1px solid #d7d7d7;
+  background-color: #f7f7f7;
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  -ms-border-radius: 5px;
+  -o-border-radius: 5px;
+  border-radius: 5px;
+}
+
+/* line 30, ../sass/timeslots.scss */
+li {
+  line-height: 120%;
+  margin-bottom: 0.5em;
+}
+
+/* line 35, ../sass/timeslots.scss */
+.block {
+  margin-bottom: 2em;
+}
+/* line 38, ../sass/timeslots.scss */
+.block .more-link {
+  display: block;
+  margin-left: 1.5em;
+  margin-top: 0.25em;
+  color: #666666;
+}
+/* line 45, ../sass/timeslots.scss */
+.block .more-link:hover {
+  color: #222222;
+}

@@ -17,8 +17,9 @@ urlpatterns = patterns(
 
     # Uncomment the next line to enable the admin:
     url(r'^admin/', include(admin.site.urls)),
-    url(r'^$', include('timeslots.urls')),
+    url(r'^', include('timeslots.urls')),
 
-    url(r'^login$', 'paws.views.login', name='paws_login'),
-    url(r'^signup$', 'paws.views.signup', name='paws_signup'),
+    url(r'^login/$', 'django.contrib.auth.views.login', {'template_name': 'paws/login.html'}, name='paws_login'),
+    url(r'^signup/$', 'paws.views.signup', name='paws_signup'),
+    url(r'^logout/$', 'paws.views.logout_view', name='paws_logout'),
 )

@@ -489,3 +489,13 @@
 	}
 	ul.tabs:after { clear: both; }
 	ul.tabs { zoom: 1; }
+
+
+/* ADDED FOR CHARITYADMIN */
+.pull-right {
+	float: right !important;
+}
+
+nav ul {
+	max-width: 1200px;
+}

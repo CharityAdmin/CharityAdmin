@@ -1,0 +1,50 @@
+@import "compass/css3/border-radius";
+
+///
+/// STYLE VARIABLES
+///
+
+$content-main-background-color: transparent;
+$well-background-color: #f7f7f7;
+
+$color-more-link: #666;
+$color-more-link-hover: #222;
+
+
+///
+/// COMMON STYLES
+///
+
+.content-container {
+	max-width: 1170px;
+}
+
+.well {
+	margin: 0;
+	padding: 1.25em 1.25em .75em;
+	border: 1px solid #d7d7d7;
+	background-color: $well-background-color;
+	@include border-radius();
+}
+
+li {
+	line-height: 120%;
+	margin-bottom: 0.5em;
+}
+
+.block {
+	margin-bottom: 2em;
+
+	.more-link {
+		display: block;
+		margin-left: 1.5em;
+		margin-top: 0.25em;
+
+		color: $color-more-link;
+
+		&:hover {
+			color: $color-more-link-hover;
+		}
+	}
+}
+
