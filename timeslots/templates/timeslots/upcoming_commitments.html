@@ -10,7 +10,7 @@
 				<li>
 					<h4>
 						Visit
-						<a href="{% url 'timeslots_client_view' client.user.username %}">{{ commitment.clientOpening.client }}</a>
+						<a href="{% url 'timeslots_client_view' commitment.clientOpening.client.user.username %}">{{ commitment.clientOpening.client }}</a>
 						on
 						<a href="#">{{ commitment.pattern_description }}</a>
 					</h4>
