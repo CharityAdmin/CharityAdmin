@@ -33,4 +33,5 @@ def upcoming_commitments(request):
 @login_required
 def client_view(request, clientname):
     client = Client.objects.get(user__username=clientname)
-    return render_to_response('timeslots/client_view.html', { "client": client }, context_instance=RequestContext(request))
+    openings = client.get_next_opening_instances(endDate=datetime.datetime.today() + datetime.timedelta(days=30))
+    return render_to_response('timeslots/client_view.html', { "client": client, "openings": openings }, context_instance=RequestContext(request))

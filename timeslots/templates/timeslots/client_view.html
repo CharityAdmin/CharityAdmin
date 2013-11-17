@@ -3,11 +3,32 @@
 {% block content %}
 	<h1>{{ client }}</h1>
 
-	<div class="list-wrapper client-openings-wrapper">
-		<h3>Upcoming openings</h3>
-		{% for opening in client.openings.all %}
-			{{ opening.get_next_unfilled }}
-		{% endfor %}
+	<div class="block">
+		<h3>Openings (Next 30 days)</h3>
+		<ul class="well">
+			{% for opening in openings %}
+				<li>
+					<!-- TODO: Figure out how we tell if an instance is filled -->
+					<a href="#" class="{% if opening.is_filled %}filled{% else %}unfilled{% endif %}">
+						{{ opening }}
+					</a>
+				</li>
+			{% endfor %}
+		</ul>
+		<a class="more-link" href="{% url 'timeslots_upcoming_commitments' %}">view all filled openings</a>
+	</div>
+
+	<div class="block">
+		<h3>Opening Patterns</h3>
+		<ul class="well">
+			{% for pattern in client.openings.all %}
+				<li>
+					<a href="#">
+						{{ pattern }}
+					</a>
+				</li>
+			{% endfor %}
+		</ul>
 	</div>
 
 {% endblock %}

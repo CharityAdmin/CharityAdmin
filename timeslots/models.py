@@ -1,5 +1,5 @@
 import datetime
-from dateutil import rrule
+from dateutil.rrule import *
 from django.db import models
 from django.contrib.auth.models import User
 
@@ -37,6 +37,20 @@ class Client(models.Model):
         return self.user.first_name + " " + self.user.last_name if (
         self.user.first_name or self.user.last_name) else self.user.email
 
+    def get_next_opening_instances(self, **kwargs):
+        instances = []
+        for opening in self.openings.all():
+            instances.extend(opening.get_next_instances(**kwargs))
+        instances.sort()
+        return instances
+
+    def get_next_unfilled_opening_instances(self, **kwargs):
+        instances = []
+        for opening in self.openings.all():
+            instances.extend(opening.get_next_unfilled_instances(**kwargs))
+        instances.sort()
+        return instances
+
 
 class ClientOpening(models.Model):
     client = models.ForeignKey(Client, db_column='clientId', related_name='openings')
@@ -52,47 +66,34 @@ class ClientOpening(models.Model):
         # For use in the context of a particular client. Same as the __unicode__ title, but missing the "[client name]: " at the beginning
         return "%s: %s (%s-%s)" % (self.type, self.get_all_metadata_string(), dateformat.format(d=self.startDate), dateformat.format(d=self.endDate) if self.endDate is not None else "")
 
-    def get_next_unfilled(self):
-        # get list of openings that haven't been filled
-        open_metadata_set = self.get_unfilled_metadata_set()
+    def get_instances(self, count=30, startDate=startDate, endDate=endDate, metadata_set=None):
+        days_of_week_dict = {'M': MO, 'T': TU, 'W': WE, 'Th': TH, 'F': FR, 'Sa': SA, 'Su': SU}
+        if metadata_set is None:
+            metadata_set = self.get_all_metadata_set()
+        instance_list = None
+        if self.type in ["Days of Week", "Days of Alternating Week"]:
+            interval = 2 if self.type == "Days of Alternating Week" else 1
+            print metadata_set
+            instance_list = list(rrule(WEEKLY, count=count, byweekday=(days_of_week_dict[day] for day in metadata_set), byhour=self.startDate.hour, byminute=self.startDate.minute, bysecond=self.startDate.second, dtstart=startDate, until=endDate, interval=interval))
+            print instance_list
+        elif self.type == "Day of Month":
+            instance_list = list(rrule(MONTHLY, count=count, bymonthday=metadata_set, byhour=self.startDate.hour, byminute=self.startDate.minute, bysecond=self.startDate.second, dtstart=startDate, until=endDate))
+        else:
+            # this is a one-off type
+            instance_list = list(self.startDate)
+        return instance_list
 
-        # TODO: make this respect commitment end dates
-        # TODO: check for exceptions too
+    def get_next_instances(self, endDate=None, **kwargs):
+        return self.get_instances(startDate=datetime.datetime.today(), endDate=endDate, **kwargs)
 
-        next_opening = None
+    def get_unfilled_instances(self, endDate=None):
+        return self.get_instances(metadata_set=self.get_unfilled_metadata_set(), endDate=endDate)
 
-        if len(open_metadata_set):
-            # if we have any open metadata, figure out the next day as a datetime object
-            if self.type in ["Days of Week", "Days of Alternating Week"]:
-                # get the first element in the set (by day-of-the-week order)
-                # TODO: make alternating weeks work
-                list_of_days = ['M', 'T', 'W', 'TH', 'F', 'SA', 'SU']
-                for idx, day in enumerate(list_of_days):
-                    if day in open_metadata_set:
-                        now = datetime.datetime.now()
-                        next_opening = datetime.datetime.now()
-                        # adjust the time to match the startDate time
-                        next_opening = next_opening.replace(hour=self.startDate.hour, minute=self.startDate.minute, second=self.startDate.second)
-                        # adjust the datetime based on the day of the week
-                        next_opening = next_opening + datetime.timedelta(days=idx - now.weekday())
-                        if now.weekday() >= idx:
-                            # if we've passed the correct day, we want the same day next week
-                            next_opening = next_opening + datetime.timedelta(weeks=1)
-                        break
-            elif self.type == "Day of Month":
-                # this assumes that Day-of-month type can only hold a single metadata each
-                now = datetime.now()
-                next_opening = now.replace(day=open_metadata_set[0], hour=self.startDate.hour, minute=self.startDate.minute, second=self.startDate.second)
-                if now.day > open_metadata_set[0]:
-                    # if we've already passed the correct day of the month, look at next month instead
-                    next_opening = next_opening + datetime.timedelta(month=1)
-            else:
-                # this is a one-off type
-                next_opening = self.startDate
-        return next_opening
+    def get_next_unfilled_instances(self, endDate=None):
+        return self.get_instances(startDate=datetime.datetime.today(), metadata_set=self.get_unfilled_metadata_set(), endDate=endDate)
 
-    def is_filled(self):
-        return self.next_opening
+    def get_next_unfilled_instance(self):
+        return self.get_instances(metadata_set=self.get_unfilled_metadata_set(), count=1)
 
     def get_all_metadata_set(self):
         return set([metadataobj.metadata for metadataobj in self.clientopeningmetadata_set.all()])
