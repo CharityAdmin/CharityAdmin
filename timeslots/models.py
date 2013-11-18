@@ -90,13 +90,13 @@ class ClientOpening(models.Model):
 
     def get_unfilled_instances(self, endDate=None, metadata_set=None, **kwargs):
         if metadata_set is None:
-            metadata_set=self.get_unfilled_metadata_set()
+            metadata_set = self.get_unfilled_metadata_set()
         instance_dates = self._get_instance_dates(metadata_set=metadata_set, endDate=endDate, **kwargs)
         return [{ "date": instance_date, "is_filled": False, "client": self.client } for instance_date in instance_dates]
 
     def get_filled_instances(self, endDate=None, metadata_set=None, **kwargs):
         if metadata_set is None:
-            metadata_set=self.get_filled_metadata_set()
+            metadata_set = self.get_filled_metadata_set()
         instance_dates = self._get_instance_dates(metadata_set=metadata_set, endDate=endDate, **kwargs)
         return [{ "date": instance_date, "is_filled": True, "client": self.client } for instance_date in instance_dates]
 

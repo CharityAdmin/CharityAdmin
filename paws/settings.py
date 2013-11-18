@@ -67,7 +67,8 @@ import os
 import sys
 
 PROJECT_ROOT = os.path.dirname(__file__)
-VENDOR_PATH = os.path.join(PROJECT_ROOT, 'vendor')
+PROJECT_PARENT = os.path.join(PROJECT_ROOT, os.pardir)
+VENDOR_PATH = os.path.join(PROJECT_PARENT, 'vendor')
 if VENDOR_PATH not in sys.path:
     sys.path.insert(0, VENDOR_PATH)
 
