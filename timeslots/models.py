@@ -43,8 +43,6 @@ class Client(models.Model):
         for opening in self.openings.all():
             instances.extend(opening.get_next_instances(**kwargs))
         instances.sort()
-        print "CLIENT INSTANCES: "
-        print instances
         return instances
 
     def get_next_unfilled_opening_instances(self, **kwargs):
@@ -52,14 +50,12 @@ class Client(models.Model):
         for opening in self.openings.all():
             instances.extend(opening.get_next_unfilled_instances(**kwargs))
         instances.sort()
-        print "CLIENT UNFILLED INSTANCES: "
-        print instances
         return instances
 
 
 class ClientOpening(models.Model):
     client = models.ForeignKey(Client, db_column='clientId', related_name='openings')
-    startDate = models.DateTimeField('Start Date', default=datetime.datetime.now)
+    startDate = models.DateTimeField('Start Date', default=timezone.now())
     endDate = models.DateTimeField('End Date', blank=True, null=True)
     type = models.CharField(max_length=20, choices=SCHEDULE_PATTERN_TYPE_CHOICES, default='Days of Week')
     notes = models.CharField(max_length=255, blank=True)
@@ -71,16 +67,18 @@ class ClientOpening(models.Model):
         # For use in the context of a particular client. Same as the __unicode__ title, but missing the "[client name]: " at the beginning
         return "%s: %s (%s-%s)" % (self.type, self.get_all_metadata_string(), dateformat.format(d=self.startDate), dateformat.format(d=self.endDate) if self.endDate is not None else "")
 
-    def _get_instance_dates(self, count=30, startDate=startDate, endDate=endDate, metadata_set=None):
-        days_of_week_dict = {'M': MO, 'T': TU, 'W': WE, 'Th': TH, 'F': FR, 'Sa': SA, 'Su': SU}
+    def _get_instance_dates(self, count=30, startDate=None, endDate=None, metadata_set=None):
+        days_of_week_dict = {'M': MO, 'Tu': TU, 'W': WE, 'Th': TH, 'F': FR, 'Sa': SA, 'Su': SU}
+        if startDate is None:
+            startDate = self.startDate
+        if endDate is None:
+            endDate = self.endDate
         if metadata_set is None:
             metadata_set = self.get_all_metadata_set()
         instance_list = list()
         if self.type in ["Days of Week", "Days of Alternating Week"]:
             interval = 2 if self.type == "Days of Alternating Week" else 1
-            print metadata_set
             instance_list = list(rrule(WEEKLY, count=count, byweekday=(days_of_week_dict[day] for day in metadata_set), byhour=self.startDate.hour, byminute=self.startDate.minute, bysecond=self.startDate.second, dtstart=startDate, until=endDate, interval=interval))
-            print instance_list
         elif self.type == "Day of Month":
             instance_list = list(rrule(MONTHLY, count=count, bymonthday=metadata_set, byhour=self.startDate.hour, byminute=self.startDate.minute, bysecond=self.startDate.second, dtstart=startDate, until=endDate))
         else:
@@ -88,27 +86,41 @@ class ClientOpening(models.Model):
             instance_list = list([self.startDate])
         return instance_list
 
-    def get_unfilled_instances(self, endDate=None, metadata_set=None, **kwargs):
+    def get_unfilled_instances(self, startDate=None, endDate=None, metadata_set=None, **kwargs):
+        if startDate is None:
+            startDate = self.startDate
+        if endDate is None:
+            endDate = self.endDate
         if metadata_set is None:
             metadata_set = self.get_unfilled_metadata_set()
-        instance_dates = self._get_instance_dates(metadata_set=metadata_set, endDate=endDate, **kwargs)
+        instance_dates = list()
+        if len(metadata_set) > 0:
+            instance_dates = self._get_instance_dates(metadata_set=metadata_set, startDate=startDate, endDate=endDate, **kwargs)
         return [{ "date": instance_date, "is_filled": False, "client": self.client } for instance_date in instance_dates]
 
-    def get_filled_instances(self, endDate=None, metadata_set=None, **kwargs):
+    def get_filled_instances(self, startDate=None, endDate=None, metadata_set=None, **kwargs):
+        if startDate is None:
+            startDate = self.startDate
+        if endDate is None:
+            endDate = self.endDate
         if metadata_set is None:
             metadata_set = self.get_filled_metadata_set()
-        instance_dates = self._get_instance_dates(metadata_set=metadata_set, endDate=endDate, **kwargs)
+        instance_dates = list()
+        if len(metadata_set) > 0:
+            instance_dates = self._get_instance_dates(metadata_set=metadata_set, startDate=startDate, endDate=endDate, **kwargs)
         return [{ "date": instance_date, "is_filled": True, "client": self.client } for instance_date in instance_dates]
 
-    def get_instances(self, endDate=None, **kwargs):
-        filled_instances = self.get_filled_instances(endDate=endDate, **kwargs)
-        unfilled_instances = self.get_unfilled_instances(endDate=endDate, **kwargs)
+    def get_instances(self, startDate=None, endDate=None, **kwargs):
+        if startDate is None:
+            startDate = self.startDate
+        if endDate is None:
+            endDate = self.endDate
+        filled_instances = self.get_filled_instances(startDate=startDate, endDate=endDate, **kwargs)
+        unfilled_instances = self.get_unfilled_instances(startDate=startDate, endDate=endDate, **kwargs)
         instances = list()
         instances.extend(filled_instances)
         instances.extend(unfilled_instances)
         instances.sort(key=lambda item:item['date'])
-        print "INSTANCES: "
-        print instances
         # return distinct list of instances (since filled_instance comes first,
         # any overlapping filled and unfilled instance should show as filled)
         seen = set()
@@ -147,12 +159,6 @@ class ClientOpening(models.Model):
         return len(self.get_filled_metadata_set()) > 0 and len(self.get_unfilled_metadata_set()) > 0
 
     def is_unfilled(self):
-        print "get_unfilled_metadata_set"
-        print self.get_unfilled_metadata_set()
-        print len(self.get_unfilled_metadata_set())
-        print "get_filled_metadata_set"
-        print self.get_filled_metadata_set()
-        print len(self.get_filled_metadata_set())
         return len(self.get_unfilled_metadata_set()) > 0 and len(self.get_filled_metadata_set()) is 0
 
     def get_filled_status(self):
