@@ -10,6 +10,9 @@ $well-background-color: #f7f7f7;
 $color-more-link: #666;
 $color-more-link-hover: #222;
 
+$color-danger: #bb0000;
+$color-warning: #ff8888;
+$color-success: #00aa00;
 
 ///
 /// COMMON STYLES
@@ -48,3 +51,69 @@ li {
 	}
 }
 
+.label {
+	margin: 0 5px;
+	padding: 1px 3px 0;
+	display: inline-block;
+
+	color: #fff;
+	font-size: 10px;
+	font-weight: bold;
+	text-transform: uppercase;
+	text-align: center;
+	text-decoration: none;
+	@include border-radius(3px);
+
+	&.label-danger {
+		background-color: $color-danger;
+	}
+
+	&.label-warning {
+		background-color: $color-warning;
+	}
+
+	&.label-success {
+		background-color: $color-success;
+	}
+}
+
+.text-danger,
+a.text-danger {
+	color: $color-danger;
+}
+
+.text-warning,
+a.text-warning {
+	color: $color-warning;
+}
+
+.text-success,
+a.text-success {
+	color: $color-success;
+}
+
+// .filled {
+// 	// color: $color-success;
+// }
+
+.unfilled_label,
+.filled_label {
+	width: 60px;
+}
+
+.filled_label {
+	visibility: hidden;
+}
+
+.pattern-label {
+	width: 100px;
+}
+
+// .date-display,
+// .pattern-display {
+// 	display: inline-block;
+// }
+
+a span {
+	text-decoration: underline;
+}

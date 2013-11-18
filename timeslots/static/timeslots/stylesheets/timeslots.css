@@ -1,9 +1,9 @@
-/* line 18, ../sass/timeslots.scss */
+/* line 21, ../sass/timeslots.scss */
 .content-container {
   max-width: 1170px;
 }
 
-/* line 22, ../sass/timeslots.scss */
+/* line 25, ../sass/timeslots.scss */
 .well {
   margin: 0;
   padding: 1.25em 1.25em .75em;
@@ -16,24 +16,93 @@
   border-radius: 5px;
 }
 
-/* line 30, ../sass/timeslots.scss */
+/* line 33, ../sass/timeslots.scss */
 li {
   line-height: 120%;
   margin-bottom: 0.5em;
 }
 
-/* line 35, ../sass/timeslots.scss */
+/* line 38, ../sass/timeslots.scss */
 .block {
   margin-bottom: 2em;
 }
-/* line 38, ../sass/timeslots.scss */
+/* line 41, ../sass/timeslots.scss */
 .block .more-link {
   display: block;
   margin-left: 1.5em;
   margin-top: 0.25em;
   color: #666666;
 }
-/* line 45, ../sass/timeslots.scss */
+/* line 48, ../sass/timeslots.scss */
 .block .more-link:hover {
   color: #222222;
+}
+
+/* line 54, ../sass/timeslots.scss */
+.label {
+  margin: 0 5px;
+  padding: 1px 3px 0;
+  display: inline-block;
+  color: #fff;
+  font-size: 10px;
+  font-weight: bold;
+  text-transform: uppercase;
+  text-align: center;
+  text-decoration: none;
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  -ms-border-radius: 3px;
+  -o-border-radius: 3px;
+  border-radius: 3px;
+}
+/* line 67, ../sass/timeslots.scss */
+.label.label-danger {
+  background-color: #bb0000;
+}
+/* line 71, ../sass/timeslots.scss */
+.label.label-warning {
+  background-color: #ff8888;
+}
+/* line 75, ../sass/timeslots.scss */
+.label.label-success {
+  background-color: #00aa00;
+}
+
+/* line 81, ../sass/timeslots.scss */
+.text-danger,
+a.text-danger {
+  color: #bb0000;
+}
+
+/* line 86, ../sass/timeslots.scss */
+.text-warning,
+a.text-warning {
+  color: #ff8888;
+}
+
+/* line 91, ../sass/timeslots.scss */
+.text-success,
+a.text-success {
+  color: #00aa00;
+}
+
+/* line 100, ../sass/timeslots.scss */
+.unfilled_label,
+.filled_label {
+  width: 60px;
+}
+
+/* line 104, ../sass/timeslots.scss */
+.filled_label {
+  visibility: hidden;
+}
+
+/* line 108, ../sass/timeslots.scss */
+.pattern-label {
+  width: 100px;
+}
+
+/* line 117, ../sass/timeslots.scss */
+a span {
+  text-decoration: underline;
 }

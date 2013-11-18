@@ -3,6 +3,7 @@ from django.http import Http404
 from django.shortcuts import render_to_response
 from django.contrib.auth.decorators import login_required
 from django.template import RequestContext
+from django.utils import timezone
 from timeslots.models import Client, ClientOpening, ClientOpeningException, ClientOpeningMetadata
 
 
@@ -21,7 +22,14 @@ def volunteer_dashboard(request):
 
 @login_required
 def upcoming_openings(request):
-    return render_to_response('timeslots/upcoming_openings.html', context_instance=RequestContext(request))
+    volunteer = request.user.volunteer
+    openings = list()
+    if volunteer is not None:
+        endDate = timezone.now() + datetime.timedelta(days=30)
+        for client in volunteer.clients.all():
+            openings.extend(client.get_next_unfilled_opening_instances(endDate=endDate))
+    openings.sort(key=lambda item:item['date'])
+    return render_to_response('timeslots/upcoming_openings.html', { "openings": openings }, context_instance=RequestContext(request))
 
 
 @login_required
@@ -33,5 +41,5 @@ def upcoming_commitments(request):
 @login_required
 def client_view(request, clientname):
     client = Client.objects.get(user__username=clientname)
-    openings = client.get_next_opening_instances(endDate=datetime.datetime.today() + datetime.timedelta(days=30))
+    openings = client.get_next_opening_instances(endDate=timezone.now() + datetime.timedelta(days=30))
     return render_to_response('timeslots/client_view.html', { "client": client, "openings": openings }, context_instance=RequestContext(request))

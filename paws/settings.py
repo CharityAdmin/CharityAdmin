@@ -6,7 +6,7 @@ DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
 ADMINS = (
-# ('Your Name', 'your_email@example.com'),
+    # ('Your Name', 'your_email@example.com'),
 )
 
 MANAGERS = ADMINS
@@ -19,13 +19,16 @@ try:
     from settings_local import *
 except ImportError:
     ACTIVE_DB = {
-        'ENGINE': 'django.db.backends.sqlite3', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': 'paws/paws.db', # Or path to database file if using sqlite3.
+        # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': 'paws/paws.db',  # Or path to database file if using sqlite3.
         # The following settings are not used with sqlite3:
         'USER': '',
         'PASSWORD': '',
-        'HOST': '', # Empty for localhost through domain sockets or '127.0.0.1' for localhost through TCP.
-        'PORT': '', # Set to empty string for default.
+        # Empty for localhost through domain sockets or '127.0.0.1' for
+        # localhost through TCP.
+        'HOST': '',
+        'PORT': '',  # Set to empty string for default.
     }
 
     DEBUG = True
@@ -35,7 +38,8 @@ DATABASES = {
 }
 
 # Try to import the secret_key from a secret_key.py file (not included in the git repo).
-# If this can't be found, create a new one and fill it as appropriate (with a new random secret key).
+# If this can't be found, create a new one and fill it as appropriate
+# (with a new random secret key).
 
 
 def generate_secret_key(filepath):
@@ -43,7 +47,8 @@ def generate_secret_key(filepath):
 
     chars = 'abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*(-_=+)'
     f = open(filepath, 'w')
-    f.write("# Make this unique, and don't share it with anybody.\nSECRET_KEY = '" + get_random_string(50, chars) + "'")
+    f.write("# Make this unique, and don't share it with anybody.\nSECRET_KEY = '" +
+            get_random_string(50, chars) + "'")
 
 
 try:
@@ -56,7 +61,8 @@ except ImportError:
     from secret_key import *
 
 
-# Add the "vendor" project sub-directory to the sys.path, to allow storing 3rd party apps in a separate directory
+# Add the "vendor" project sub-directory to the sys.path, to allow storing
+# 3rd party apps in a separate directory
 import os
 import sys
 
