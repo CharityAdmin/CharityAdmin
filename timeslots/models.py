@@ -3,6 +3,8 @@ from dateutil.rrule import *
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
+from django.contrib.localflavor.us.us_states import STATE_CHOICES
+from django.core.urlresolvers import reverse
 
 SCHEDULE_PATTERN_TYPE_CHOICES = (
     ('One-Off', 'One-Off'),
@@ -19,10 +21,14 @@ class Volunteer(models.Model):
     user = models.OneToOneField(User, db_column='userId')
     trained = models.BooleanField(default=False)
     clients = models.ManyToManyField('Client', related_name='volunteers')
+    phone = models.CharField(max_length=20, null=True, blank=True)
 
     def __unicode__(self):
         return self.user.first_name + " " + self.user.last_name if (
         self.user.first_name or self.user.last_name) else self.user.email
+
+    def get_absolute_url(self):
+        return reverse('timeslots_volunteer_view', kwargs={'userid': self.user.id})
 
     def get_current_commitments(self):
         from django.db.models import Q
@@ -30,25 +36,47 @@ class Volunteer(models.Model):
         today = timezone.now()
         return self.commitments.filter(Q(endDate__gte=today) | Q(endDate__isnull=True), startDate__lte=today)
 
+    def get_commitments(self):
+        from django.db.models import Q
+
+        today = timezone.now()
+        return self.commitments.filter(Q(endDate__gte=today) | Q(endDate__isnull=True), startDate__lte=today)
+
+    def get_commitment_instances(self, startDate=None, endDate=None, **kwargs):
+        instances = list()
+        for commitment in self.get_commitments():
+            instances.extend(commitment.get_instances(startDate=startDate, endDate=endDate, **kwargs))
+        # instances.sort()
+        return instances
+
 
 class Client(models.Model):
     user = models.OneToOneField(User, db_column='userId')
+    address = models.CharField(max_length=255, blank=True, null=True)
+    address2 = models.CharField(max_length=255, blank=True, null=True)
+    city = models.CharField(max_length=255, blank=True, null=True)
+    state = models.CharField(max_length=2, choices=STATE_CHOICES, blank=True, null=True)
+    zipcode = models.CharField(max_length=10, blank=True, null=True)
+    phone = models.CharField(max_length=20, null=True, blank=True)
 
     def __unicode__(self):
         return self.user.first_name + " " + self.user.last_name if (
         self.user.first_name or self.user.last_name) else self.user.email
 
-    def get_next_opening_instances(self, **kwargs):
+    def get_absolute_url(self):
+        return reverse('timeslots_client_view', kwargs={'userid': self.user.id})
+
+    def get_opening_instances(self, **kwargs):
         instances = list()
         for opening in self.openings.all():
             instances.extend(opening.get_next_instances(**kwargs))
         instances.sort()
         return instances
 
-    def get_next_unfilled_opening_instances(self, **kwargs):
+    def get_unfilled_opening_instances(self, **kwargs):
         instances = list()
         for opening in self.openings.all():
-            instances.extend(opening.get_next_unfilled_instances(**kwargs))
+            instances.extend(opening.get_unfilled_instances(**kwargs))
         instances.sort()
         return instances
 
@@ -58,7 +86,7 @@ class ClientOpening(models.Model):
     startDate = models.DateTimeField('Start Date', default=timezone.now())
     endDate = models.DateTimeField('End Date', blank=True, null=True)
     type = models.CharField(max_length=20, choices=SCHEDULE_PATTERN_TYPE_CHOICES, default='Days of Week')
-    notes = models.CharField(max_length=255, blank=True)
+    notes = models.CharField(max_length=255, blank=True, null=True)
 
     def __unicode__(self):
         return "%s, %s: %s (%s-%s)" % (self.client, self.type, self.get_all_metadata_string(), dateformat.format(d=self.startDate), dateformat.format(d=self.endDate) if self.endDate is not None else "")
@@ -126,8 +154,10 @@ class ClientOpening(models.Model):
         seen = set()
         return [instance for instance in instances if instance['date'] not in seen and not seen.add(instance['date'])]
 
-    def get_next_instances(self, endDate=None, **kwargs):
-        return self.get_instances(startDate=timezone.now(), endDate=endDate, **kwargs)
+    def get_next_instances(self, startDate=None, endDate=None, **kwargs):
+        if startDate is None:
+            startDate = timezone.now()
+        return self.get_instances(startDate=startDate, endDate=endDate, **kwargs)
 
     def get_next_unfilled_instances(self, endDate=None, **kwargs):
         return self.get_unfilled_instances(startDate=timezone.now(), endDate=endDate, **kwargs)
@@ -195,7 +225,7 @@ class VolunteerCommitment(models.Model):
     startDate = models.DateTimeField('Start Date', default=datetime.datetime.now)
     endDate = models.DateTimeField('End Date', blank=True, null=True)
     type = models.CharField(max_length=20, choices=SCHEDULE_PATTERN_TYPE_CHOICES, default='Days of Week')
-    notes = models.CharField(max_length=255, blank=True)
+    notes = models.CharField(max_length=255, blank=True, null=True)
 
     def __unicode__(self):
         return "%s visits %s, %s: %s (%s-%s)" % (
@@ -205,6 +235,12 @@ class VolunteerCommitment(models.Model):
     def pattern_description(self, prefix="Visit "):
         # displays just the Type, Metadata, and Start/End Dates
         return "%s: %s (%s-%s)" % (self.type, self.volunteercommitmentmetadata_set.all()[0].metadata, dateformat.format(d=self.startDate), dateformat.format(d=self.endDate) if self.endDate is not None else "")
+
+    def get_all_metadata_set(self):
+        return set([metadataobj.metadata for metadataobj in self.volunteercommitmentmetadata_set.all()])
+
+    def get_instances(self, **kwargs):
+        return self.clientOpening.get_instances(metadata_set=self.get_all_metadata_set(), **kwargs)
 
 
 class VolunteerCommitmentMetadata(models.Model):

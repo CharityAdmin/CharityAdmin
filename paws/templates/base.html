@@ -38,24 +38,67 @@
                     <div class="menu-header-navigation menu">
                         {% block navigation %}
                         <ul>
-                            <li><a href="{% url 'timeslots_home' %}">Home</a></li>
                             {% if not user.is_authenticated %}
-                                <li><a href="{% url 'paws_login' %}">Log in</a></li>
-                                <li><a href="{% url 'paws_signup' %}">Sign up</a></li>
+                                <li class="menu-item"><a href="{% url 'timeslots_home' %}">Home</a></li>
+                                <li class="menu-item"><a href="{% url 'paws_login' %}">Log in</a></li>
+                                <li class="menu-item"><a href="{% url 'paws_signup' %}">Sign up</a></li>
                             {% else %}
                                 {% block navigation_authenticated %}
-                                    <li>
-                                        <a href="{% url 'timeslots_upcoming_commitments' %}">
-                                            {% if not user.is_staff %}Your {% endif %}Upcoming Commitments
+                                    <li class="menu-item">
+                                        <a href="{% url 'timeslots_volunteer_dashboard' %}">
+                                            Dashboard
                                         </a>
                                     </li>
-                                    <li>
-                                        <a href="{% url 'timeslots_upcoming_openings' %}">
-                                            {% if not user.is_staff %}Your {% endif %}Clients' Upcoming Openings
+                                    <li class="menu-item">
+                                        <a href="{% url 'timeslots_commitments_view' %}">
+                                            {% if not user.is_staff %}Your {% endif %}Commitments
+                                        </a>
+                                    </li>
+                                    <li class="menu-item">
+                                        <a href="{% url 'timeslots_openings_view' %}">
+                                            {% if not user.is_staff %}Your {% endif %}Clients' Openings
                                         </a>
                                     </li>
                                     {% block navigation_authenticated_additional %}{% endblock %}
-                                    <li class="pull-right">
+                                    {% if user.is_staff %}
+                                        {% block navigation_staff %}
+                                        <li class="menu-item menu-item-has-children">
+                                            <a href="#">
+                                                Admin
+                                            </a>
+                                            <ul>
+                                                <li class="menu-item">
+                                                    <a href="{% url 'timeslots_clients_view' %}">
+                                                        View All Clients
+                                                    </a>
+                                                </li>
+                                                <li class="menu-item">
+                                                    <a href="{% url 'timeslots_volunteers_view' %}">
+                                                        View All Volunteers
+                                                    </a>
+                                                </li>
+                                                <li class="menu-item">
+                                                    <a href="{% url 'timeslots_user_add' %}">
+                                                        Add Client/Volunteer
+                                                    </a>
+                                                </li>
+                                                {% comment %}
+                                                <li class="menu-item">
+                                                    <a href="{% url 'timeslots_opening_add' %}">
+                                                        Add Client Opening
+                                                    </a>
+                                                </li>
+                                                <li class="menu-item">
+                                                    <a href="{% url 'timeslots_commitment_add' %}">
+                                                        Add Volunteer Commitment
+                                                    </a>
+                                                </li>
+                                                {% endcomment %}
+                                            </ul>
+                                        </li>
+                                        {% endblock %}
+                                    {% endif %}
+                                    <li class="menu-item pull-right">
                                         <a href="{% url 'paws_logout' %}">Log out</a>
                                     </li>
                                 {% endblock %}
@@ -65,6 +108,7 @@
                     </div>
                 </nav>
             </div>
+            <div class="clear"></div>
         </div>
 
         <div class="white-container">

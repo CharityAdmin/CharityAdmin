@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block content %}
+	<div class="block">
+		<h3>{{ listTitle }}</h3>
+
+		<div class="block">
+			<ul class="well">
+				{% for item in listItems %}
+					<li>
+						<a href="{{ item.get_absolute_url }}">{{ item }}</a>
+					</li>
+				{% endfor %}
+			</ul>
+		</div>
+	</div>
+
+{% endblock %}

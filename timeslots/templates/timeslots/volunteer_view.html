@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block content %}
+	<h3>{{ volunteer }}</h3>
+
+	<div class="block">
+		<div class="phone">
+			Phone:
+			{% if volunteer.phone %}
+				{{ volunteer.phone }}
+			{% else %}
+				Not provided
+			{% endif %}
+		</div>
+	</div>
+
+	<div class="block">
+		<h4>Clients</h4>
+		<ul class="well">
+			{% for client in volunteer.clients.all %}
+				<li>
+					<a href="{{ client.get_absolute_url }}">
+						{{ client }}
+					</a>
+				</li>
+			{% endfor %}
+		</ul>
+	</div>
+
+	<div class="block">
+		<h4>Upcoming Commitments</h4>
+		<ul class="well">
+			{% for instance in instances %}
+				{% include "timeslots/partials/commitment_instance.html" %}
+			{% endfor %}
+		</ul>
+	</div>
+
+	<div class="block">
+		<h3>Commitment Patterns</h3>
+		<ul class="well">
+			{% for commitment in commitments %}
+				<li>
+					<div>
+						Visit
+						<a href="{{ commitment.clientOpening.client.get_absolute_url }}">{{ commitment.clientOpening.client }}</a>
+						on
+						<a href="#">{{ commitment.pattern_description }}</a>
+					</div>
+				</li>
+			{% endfor %}
+		</ul>
+	</div>
+
+{% endblock %}

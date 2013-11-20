@@ -1,0 +1,16 @@
+<div class="date-selector-wrapper">
+	<a class="date-selector js-date-selector">
+		<div class="current-selection">&nbsp;</div>
+		<div class="select-time-period-label">Select Time Period...</div>
+		<div class="date-selector-arrow"></div>
+		<div class="date-selector-menu js-date-selector-menu">
+			<div class="date-selector-menu-item js-date-menu-item-next-30-days">Next 30 Days</div>
+			<div class="date-selector-menu-item custom-dates js-date-menu-item-custom-dates">
+				<input type="text" placeholder="Start Date" name="startdate" id="startdate" class="date-input js-date-input" tabindex="99" /> to
+				<input type="text" placeholder="End Date" name="enddate" id="enddate" class="date-input js-date-input" tabindex="99" />
+			</div>
+		</div>
+	</a>
+	<div class="js-variable js-startdate">{{ startDate|date:"Y-m-d T" }}</div>
+	<div class="js-variable js-enddate">{{ endDate|date:"Y-m-d T" }}</div>
+</div>

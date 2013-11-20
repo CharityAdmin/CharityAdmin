@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block content %}
+	<div class="block">
+		<h3>{{ opening }}</h3>
+		{% include "timeslots/partials/datepicker.html" %}
+
+		{% if user.is_staff or is_myopening %}
+			<a class="edit-link edit-commitments" href="#">Edit This Opening</a>
+		{% endif %}
+
+		<div class="block">
+			<!-- <h3>Commitment Instances</h3> -->
+			<ul class="well">
+				{% for instance in instances %}
+					{% include "timeslots/partials/commitment_instance.html" %}
+				{% endfor %}
+			</ul>
+		</div>
+	</div>
+
+{% endblock %}

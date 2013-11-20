@@ -2,32 +2,44 @@
 
 {% block content %}
 	<div class="dashboard">
-		<h1>Volunteer Dashboard</h1>
+		<h3>Volunteer Dashboard</h3>
+		{% include "timeslots/partials/datepicker.html" %}
+
+		{% if volunteer == None %}
+			<div class="alert alert-danger">
+				<strong>Minor Error</strong>
+				<br />
+				Nothing too major, but your account doesn't seem to be set up as a volunteer! Please ask an administrator to check your account configuration.
+			</div>
+		{% endif %}
+
 		<div class="block">
-			<h3>Upcoming Commitments for You</h3>
+			<a href="{% url 'timeslots_commitments_view' %}">
+				<h4>Upcoming Commitments for You</h4>
+			</a>
 			<ul class="well">
-				<li>Visit <a href="#">Client Name 1</a> on <a href="#">Tuesday, 10/31/13 at 3 PM</a></li>
-				<li>Visit <a href="#">Client Name 3</a> on <a href="#">Sunday, 11/4/13 at 9 AM</a></li>
-				<li>Visit <a href="#">Client Name 2</a> on <a href="#">Monday, 11/8/13 at 5 PM</a></li>
+				{% for instance in commitment_instances %}
+					{% include "timeslots/partials/commitment_instance.html" %}
+				{% endfor %}
 			</ul>
-			<a class="more-link" href="{% url 'timeslots_upcoming_commitments' %}">view all upcoming commitments</a>
 		</div>
 
 		<div class="block">
-			<h3>Upcoming Openings for Your Clients</h3>
+			<a href="{% url 'timeslots_openings_view' %}">
+				<h4>Upcoming Openings for Your Clients</h4>
+			</a>
 			<ul class="well">
-				<li><a href="#">Opening for Client Name 1 on Tuesday, 10/31/13 at 3 PM</a></li>
-				<li><a href="#">Opening for Client Name 1 on Tuesday, 10/31/13 at 3 PM</a></li>
-				<li><a href="#">Opening for Client Name 1 on Tuesday, 10/31/13 at 3 PM</a></li>
+				{% for opening in openings %}
+					{% include "timeslots/partials/opening_instance.html" %}
+				{% endfor %}
 			</ul>
-			<a class="more-link" href="{% url 'timeslots_upcoming_openings' %}">view all upcoming openings for your clients</a>
 		</div>
 
 		<div class="block">
-			<h3>Your Clients</h3>
+			<h4>Your Clients</h4>
 			<ul class="well">
 				{% for client in clients %}
-					<li><a href="{% url 'timeslots_client_view' client.user.username %}">{{ client.user.username }}</a></li>
+					<li><a href="{% url 'timeslots_client_view' client.user.username %}">{{ client }}</a></li>
 				{% endfor %}
 			</ul>
 		</div>

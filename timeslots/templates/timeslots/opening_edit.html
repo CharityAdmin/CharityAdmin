@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block content %}
+	<h3>Edit Client Opening: {{ opening }}</h3>
+	<div>
+		<form action="." method="post" class="form-edit-client">
+			{% csrf_token %}
+		    {% include "timeslots/partials/form_snippet.html" %}
+		    <div class="control-group">
+		    	<input type="submit" value="Save Client Opening" />
+		   	</div>
+		</form>
+	</div>
+{% endblock %}
