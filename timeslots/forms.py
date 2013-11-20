@@ -44,7 +44,7 @@ class OpeningForm(forms.ModelForm):
         if type == "Days of Week" or type == "Days of Alt Week":
             # convert metadata string to list of days
             for day in ['M', 'Tu', 'W', 'Th', 'F', 'Sa', 'Su']:
-                if metadatastring.find(day)!=-1:
+                if metadatastring.find(day) != -1:
                     metadata.append(day)
         else:
             metadata = metadatastring
