@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block content %}
+	<div class="dashboard">
+		<h3>Volunteer Dashboard</h3>
+		{% include "timeslots/partials/datepicker.html" %}
+
+		{% if volunteer == None %}
+			<div class="alert alert-danger">
+				<strong>Minor Error</strong>
+				<br />
+				Nothing too major, but your account doesn't seem to be set up as a volunteer! Please ask an administrator to check your account configuration.
+			</div>
+		{% endif %}
+
+		<div class="block">
+			<a href="{% url 'timeslots_commitments_view' %}">
+				<h4>Upcoming Commitments for You</h4>
+			</a>
+			<ul class="well">
+				{% for instance in commitment_instances %}
+					{% include "timeslots/partials/commitment_instance.html" %}
+				{% endfor %}
+			</ul>
+		</div>
+
+		<div class="block">
+			<a href="{% url 'timeslots_openings_view' %}">
+				<h4>Upcoming Openings for Your Clients</h4>
+			</a>
+			<ul class="well">
+				{% for opening in openings %}
+					{% include "timeslots/partials/opening_instance.html" %}
+				{% endfor %}
+			</ul>
+		</div>
+
+		<div class="block">
+			<h4>Your Clients</h4>
+			<ul class="well">
+				{% for client in clients %}
+					<li><a href="{% url 'timeslots_client_view' client.user.username %}">{{ client }}</a></li>
+				{% endfor %}
+			</ul>
+		</div>
+	</div>
+{% endblock content %}

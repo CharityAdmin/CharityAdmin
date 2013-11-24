@@ -31,7 +31,7 @@
 	p.lead {font-size: 21px; line-height: 27px; color: #777; }
 
 	em {font-style: italic;}
-	strong {font-weight: bold; color: #333;}
+	strong {font-weight: bold; }
 	small {font-size: 80%;}
 
 /*	Blockquotes  */
@@ -158,23 +158,26 @@
 ================================================== */
 	.nav-primary-outer-wrapper {
 		position: relative;
+		/*height: 50px;*/
 		z-index: 9;
 		background: #111 url('../images/nav-primary-outer-bg.png') repeat-x top;
 		border-bottom: 1px solid #000;
 		-webkit-box-shadow: 0 0 5px rgba(0,0,0,.5);
 		-moz-box-shadow: 0 0 5px rgba(0,0,0,.5);
 		box-shadow: 0 0 5px rgba(0,0,0,.5);
-	}
-	.nav-primary-outer-wrapper {
 		border-bottom: 1px solid #222;
-		overflow: hidden;
 	}
-	.nav-primary { }
+
+	.clear {
+		clear: both;
+	}
+
+	/*.nav-primary { }*/
 	.nav-primary li { position: relative; display: inline; float: left; margin: 0; line-height: 50px; }
 	.nav-primary li:hover { background: #141414; -webkit-box-shadow: inset 0px 5px 10px rgba(0, 0, 0, 1); -moz-box-shadow: inset 0px 5px 10px rgba(0, 0, 0, 1); box-shadow: inset 0px 5px 10px rgba(0, 0, 0, 1);}
 	.nav-primary li:hover > ul { display: block; }
-	.nav-primary > ul > li { border-right: 1px solid #222; }
-	.nav-primary > ul > li > a { border-right: 1px solid #0c0c0c; }
+	.nav-primary ul > li { border-right: 1px solid #222; }
+	.nav-primary ul > li > a { border-right: 1px solid #0c0c0c; }
 	.nav-primary li a { display: block; font-family: PT Sans Narrow, Helvetica, Arial, Sans Serif; font-size: 18px; padding: 0 20px; margin: 0; text-decoration: none; color: #f5f5f5; }
 	.nav-primary li a:hover { color: #fff; }
 	.nav-primary li li { clear: left; white-space: nowrap; display: block; width: 100%; background: #111; margin: 0; line-height: 40px; }
@@ -489,3 +492,17 @@
 	}
 	ul.tabs:after { clear: both; }
 	ul.tabs { zoom: 1; }
+
+
+/* ADDED FOR CHARITYADMIN */
+.pull-right {
+	float: right !important;
+}
+
+nav ul {
+	max-width: 1200px;
+}
+
+.nav-primary ul li:hover ul {
+	display: block;
+}
