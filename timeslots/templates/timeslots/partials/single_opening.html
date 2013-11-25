@@ -4,9 +4,9 @@
 	 		{% if not opening.is_filled %}Un{% endif %}filled
 	 	</span>
 		<span class="date-display">
-			Visit <a href="{% url 'timeslots_client_view' opening.client.user.id %}">{{ opening.client }}</a>
+			Visit <a href="{{ opening.client.get_absolute_url }}">{{ opening.client }}</a>
 			on
-			<a href="#">{{ opening.date|date:"D N j, Y, P" }}</a>
+			<a href="{{ opening.get_absolute_url }}">{{ opening.date|date:"D N j, Y, P" }}</a>
 		</span>
 	</div>
 </li>

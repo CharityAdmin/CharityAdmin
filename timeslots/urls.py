@@ -1,4 +1,4 @@
-from django.conf.urls import patterns, include, url
+from django.conf.urls import patterns, url
 
 urlpatterns = patterns(
     '',
@@ -8,32 +8,33 @@ urlpatterns = patterns(
 
     url(r'^$', 'timeslots.views.home', name='timeslots_home'),
     url(r'^dashboard/$', 'timeslots.views.volunteer_dashboard', name='timeslots_volunteer_dashboard'),
-
-    url(r'^commitments/$', 'timeslots.views.commitments_view', name='timeslots_commitments_view'),
-    url(r'^commitment/add/(?P<openingid>\w+)/$', 'timeslots.views.commitment_add', name='timeslots_commitment_add'),
-    url(r'^commitment/add/(?P<openingid>\w+)/v/(?P<volunteerid>\w+)$', 'timeslots.views.commitment_add', name='timeslots_commitment_add'),
-    url(r'^commitment/(?P<commitmentid>\w+)/$', 'timeslots.views.commitment_view', name='timeslots_commitment_view'),
-    url(r'^commitment/(?P<commitmentid>\w+)/edit/$', 'timeslots.views.commitment_edit', name='timeslots_commitment_edit'),
-    url(r'^commitment/(?P<commitmentid>\w+)/edit/success/$', 'timeslots.views.commitment_edit_success', name='timeslots_commitment_edit_success'),
-
-    url(r'^openings/$', 'timeslots.views.openings_view', name='timeslots_openings_view'),
-    url(r'^opening/add/(?P<clientid>\w+)/$', 'timeslots.views.opening_add', name='timeslots_opening_add'),
-    url(r'^opening/add/(?P<clientid>\w+)/v/(?P<volunteerid>\w+)$', 'timeslots.views.opening_add', name='timeslots_opening_add'),
-    url(r'^opening/(?P<openingid>\w+)/$', 'timeslots.views.opening_view', name='timeslots_opening_view'),
-    url(r'^opening/(?P<openingid>\w+)/edit/$', 'timeslots.views.opening_edit', name='timeslots_opening_edit'),
-    url(r'^opening/(?P<openingid>\w+)/edit/success/$', 'timeslots.views.opening_edit_success', name='timeslots_opening_edit_success'),
-
     url(r'^user/add/$', 'timeslots.views.user_add', name='timeslots_user_add'),
 
     url(r'^clients/$', 'timeslots.views.clients_view', name='timeslots_clients_view'),
-    url(r'^client/(?P<userid>\w+)/$', 'timeslots.views.client_view', name='timeslots_client_view'),
-    url(r'^client/(?P<userid>\w+)/edit/$', 'timeslots.views.client_edit', name='timeslots_client_edit'),
-    url(r'^client/(?P<userid>\w+)/edit/success/$', 'timeslots.views.client_edit_success', name='timeslots_client_edit_success'),
+    url(r'^client/(?P<userid>\d+)/$', 'timeslots.views.client_view', name='timeslots_client_view'),
+    url(r'^client/(?P<userid>\d+)/edit/$', 'timeslots.views.client_edit', name='timeslots_client_edit'),
+    url(r'^client/(?P<userid>\d+)/edit/success/$', 'timeslots.views.client_edit_success', name='timeslots_client_edit_success'),
 
     url(r'^volunteers/$', 'timeslots.views.volunteers_view', name='timeslots_volunteers_view'),
-    url(r'^volunteer/(?P<userid>\w+)/$', 'timeslots.views.volunteer_view', name='timeslots_volunteer_view'),
-    url(r'^volunteer/(?P<userid>\w+)/edit/$', 'timeslots.views.volunteer_edit', name='timeslots_volunteer_edit'),
-    url(r'^volunteer/(?P<userid>\w+)/edit/success/$', 'timeslots.views.volunteer_edit_success', name='timeslots_volunteer_edit_success'),
+    url(r'^volunteer/(?P<userid>\d+)/$', 'timeslots.views.volunteer_view', name='timeslots_volunteer_view'),
+    url(r'^volunteer/(?P<userid>\d+)/edit/$', 'timeslots.views.volunteer_edit', name='timeslots_volunteer_edit'),
+    url(r'^volunteer/(?P<userid>\d+)/edit/success/$', 'timeslots.views.volunteer_edit_success', name='timeslots_volunteer_edit_success'),
 
+    url(r'^openings/$', 'timeslots.views.openings_view', name='timeslots_openings_view'),
+    url(r'^client/(?P<clientid>\d+)/openings/$', 'timeslots.views.openings_view', name='timeslots_openings_view'),
+    url(r'^client/(?P<clientid>\d+)/opening/(?P<year>\d+)/(?P<month>\d+)/(?P<day>\d+)/(?P<time>\d+)$', 'timeslots.views.opening_instance_view', name='timeslots_opening_instance_view'),
+    url(r'^opening/add/(?P<clientid>\d+)/$', 'timeslots.views.opening_add', name='timeslots_opening_add'),
+    url(r'^opening/(?P<openingid>\d+)/$', 'timeslots.views.opening_view', name='timeslots_opening_view'),
+    url(r'^opening/(?P<openingid>\d+)/edit/$', 'timeslots.views.opening_edit', name='timeslots_opening_edit'),
+    url(r'^opening/(?P<openingid>\d+)/edit/success/$', 'timeslots.views.opening_edit_success', name='timeslots_opening_edit_success'),
+
+    url(r'^commitments/$', 'timeslots.views.commitments_view', name='timeslots_commitments_view'),
+    url(r'^client/(?P<clientid>\d+)/commitments/$', 'timeslots.views.commitments_view', name='timeslots_commitments_view'),
+    url(r'^client/(?P<clientid>\d+)/commitment/(?P<year>\d+)/(?P<month>\d+)/(?P<day>\d+)/(?P<time>\d+)$', 'timeslots.views.commitment_instance_view', name='timeslots_commitment_instance_view'),
+    url(r'^commitment/add/(?P<openingid>\d+)/$', 'timeslots.views.commitment_add', name='timeslots_commitment_add'),
+    url(r'^commitment/add/(?P<openingid>\d+)/v/(?P<volunteerid>\d+)$', 'timeslots.views.commitment_add', name='timeslots_commitment_add'),
+    url(r'^commitment/(?P<commitmentid>\d+)/$', 'timeslots.views.commitment_view', name='timeslots_commitment_view'),
+    url(r'^commitment/(?P<commitmentid>\d+)/edit/$', 'timeslots.views.commitment_edit', name='timeslots_commitment_edit'),
+    url(r'^commitment/(?P<commitmentid>\d+)/edit/success/$', 'timeslots.views.commitment_edit_success', name='timeslots_commitment_edit_success'),
 
 )

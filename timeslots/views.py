@@ -1,6 +1,6 @@
 import datetime
 from django.http import Http404, HttpResponseRedirect, HttpResponseForbidden
-from django.shortcuts import render_to_response
+from django.shortcuts import render_to_response, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib.admin.views.decorators import staff_member_required
 from django.template import RequestContext
@@ -78,17 +78,25 @@ def volunteer_dashboard(request):
 
 
 @login_required
-def openings_view(request):
+def openings_view(request, clientid=None):
+    """ Show all openings, or if a clientid is provided, all openings for that client """
     startDate, endDate = get_dates(request)
 
-    volunteer = request.user.volunteer
+    volunteer = get_volunteer(request)
     openings = list()
+    client = None
     if volunteer is not None:
-        for client in volunteer.clients.all():
-            openings.extend(client.get_unfilled_opening_instances(startDate=startDate, endDate=endDate))
+        if clientid:
+            client = Client.objects.get(user__id=clientid)
+            openings = client.get_unfilled_opening_instances(startDate=startDate, endDate=endDate)
+            if not request.user.is_staff and client not in volunteer.clients.all():
+                return HttpResponseForbidden
+        else:
+            for client in volunteer.clients.all():
+                openings.extend(client.get_unfilled_opening_instances(startDate=startDate, endDate=endDate))
     openings.sort(key=lambda item:item['date'])
 
-    return render_to_response('timeslots/openings_view.html', { "openings": openings, "startDate": startDate, "endDate": endDate }, context_instance=RequestContext(request))
+    return render_to_response('timeslots/openings_view.html', { "openings": openings, "client": client, "startDate": startDate, "endDate": endDate }, context_instance=RequestContext(request))
 
 
 @login_required
@@ -96,11 +104,23 @@ def opening_view(request, openingid):
     """ Show a single opening, along with instances based on startDate and endDate url parameters. """
     startDate, endDate = get_dates(request)
 
-    opening = ClientOpening.objects.get(id=openingid)
+    opening = get_object_or_404(ClientOpening, id=openingid)
     is_myopening = True if opening.client.user == request.user else False
     instances = opening.get_instances(startDate=startDate, endDate=endDate)
     return render_to_response('timeslots/opening_view.html', { "opening": opening, "is_myopening": is_myopening, "instances": instances, "startDate": startDate, "endDate": endDate }, context_instance=RequestContext(request))
 
+@login_required
+def opening_instance_view(request, clientid, year, month, date, time):
+    """ Show a single opening instance """
+    volunteer = get_volunteer(request)
+    client = Client.objects.get(user__id=clientid)
+    team = client.volunteers
+    if client not in team:
+        return HttpResponseForbidden
+    openingdate = dateutil.parse("%s-%s-%s %s" % (year, month, date, time))
+    print openingdate
+    instances = client.get_opening_instances(count=1, startDate=openingdate)
+    return render_to_response('timeslots/opening_instance_view.html', { "openingdate": openingdate, "instances": instances, "client": client, "volunteer": volunteer })
 
 @login_required
 def opening_add(request, clientid):
@@ -128,7 +148,6 @@ def opening_edit(request, openingid):
         if form.is_valid():
             # PROCESS DATA
             form.save()
-            print "TIMESLOTS OPENING EDIT SUCCESS"
             HttpResponseRedirect(reverse('timeslots_opening_edit_success', kwargs={'openingid':opening.id}))
     else:
         form = OpeningForm(instance=opening)
@@ -145,12 +164,32 @@ def opening_edit_success(request, openingid):
 
 
 @login_required
-def commitments_view(request):
-    """ Show commitments based on startDate and endDate url parameters. """
+def commitments_view(request, clientid=None):
+    """ Show commitments based on startDate and endDate url parameters. If clientid is specified, limit to that client """
     startDate, endDate = get_dates(request)
 
-    instances = request.user.volunteer.get_commitment_instances(startDate=startDate, endDate=endDate)
-    return render_to_response('timeslots/commitments_view.html', { "instances": instances, "startDate": startDate, "endDate": endDate }, context_instance=RequestContext(request))
+    volunteer = get_volunteer(request)
+    client = None
+    if volunteer:
+        if clientid:
+            print "GOT CLIENT ID"
+            client = Client.objects.get(user__id=clientid)
+            if not request.user.is_staff and client not in volunteer.clients.all():
+                return HttpResponseForbidden
+            instances = volunteer.get_commitment_instances(startDate=startDate, endDate=endDate, client=client)
+            print instances
+        else:
+            instances = volunteer.get_commitment_instances(startDate=startDate, endDate=endDate)
+    else:
+        instances = list()
+    return render_to_response('timeslots/commitments_view.html', { "instances": instances, "client": client, "startDate": startDate, "endDate": endDate }, context_instance=RequestContext(request))
+
+
+@login_required
+def commitment_instance_view(request, clientid, year, month, day, time):
+    """ Show a single commitment instance (i.e., a single date) """
+    """ THIS IS JUST A TEMP STUB """
+    return render_to_response('timeslots/commitment_view.html', context_instance=RequestContext(request))
 
 
 @login_required
@@ -158,7 +197,7 @@ def commitment_view(request, commitmentid):
     """ Show a single commitment, along with instances based on startDate and endDate url parameters. """
     startDate, endDate = get_dates(request)
 
-    commitment = VolunteerCommitment.objects.get(id=commitmentid)
+    commitment = get_object_or_404(VolunteerCommitment, id=commitmentid)
     is_mycommitment = True if commitment.volunteer.user == request.user else False
     instances = commitment.get_instances(startDate=startDate, endDate=endDate)
     return render_to_response('timeslots/commitment_view.html', { "commitment": commitment, "is_mycommitment": is_mycommitment, "instances": instances, "startDate": startDate, "endDate": endDate }, context_instance=RequestContext(request))
@@ -238,7 +277,7 @@ def user_add(request):
 def client_view(request, userid):
     startDate, endDate = get_dates(request)
 
-    client = Client.objects.get(user__id=userid)
+    client = get_object_or_404(Client, user__id=userid)
     openings = client.get_opening_instances(startDate=startDate, endDate=endDate)
     team = client.volunteers.all()
     return render_to_response('timeslots/client_view.html', { "client": client, "openings": openings, "team": team, "startDate": startDate, "endDate": endDate  }, context_instance=RequestContext(request))
@@ -273,7 +312,7 @@ def client_edit_success(request, userid):
 def volunteer_view(request, userid):
     startDate, endDate = get_dates(request)
 
-    volunteer = Volunteer.objects.get(user__id=userid)
+    volunteer = get_object_or_404(Volunteer, user__id=userid)
     commitments = volunteer.get_current_commitments()
     instances = volunteer.get_commitment_instances(startDate=startDate, endDate=endDate)
 

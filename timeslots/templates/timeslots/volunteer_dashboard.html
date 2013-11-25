@@ -19,7 +19,7 @@
 			</a>
 			<ul class="well">
 				{% for instance in commitment_instances %}
-					{% include "timeslots/partials/commitment_instance.html" %}
+					{% include "timeslots/partials/single_commitment.html" %}
 				{% endfor %}
 			</ul>
 		</div>
@@ -30,7 +30,7 @@
 			</a>
 			<ul class="well">
 				{% for opening in openings %}
-					{% include "timeslots/partials/opening_instance.html" %}
+					{% include "timeslots/partials/single_opening.html" %}
 				{% endfor %}
 			</ul>
 		</div>

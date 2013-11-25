@@ -30,21 +30,35 @@ class Volunteer(models.Model):
     def get_absolute_url(self):
         return reverse('timeslots_volunteer_view', kwargs={'userid': self.user.id})
 
+    def get_absolute_edit_url(self):
+        return reverse('timeslots_volunteer_edit', kwargs={'userid': self.user.id})
+
+    def get_absolute_list_url(self):
+        """ URL for list of Volunteers """
+        return reverse('timeslots_volunteers_view')
+
+    def get_clean_model_name(self):
+        return "Volunteer"
+
     def get_current_commitments(self):
         from django.db.models import Q
 
         today = timezone.now()
         return self.commitments.filter(Q(endDate__gte=today) | Q(endDate__isnull=True), startDate__lte=today)
 
-    def get_commitments(self):
+    def get_commitments(self, client=None):
         from django.db.models import Q
 
         today = timezone.now()
-        return self.commitments.filter(Q(endDate__gte=today) | Q(endDate__isnull=True), startDate__lte=today)
+        if client:
+            commitments = self.commitments.filter(Q(endDate__gte=today) | Q(endDate__isnull=True), startDate__lte=today, clientOpening__client=client)
+        else:
+            commitments = self.commitments.filter(Q(endDate__gte=today) | Q(endDate__isnull=True), startDate__lte=today)
+        return commitments
 
-    def get_commitment_instances(self, startDate=None, endDate=None, **kwargs):
+    def get_commitment_instances(self, startDate=None, endDate=None, client=None, **kwargs):
         instances = list()
-        for commitment in self.get_commitments():
+        for commitment in self.get_commitments(client=client):
             instances.extend(commitment.get_instances(startDate=startDate, endDate=endDate, **kwargs))
         # instances.sort()
         return instances
@@ -65,6 +79,16 @@ class Client(models.Model):
 
     def get_absolute_url(self):
         return reverse('timeslots_client_view', kwargs={'userid': self.user.id})
+
+    def get_absolute_edit_url(self):
+        return reverse('timeslots_client_edit', kwargs={'userid': self.user.id})
+
+    def get_absolute_list_url(self):
+        """ URL for list of Clients """
+        return reverse('timeslots_clients_view')
+
+    def get_clean_model_name(self):
+        return "Client"
 
     def get_opening_instances(self, **kwargs):
         instances = list()
@@ -91,9 +115,29 @@ class ClientOpening(models.Model):
     def __unicode__(self):
         return "%s, %s: %s (%s-%s)" % (self.client, self.type, self.get_all_metadata_string(), dateformat.format(d=self.startDate), dateformat.format(d=self.endDate) if self.endDate is not None else "")
 
-    def client_title(self):
+    def get_absolute_url(self):
+        return reverse('timeslots_opening_view', kwargs={'openingid': self.id})
+
+    def get_absolute_edit_url(self):
+        return reverse('timeslots_opening_edit', kwargs={'openingid': self.id})
+
+    def get_absolute_list_url(self):
+        """ URL for list of Openings """
+        return reverse('timeslots_openings_view')
+
+    def get_absolute_list_for_client_url(self):
+        """ URL for list of Openings for this client """
+        return reverse('timeslots_openings_view', kwargs={'clientid': self.client.user.id})
+
+    def get_clean_model_name(self):
+        return "Opening"
+
+    def get_client_title(self):
         # For use in the context of a particular client. Same as the __unicode__ title, but missing the "[client name]: " at the beginning
         return "%s: %s (%s-%s)" % (self.type, self.get_all_metadata_string(), dateformat.format(d=self.startDate), dateformat.format(d=self.endDate) if self.endDate is not None else "")
+
+    def get_client_name(self):
+        return self.client
 
     def _get_instance_dates(self, count=30, startDate=None, endDate=None, metadata_set=None):
         days_of_week_dict = {'M': MO, 'Tu': TU, 'W': WE, 'Th': TH, 'F': FR, 'Sa': SA, 'Su': SU}
@@ -124,7 +168,7 @@ class ClientOpening(models.Model):
         instance_dates = list()
         if len(metadata_set) > 0:
             instance_dates = self._get_instance_dates(metadata_set=metadata_set, startDate=startDate, endDate=endDate, **kwargs)
-        return [{ "date": instance_date, "is_filled": False, "client": self.client } for instance_date in instance_dates]
+        return [{ "date": instance_date, "is_filled": False, "client": self.client, "url": self.get_absolute_url } for instance_date in instance_dates]
 
     def get_filled_instances(self, startDate=None, endDate=None, metadata_set=None, **kwargs):
         if startDate is None:
@@ -136,7 +180,7 @@ class ClientOpening(models.Model):
         instance_dates = list()
         if len(metadata_set) > 0:
             instance_dates = self._get_instance_dates(metadata_set=metadata_set, startDate=startDate, endDate=endDate, **kwargs)
-        return [{ "date": instance_date, "is_filled": True, "client": self.client } for instance_date in instance_dates]
+        return [{ "date": instance_date, "is_filled": True, "client": self.client, "url": self.get_absolute_url } for instance_date in instance_dates]
 
     def get_instances(self, startDate=None, endDate=None, **kwargs):
         if startDate is None:
@@ -231,6 +275,26 @@ class VolunteerCommitment(models.Model):
         return "%s visits %s, %s: %s (%s-%s)" % (
         self.volunteer, self.clientOpening.client, self.type, self.volunteercommitmentmetadata_set.all()[0].metadata,
         dateformat.format(d=self.startDate), dateformat.format(d=self.endDate) if self.endDate is not None else "")
+
+    def get_absolute_url(self):
+        return reverse('timeslots_commitment_view', kwargs={'commitmentid': self.id})
+
+    def get_absolute_edit_url(self):
+        return reverse('timeslots_commitment_edit', kwargs={'commitmentid': self.id})
+
+    def get_absolute_list_url(self):
+        """ URL for list of Commitments """
+        return reverse('timeslots_commitments_view')
+
+    def get_absolute_list_for_client_url(self):
+        """ URL for list of Commitments for this client """
+        return reverse('timeslots_commitments_view', kwargs={'clientid': self.clientOpening.client.user.id})
+
+    def get_clean_model_name(self):
+        return "Commitment"
+
+    def get_client_name(self):
+        return self.clientOpening.client
 
     def pattern_description(self, prefix="Visit "):
         # displays just the Type, Metadata, and Start/End Dates

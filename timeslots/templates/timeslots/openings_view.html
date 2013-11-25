@@ -2,14 +2,14 @@
 
 {% block content %}
 	<div class="block">
-		<h3>Unfilled Openings for Your Clients</h3>
+		<h3>Unfilled Openings for {% if client %}{{ client }}{% else %}Your Clients{% endif %}</h3>
 		{% include "timeslots/partials/datepicker.html" %}
 
-		<a class="edit-link edit-commitments" href="#">Edit My Commitment Schedule</a>
+		<a class="edit-link edit-commitments pull-right" href="#">Edit My Commitment Schedule</a>
 
 		<ul class="well">
 			{% for opening in openings %}
-				{% include "timeslots/partials/opening_instance.html" %}
+				{% include "timeslots/partials/single_opening.html" %}
 			{% endfor %}
 		</ul>
 	</div>

@@ -2,6 +2,7 @@
 
 {% block content %}
 	<div class="block">
+		{% include "timeslots/partials/breadcrumbs.html" with item=commitment %}
 		<h3>{{ commitment }}</h3>
 		{% include "timeslots/partials/datepicker.html" %}
 
@@ -13,7 +14,7 @@
 			<!-- <h3>Commitment Instances</h3> -->
 			<ul class="well">
 				{% for instance in instances %}
-					{% include "timeslots/partials/commitment_instance.html" %}
+					{% include "timeslots/partials/single_commitment.html" %}
 				{% endfor %}
 			</ul>
 		</div>
