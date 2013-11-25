@@ -8,7 +8,7 @@ from django.utils import timezone
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from timeslots.models import Client, ClientOpening, ClientOpeningException, ClientOpeningMetadata, Volunteer, VolunteerCommitment, VolunteerCommitmentException, VolunteerCommitmentMetadata
-from timeslots.forms import UserForm, ClientForm, VolunteerForm, OpeningForm, OpeningMetaDataForm, CommitmentForm, CommitmentMetadataForm
+from timeslots.forms import UserForm, ClientForm, VolunteerForm, OpeningForm, CommitmentForm, CommitmentMetadataForm
 
 ##
 ## VIEW UTILITY FUNCTIONS
