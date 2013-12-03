@@ -30,6 +30,15 @@ except ImportError:
         'HOST': '',
         'PORT': '',  # Set to empty string for default.
     }
+    
+    # ACTIVE_DB = {
+    #     'ENGINE': 'django.db.backends.postgresql_psycopg2',
+    #     'NAME': 'paws',
+    #     'USER': '{user}',
+    #     'PASSWORD': '{password}',
+    #     'HOST': '127.0.0.1',
+    #     'PORT': '15432'
+    # }
 
     DEBUG = True
 
