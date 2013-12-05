@@ -104,6 +104,13 @@ class Client(models.Model):
         instances.sort()
         return instances
 
+    def get_commitments(self, **kwargs):
+        openings = self.openings.all()
+        commitments = list()
+        for opening in openings:
+            commitments.extend(opening.volunteercommitment_set.all())
+        return commitments
+
 
 class ClientOpening(models.Model):
     client = models.ForeignKey(Client, db_column='clientId', related_name='openings')
@@ -158,6 +165,15 @@ class ClientOpening(models.Model):
             instance_list = list([self.startDate])
         return instance_list
 
+    def get_instance(self, instance_date,  **kwargs):
+        instance = None
+        opening_instances = self.get_instances(count=1, startDate=instance_date)
+        if len(opening_instances) > 0:
+            opening_instance = opening_instances[0]
+            if opening_instance["date"] == instance_date:
+                instance = opening_instance
+        return instance
+
     def get_unfilled_instances(self, startDate=None, endDate=None, metadata_set=None, **kwargs):
         if startDate is None:
             startDate = self.startDate
@@ -180,7 +196,7 @@ class ClientOpening(models.Model):
         instance_dates = list()
         if len(metadata_set) > 0:
             instance_dates = self._get_instance_dates(metadata_set=metadata_set, startDate=startDate, endDate=endDate, **kwargs)
-        return [{ "date": instance_date, "is_filled": True, "client": self.client, "url": self.get_absolute_url } for instance_date in instance_dates]
+        return [{ "date": instance_date, "is_filled": True, "client": self.client, "url": self.get_absolute_url(), "openingid": self.id } for instance_date in instance_dates]
 
     def get_instances(self, startDate=None, endDate=None, **kwargs):
         if startDate is None:
@@ -305,6 +321,15 @@ class VolunteerCommitment(models.Model):
 
     def get_instances(self, **kwargs):
         return self.clientOpening.get_instances(metadata_set=self.get_all_metadata_set(), **kwargs)
+
+    def get_instance(self, instance_date,  **kwargs):
+        instance = None
+        commitment_instances = self.get_instances(count=1, startDate=instance_date)
+        if len(commitment_instances) > 0:
+            commitment_instance = commitment_instances[0]
+            if commitment_instance["date"] == instance_date:
+                instance = commitment_instance
+        return instance
 
 
 class VolunteerCommitmentMetadata(models.Model):

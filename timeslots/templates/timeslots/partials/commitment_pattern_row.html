@@ -1,0 +1,7 @@
+<li>
+	<a href="{% if use_edit_links %}{% url 'timeslots_commitment_edit' pattern.id %}{% else %}{{ pattern.get_absolute_url }}{% endif %}">
+		<span class="pattern-display">
+			{% if use_edit_links %}Edit: {% endif %}{{ pattern }}
+		</span>
+	</a>
+</li>

@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% load display_helpers %}
+
+{% block content %}
+	<div class="block">
+		<h3>Visit {{ client }} on {{ instance_date }}</h3>
+
+		{% display_address client %}
+
+		<div class="block">
+			{% if instance.is_filled %}
+				<p>This opening is filled. <a href="{% commitment_instance_url instance %}">View the commitment</a></p>
+			{% else %}
+				<p>This opening is unfilled. <a href="#create-commitment">Fill this opening</a></p>
+			{% endif %}
+		</div>
+	</div>
+
+{% endblock %}

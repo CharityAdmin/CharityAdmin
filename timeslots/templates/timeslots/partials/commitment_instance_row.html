@@ -1,0 +1,10 @@
+{% load display_helpers %}
+
+<li>
+	<div>
+		Visit
+		<a href="{{ instance.client.get_absolute_url }}">{{ instance.client }}</a>
+		on
+		<a href="{% commitment_instance_url instance %}">{{ instance.date|date:"D N j, Y, P" }}</a>
+	</div>
+</li>

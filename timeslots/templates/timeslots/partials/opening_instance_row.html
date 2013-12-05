@@ -1,0 +1,17 @@
+{% load display_helpers %}
+
+<li>
+	<div>
+		{% if show_status_label %}
+			<span class="label {% if not instance.is_filled %}label-danger un{% endif %}filled_label">
+		 		{% if not instance.is_filled %}Un{% endif %}filled
+		 	</span>
+		{% endif %}
+		{% if specify_client %}
+			<a href="{% opening_instance_url instance %}">Opening</a> for
+			<a href="{{ instance.client.get_absolute_url }}">{{ instance.client }}</a>
+			on
+		{% endif %}
+		<a href="{% opening_instance_url instance %}">{{ instance.date|date:"D N j, Y, P" }}</a>
+	</div>
+</li>

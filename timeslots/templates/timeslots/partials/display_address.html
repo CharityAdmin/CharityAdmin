@@ -1,0 +1,25 @@
+<div class="block">
+	<address>
+		{% if client.phone %}
+			<div class="phone">
+				{{ client.phone }}
+			</div>
+		{% endif %}
+		{% if client.address %}
+			<div class="address">
+				{{ client.address }}
+				{{ client.address2 }}
+			</div>
+		{% endif %}
+		{% if client.city or client.state or client.zip %}
+			<div class="citystatezip">
+				{{ client.city }}
+				{% if client.city and client.state %}, {% endif %}
+				{{ client.state }} {{ client.zip }}
+				{% if client.address %}
+					<a class="map-link" href="#">map</a>
+				{% endif %}
+			</div>
+		{% endif %}
+	</address>
+</div>

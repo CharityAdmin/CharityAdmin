@@ -6,7 +6,7 @@
 		<h3>{{ commitment }}</h3>
 		{% include "timeslots/partials/datepicker.html" %}
 
-		{% if user.is_staff or is_mycommitment %}
+		{% if user.is_staff or is_my_commitment %}
 			<a class="edit-link edit-commitments" href="#">Edit Commitment Schedule</a>
 		{% endif %}
 
@@ -14,7 +14,7 @@
 			<!-- <h3>Commitment Instances</h3> -->
 			<ul class="well">
 				{% for instance in instances %}
-					{% include "timeslots/partials/single_commitment.html" %}
+					{% include "timeslots/partials/commitment_instance_row.html" %}
 				{% endfor %}
 			</ul>
 		</div>
