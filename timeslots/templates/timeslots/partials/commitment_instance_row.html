@@ -2,8 +2,11 @@
 
 <li>
 	<div>
-		Visit
-		<a href="{{ instance.client.get_absolute_url }}">{{ instance.client }}</a>
+		<a href="{% commitment_instance_url instance %}">Visit</a>
+		{% if specify_client %}
+			with
+			<a href="{{ instance.client.get_absolute_url }}">{{ instance.client }}</a>
+		{% endif %}
 		on
 		<a href="{% commitment_instance_url instance %}">{{ instance.date|date:"D N j, Y, P" }}</a>
 	</div>

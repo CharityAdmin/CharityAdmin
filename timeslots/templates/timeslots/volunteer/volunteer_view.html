@@ -31,7 +31,7 @@
 		<h4>Upcoming Commitments</h4>
 		<ul class="well">
 			{% for instance in instances %}
-				{% include "timeslots/partials/commitment_instance_row.html" %}
+				{% include "timeslots/partials/commitment_instance_row.html" with specify_client=True %}
 			{% endfor %}
 		</ul>
 	</div>

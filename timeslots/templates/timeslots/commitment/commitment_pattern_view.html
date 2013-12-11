@@ -7,14 +7,13 @@
 		{% include "timeslots/partials/datepicker.html" %}
 
 		{% if user.is_staff or is_my_commitment %}
-			<a class="edit-link edit-commitments" href="#">Edit Commitment Schedule</a>
+			<a class="edit-link edit-commitments" href="#">Edit Visit Schedule</a>
 		{% endif %}
 
 		<div class="block">
-			<!-- <h3>Commitment Instances</h3> -->
 			<ul class="well">
 				{% for instance in instances %}
-					{% include "timeslots/partials/commitment_instance_row.html" %}
+					{% include "timeslots/partials/commitment_instance_row.html" with specify_client=True %}
 				{% endfor %}
 			</ul>
 		</div>

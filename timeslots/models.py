@@ -226,13 +226,13 @@ class ClientOpening(models.Model):
         return self.get_next_unfilled_instances(count=1, **kwargs)
 
     def get_all_metadata_set(self):
-        return set([metadataobj.metadata for metadataobj in self.clientopeningmetadata_set.all()])
+        return set([metadataobj.metadata for metadataobj in self.metadata.all()])
 
     def get_unfilled_metadata_set(self):
-        return set([metadataobj.metadata for metadataobj in self.clientopeningmetadata_set.all() if not metadataobj.is_filled()])
+        return set([metadataobj.metadata for metadataobj in self.metadata.all() if not metadataobj.is_filled()])
 
     def get_filled_metadata_set(self):
-        return set([metadataobj.metadata for metadataobj in self.clientopeningmetadata_set.all() if metadataobj.is_filled()])
+        return set([metadataobj.metadata for metadataobj in self.metadata.all() if metadataobj.is_filled()])
 
     def get_all_metadata_string(self):
         if self.type in ["Days of Week", "Days of Alternating Week"]:
@@ -261,14 +261,14 @@ class ClientOpening(models.Model):
 
 
 class ClientOpeningMetadata(models.Model):
-    clientOpening = models.ForeignKey(ClientOpening, db_column='clientOpeningId')
+    clientOpening = models.ForeignKey(ClientOpening, related_name="metadata", db_column='clientOpeningId')
     metadata = models.CharField(max_length=20)
 
     def __unicode__(self):
         return "%s, %s: %s" % (self.clientOpening.client, self.clientOpening.type, self.metadata)
 
     def is_filled(self):
-        return self.metadata in set([metadataobj.metadata for commitment in self.clientOpening.volunteercommitment_set.all() for metadataobj in commitment.volunteercommitmentmetadata_set.all()])
+        return self.metadata in set([metadataobj.metadata for commitment in self.clientOpening.volunteercommitment_set.all() for metadataobj in commitment.metadata.all()])
 
 
 class ClientOpeningException(models.Model):
@@ -289,7 +289,7 @@ class VolunteerCommitment(models.Model):
 
     def __unicode__(self):
         return "%s visits %s, %s: %s (%s-%s)" % (
-        self.volunteer, self.clientOpening.client, self.type, self.volunteercommitmentmetadata_set.all()[0].metadata,
+        self.volunteer, self.clientOpening.client, self.type, self.metadata.all()[0].metadata,
         dateformat.format(d=self.startDate), dateformat.format(d=self.endDate) if self.endDate is not None else "")
 
     def get_absolute_url(self):
@@ -314,10 +314,18 @@ class VolunteerCommitment(models.Model):
 
     def pattern_description(self, prefix="Visit "):
         # displays just the Type, Metadata, and Start/End Dates
-        return "%s: %s (%s-%s)" % (self.type, self.volunteercommitmentmetadata_set.all()[0].metadata, dateformat.format(d=self.startDate), dateformat.format(d=self.endDate) if self.endDate is not None else "")
+        return "%s: %s (%s-%s)" % (self.type, self.metadata.all()[0].metadata, dateformat.format(d=self.startDate), dateformat.format(d=self.endDate) if self.endDate is not None else "")
 
     def get_all_metadata_set(self):
-        return set([metadataobj.metadata for metadataobj in self.volunteercommitmentmetadata_set.all()])
+        return set([metadataobj.metadata for metadataobj in self.metadata.all()])
+
+    def get_all_metadata_string(self):
+        if self.type in ["Days of Week", "Days of Alternating Week"]:
+            join_string = ''
+        else:
+            join_string = ', '
+        combinedmetadata = join_string.join(self.get_all_metadata_set())
+        return combinedmetadata
 
     def get_instances(self, **kwargs):
         return self.clientOpening.get_instances(metadata_set=self.get_all_metadata_set(), **kwargs)
@@ -333,7 +341,7 @@ class VolunteerCommitment(models.Model):
 
 
 class VolunteerCommitmentMetadata(models.Model):
-    volunteerCommitment = models.ForeignKey(VolunteerCommitment, db_column='volunteerCommitmentId')
+    volunteerCommitment = models.ForeignKey(VolunteerCommitment, related_name="metadata", db_column='volunteerCommitmentId')
     # FEATURE REQUEST: prettify/validate the metadata field:
     #                  use a select box when the volunteerCommitment is set to day of week,
     #                  calendar when day of month or one-off date

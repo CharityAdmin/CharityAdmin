@@ -17,12 +17,12 @@
                     </a>
                 </h1>
 
-                <p class="desktop tagline">
+<!--                 <p class="desktop tagline">
                     PAWS NY is a 501(c)3 nonprofit organization. Our mission is to preserve, support, and nurture the
                     human-animal bond for New York City’s most vulnerable residents.
 
                     To make a donation to support our work, please visit our Get Involved/Donate page.
-                </p>
+                </p> -->
             </header>
             <!-- #header -->
         </div>
@@ -45,13 +45,13 @@
                             {% else %}
                                 {% block navigation_authenticated %}
                                     <li class="menu-item">
-                                        <a href="{% url 'timeslots_volunteer_dashboard' %}">
+                                        <a href="{% url 'timeslots_dashboard' %}">
                                             Dashboard
                                         </a>
                                     </li>
                                     <li class="menu-item">
                                         <a href="{% url 'timeslots_commitments_view' %}">
-                                            {% if not user.is_staff %}Your {% endif %}Commitments
+                                            {% if not user.is_staff %}Your {% endif %}Scheduled Visits
                                         </a>
                                     </li>
                                     <li class="menu-item">

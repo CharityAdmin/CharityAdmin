@@ -8,7 +8,7 @@ from django.utils import timezone
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from timeslots.models import Client, ClientOpening, ClientOpeningException, ClientOpeningMetadata, Volunteer, VolunteerCommitment, VolunteerCommitmentException, VolunteerCommitmentMetadata
-from timeslots.forms import UserForm, ClientForm, VolunteerForm, OpeningForm, CommitmentForm, CommitmentMetadataForm
+from timeslots.forms import UserForm, ClientForm, VolunteerForm, OpeningForm, CommitmentForm
 
 ##
 ## VIEW UTILITY FUNCTIONS
@@ -60,21 +60,25 @@ def home(request):
 
 
 @login_required
-def volunteer_dashboard(request):
+def dashboard(request):
     startDate, endDate = get_dates(request)
 
     volunteer = get_volunteer(request)
     clients = None
+    multipleclients = False
     openings = list()
     commitment_instances = list()
 
     if volunteer is not None:
         clients = volunteer.clients.all()
+        if len(clients) > 1:
+            multipleclients = True
         for client in clients:
             openings.extend(client.get_unfilled_opening_instances(startDate=startDate, endDate=endDate))
         commitment_instances = volunteer.get_commitment_instances(startDate=startDate, endDate=endDate)
 
-    return render_to_response('timeslots/dashboard.html', { "volunteer": volunteer, "clients": clients, "openings": openings, "commitment_instances": commitment_instances, "startDate": startDate, "endDate": endDate }, context_instance=RequestContext(request))
+
+    return render_to_response('timeslots/dashboard.html', { "volunteer": volunteer, "clients": clients, "multipleclients": multipleclients, "openings": openings, "commitment_instances": commitment_instances, "startDate": startDate, "endDate": endDate }, context_instance=RequestContext(request))
 
 
 @login_required
@@ -142,7 +146,7 @@ def opening_add(request, clientid):
 def opening_edit(request, openingid):
     opening = ClientOpening.objects.get(id=openingid)
 
-    if not request.user.is_staff and opening.client is not request.user.client:
+    if not (request.user.is_staff or opening.client == request.user.client):
         # only a staff member can edit an opening for someone else
         return HttpResponseForbidden()
 
@@ -251,7 +255,7 @@ def commitment_add(request, openingid, volunteerid=None):
 def commitment_edit(request, commitmentid):
     commitment = VolunteerCommitment.objects.get(id=commitmentid)
 
-    if not request.user.is_staff and commitment.volunteer is not request.user.volunteer:
+    if not (request.user.is_staff or commitment.volunteer == request.user.volunteer):
         # only a staff member can edit a commitment for someone else
         return HttpResponseForbidden()
 

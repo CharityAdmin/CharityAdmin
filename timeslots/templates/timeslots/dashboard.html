@@ -2,7 +2,7 @@
 
 {% block content %}
 	<div class="dashboard">
-		<h3>Volunteer Dashboard</h3>
+		<h3>Dashboard</h3>
 		{% include "timeslots/partials/datepicker.html" %}
 
 		{% if volunteer == None %}
@@ -15,22 +15,22 @@
 
 		<div class="block">
 			<a href="{% url 'timeslots_commitments_view' %}">
-				<h4>Upcoming Commitments for You</h4>
+				<h4>Upcoming Visits Scheduled for You{% if not multipleclients %} and {{ clients|first }}{% endif %}</h4>
 			</a>
 			<ul class="well">
 				{% for instance in commitment_instances %}
-					{% include "timeslots/partials/commitment_instance_row.html" %}
+					{% include "timeslots/partials/commitment_instance_row.html" with specify_client=multipleclients %}
 				{% endfor %}
 			</ul>
 		</div>
 
 		<div class="block">
 			<a href="{% url 'timeslots_openings_view' %}">
-				<h4>Upcoming Openings for Your Clients</h4>
+				<h4>Upcoming Unfilled Openings for {% if not multipleclients %}{{ clients|first }}{% else %}Your Clients{% endif %}</h4>
 			</a>
 			<ul class="well">
 				{% for instance in openings %}
-					{% include "timeslots/partials/opening_instance_row.html" with specify_client=True %}
+					{% include "timeslots/partials/opening_instance_row.html" with specify_client=multipleclients %}
 				{% endfor %}
 			</ul>
 		</div>

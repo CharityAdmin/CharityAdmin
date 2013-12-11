@@ -34,10 +34,37 @@ class OpeningForm(forms.ModelForm):
         super(OpeningForm, self).__init__(*args, **kwargs)
         self.initial['metadata'] = self.instance.get_all_metadata_string()
 
+    def save(self, commit=True):
+        # on save, wipe out the existing metadatas and create new ones
+        self.instance.metadata.all().delete()
+        type = self.cleaned_data['type']
+        metadatastring = self.cleaned_data['metadata']
+        metadata = list()
+        if type == "Days of Week" or type == "Days of Alt Week":
+            # convert metadata string to list of days
+            for day in ['M', 'Tu', 'W', 'Th', 'F', 'Sa', 'Su']:
+                if metadatastring.find(day) != -1:
+                    metadata.append(day)
+        else:
+            metadata =volunteercommitmentng
+        for item in metadata:
+            md = ClientOpeningMetadata.objects.create(clientOpening=self.instance, metadata=item)
+        super(OpeningForm, self).save(commit=commit)
+
+class CommitmentForm(forms.ModelForm):
+    metadata = forms.CharField(max_length=30)
+
+    class Meta:
+        model = VolunteerCommitment
+
+    def __init__(self, *args, **kwargs):
+        # patch the initial data to include the metadata values
+        super(CommitmentForm, self).__init__(*args, **kwargs)
+        self.initial['metadata'] = self.instance.get_all_metadata_string()
 
     def save(self, commit=True):
         # on save, wipe out the existing metadatas and create new ones
-        self.instance.clientopeningmetadata_set.all().delete()
+        self.instance.metadata.all().delete()
         type = self.cleaned_data['type']
         metadatastring = self.cleaned_data['metadata']
         metadata = list()
@@ -49,13 +76,5 @@ class OpeningForm(forms.ModelForm):
         else:
             metadata = metadatastring
         for item in metadata:
-            md = ClientOpeningMetadata.objects.create(clientOpening=self.instance, metadata=item)
-        super(OpeningForm, self).save(commit=commit)
-
-class CommitmentForm(forms.ModelForm):
-    class Meta:
-        model = VolunteerCommitment
-
-class CommitmentMetadataForm(forms.Form):
-    clientOpening = forms.IntegerField()
-    metadata = forms.CharField()
+            md = VolunteerCommitmentMetadata.objects.create(volunteerCommitment=self.instance, metadata=item)
+        super(CommitmentForm, self).save(commit=commit)

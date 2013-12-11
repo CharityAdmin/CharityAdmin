@@ -135,10 +135,14 @@
 	.header-outer-wrapper { background: url('../images/header-outer-wrapper-bg.gif'); }
 	.header-outer { background: url('../images/header-outer-bg.jpg') repeat-y center; }
 	.header-inner { background: url('../images/header-inner-bg.png') no-repeat center; background-size: 100%; }
+	.header {
+		max-width: 1200px;
+		margin: 0 auto;
+	}
 
 	/* other */
 	.logo {
-		margin: 30px 0 20px;
+		margin: 30px 0 20px 20px;
 		padding: 0;
 		display: inline-block;
 	}
@@ -507,6 +511,7 @@
 
 nav ul {
 	max-width: 1200px;
+	margin: 0 auto;
 }
 
 .nav-primary ul li:hover ul {

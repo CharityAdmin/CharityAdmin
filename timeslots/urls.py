@@ -7,7 +7,7 @@ urlpatterns = patterns(
     # url(r'^paws/', include('paws.foo.urls')),
 
     url(r'^$', 'timeslots.views.home', name='timeslots_home'),
-    url(r'^dashboard/$', 'timeslots.views.volunteer_dashboard', name='timeslots_volunteer_dashboard'),
+    url(r'^dashboard/$', 'timeslots.views.dashboard', name='timeslots_dashboard'),
     url(r'^user/add/$', 'timeslots.views.user_add', name='timeslots_user_add'),
 
     url(r'^clients/$', 'timeslots.views.clients_view', name='timeslots_clients_view'),
@@ -28,14 +28,14 @@ urlpatterns = patterns(
     url(r'^opening/(?P<openingid>\d+)/edit/$', 'timeslots.views.opening_edit', name='timeslots_opening_edit'),
     url(r'^opening/(?P<openingid>\d+)/edit/success/$', 'timeslots.views.opening_edit_success', name='timeslots_opening_edit_success'),
 
-    url(r'^commitments/$', 'timeslots.views.commitment_instances_view', name='timeslots_commitments_view'),
-    url(r'^commitmentpatterns/$', 'timeslots.views.commitment_patterns_view', name='timeslots_commitment_patterns_view'),
-    url(r'^client/(?P<clientid>\d+)/commitments/$', 'timeslots.views.commitment_instances_view', name='timeslots_commitments_view'),
-    url(r'^client/(?P<clientid>\d+)/commitment/(?P<year>\d+)/(?P<month>\d+)/(?P<day>\d+)/(?P<time>\d+)$', 'timeslots.views.commitment_instance_view', name='timeslots_commitment_instance_view'),
-    url(r'^commitment/add/(?P<openingid>\d+)/$', 'timeslots.views.commitment_add', name='timeslots_commitment_add'),
-    url(r'^commitment/add/(?P<openingid>\d+)/v/(?P<volunteerid>\d+)$', 'timeslots.views.commitment_add', name='timeslots_commitment_add'),
-    url(r'^commitment/(?P<commitmentid>\d+)/$', 'timeslots.views.commitment_pattern_view', name='timeslots_commitment_view'),
-    url(r'^commitment/(?P<commitmentid>\d+)/edit/$', 'timeslots.views.commitment_edit', name='timeslots_commitment_edit'),
-    url(r'^commitment/(?P<commitmentid>\d+)/edit/success/$', 'timeslots.views.commitment_edit_success', name='timeslots_commitment_edit_success'),
+    url(r'^scheduledvisits/$', 'timeslots.views.commitment_instances_view', name='timeslots_commitments_view'),
+    url(r'^scheduledvisitpatterns/$', 'timeslots.views.commitment_patterns_view', name='timeslots_commitment_patterns_view'),
+    url(r'^client/(?P<clientid>\d+)/scheduledvisits/$', 'timeslots.views.commitment_instances_view', name='timeslots_commitments_view'),
+    url(r'^client/(?P<clientid>\d+)/scheduledvisit/(?P<year>\d+)/(?P<month>\d+)/(?P<day>\d+)/(?P<time>\d+)$', 'timeslots.views.commitment_instance_view', name='timeslots_commitment_instance_view'),
+    url(r'^scheduledvisit/add/(?P<openingid>\d+)/$', 'timeslots.views.commitment_add', name='timeslots_commitment_add'),
+    url(r'^scheduledvisit/add/(?P<openingid>\d+)/v/(?P<volunteerid>\d+)$', 'timeslots.views.commitment_add', name='timeslots_commitment_add'),
+    url(r'^scheduledvisit/(?P<commitmentid>\d+)/$', 'timeslots.views.commitment_pattern_view', name='timeslots_commitment_view'),
+    url(r'^scheduledvisit/(?P<commitmentid>\d+)/edit/$', 'timeslots.views.commitment_edit', name='timeslots_commitment_edit'),
+    url(r'^scheduledvisit/(?P<commitmentid>\d+)/edit/success/$', 'timeslots.views.commitment_edit_success', name='timeslots_commitment_edit_success'),
 
 )

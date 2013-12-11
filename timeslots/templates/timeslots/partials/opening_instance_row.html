@@ -7,11 +7,12 @@
 		 		{% if not instance.is_filled %}Un{% endif %}filled
 		 	</span>
 		{% endif %}
+		<a href="{% opening_instance_url instance %}">Opening</a>
 		{% if specify_client %}
-			<a href="{% opening_instance_url instance %}">Opening</a> for
+			 for
 			<a href="{{ instance.client.get_absolute_url }}">{{ instance.client }}</a>
-			on
 		{% endif %}
+		on
 		<a href="{% opening_instance_url instance %}">{{ instance.date|date:"D N j, Y, P" }}</a>
 	</div>
 </li>
