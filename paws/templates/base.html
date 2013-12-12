@@ -31,7 +31,7 @@
     <!-- #header-outer -->
 </div>
 
-    <div class="pagebody">
+    <div class="pagebody{% if user.is_staff %} is-admin{% endif %}">
         <div class="nav-primary-outer-wrapper">
             <div class="nav-primary-inner-wrapper">
                 <nav class="nav-primary">

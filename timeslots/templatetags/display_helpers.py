@@ -16,3 +16,9 @@ def opening_instance_url(instance):
 @register.inclusion_tag('timeslots/partials/display_address.html')
 def display_address(client):
 	return {'client': client}
+
+
+@register.filter()
+def field_class(formfield):
+	fieldclass = formfield.field.widget.attrs['class'] if formfield.field.widget.attrs and 'class' in formfield.field.widget.attrs else ""
+	return fieldclass

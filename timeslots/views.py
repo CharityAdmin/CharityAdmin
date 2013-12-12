@@ -1,6 +1,6 @@
 import datetime
 from django.http import Http404, HttpResponseRedirect, HttpResponseForbidden
-from django.shortcuts import render_to_response, get_object_or_404
+from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib.admin.views.decorators import staff_member_required
 from django.template import RequestContext
@@ -56,7 +56,7 @@ def get_volunteer(request):
 
 
 def home(request):
-    return render_to_response('timeslots/home.html', {'poll': None}, context_instance=RequestContext(request))
+    return render(request, 'timeslots/home.html', {'poll': None})
 
 
 @login_required
@@ -78,7 +78,7 @@ def dashboard(request):
         commitment_instances = volunteer.get_commitment_instances(startDate=startDate, endDate=endDate)
 
 
-    return render_to_response('timeslots/dashboard.html', { "volunteer": volunteer, "clients": clients, "multipleclients": multipleclients, "openings": openings, "commitment_instances": commitment_instances, "startDate": startDate, "endDate": endDate }, context_instance=RequestContext(request))
+    return render(request, 'timeslots/dashboard.html', { "volunteer": volunteer, "clients": clients, "multipleclients": multipleclients, "openings": openings, "commitment_instances": commitment_instances, "startDate": startDate, "endDate": endDate })
 
 
 @login_required
@@ -100,7 +100,7 @@ def opening_instances_view(request, clientid=None):
                 openings.extend(c.get_unfilled_opening_instances(startDate=startDate, endDate=endDate))
     openings.sort(key=lambda item:item['date'])
 
-    return render_to_response('timeslots/opening/opening_instances_view.html', { "openings": openings, "client": client, "startDate": startDate, "endDate": endDate }, context_instance=RequestContext(request))
+    return render(request, 'timeslots/opening/opening_instances_view.html', { "openings": openings, "client": client, "startDate": startDate, "endDate": endDate })
 
 
 @login_required
@@ -111,7 +111,7 @@ def opening_pattern_view(request, openingid):
     opening = get_object_or_404(ClientOpening, id=openingid)
     is_myopening = True if opening.client.user == request.user else False
     instances = opening.get_instances(startDate=startDate, endDate=endDate)
-    return render_to_response('timeslots/opening/opening_pattern_view.html', { "opening": opening, "is_myopening": is_myopening, "instances": instances, "startDate": startDate, "endDate": endDate }, context_instance=RequestContext(request))
+    return render(request, 'timeslots/opening/opening_pattern_view.html', { "opening": opening, "is_myopening": is_myopening, "instances": instances, "startDate": startDate, "endDate": endDate })
 
 
 @login_required
@@ -128,7 +128,7 @@ def opening_instance_view(request, clientid, year, month, day, time):
             opening = o
             break
 
-    return render_to_response('timeslots/opening/opening_instance_view.html', { "instance_date": instance_date, "opening": opening, "client": client, "instance": instance }, context_instance=RequestContext(request))
+    return render(request, 'timeslots/opening/opening_instance_view.html', { "instance_date": instance_date, "opening": opening, "client": client, "instance": instance })
 
 @login_required
 def opening_add(request, clientid):
@@ -137,7 +137,7 @@ def opening_add(request, clientid):
         # only a staff member can create a opening for someone else
         client = request.user.client
     else:
-        client = Client.objects.get(id=clientid)
+        client = Client.objects.get(user__id=clientid)
     opening, created = ClientOpening.objects.get_or_create(client=client)
     return HttpResponseRedirect(reverse('timeslots_opening_edit', kwargs={'openingid': opening.id}))
 
@@ -156,19 +156,19 @@ def opening_edit(request, openingid):
         if form.is_valid():
             # PROCESS DATA
             form.save()
-            HttpResponseRedirect(reverse('timeslots_opening_edit_success', kwargs={'openingid':opening.id}))
+            return HttpResponseRedirect(reverse('timeslots_opening_edit_success', kwargs={'openingid':opening.id}))
     else:
         form = OpeningForm(instance=opening)
         # initial_metadata = {'clientOpening': opening.id, 'metadata': opening.get_all_metadata_string()}
         # metadataform = OpeningMetaDataForm(initial_metadata)
 
-    return render_to_response('timeslots/opening/opening_edit.html', { 'opening': opening, 'form': form }, context_instance=RequestContext(request))
+    return render(request, 'timeslots/opening/opening_edit.html', { 'opening': opening, 'form': form })
 
 
 @staff_member_required
 def opening_edit_success(request, openingid):
     opening = ClientOpening.objects.get(id=openingid)
-    return render_to_response('timeslots/opening/opening_edit_success.html', { "opening": opening }, context_instance=RequestContext(request))
+    return render(request, 'timeslots/opening/opening_edit_success.html', { "opening": opening })
 
 
 @login_required
@@ -188,7 +188,7 @@ def commitment_instances_view(request, clientid=None):
             instances = volunteer.get_commitment_instances(startDate=startDate, endDate=endDate)
     else:
         instances = list()
-    return render_to_response('timeslots/commitment/commitment_instances_view.html', { "instances": instances, "client": client, "startDate": startDate, "endDate": endDate }, context_instance=RequestContext(request))
+    return render(request, 'timeslots/commitment/commitment_instances_view.html', { "instances": instances, "client": client, "startDate": startDate, "endDate": endDate })
 
 
 @login_required
@@ -206,7 +206,7 @@ def commitment_patterns_view(request, clientid=None):
             patterns = volunteer.commitments.all()
     else:
         instances = list()
-    return render_to_response('timeslots/commitment/commitment_patterns_view.html', { "patterns": patterns, "client": client }, context_instance=RequestContext(request))
+    return render(request, 'timeslots/commitment/commitment_patterns_view.html', { "patterns": patterns, "client": client })
 
 
 @login_required
@@ -224,7 +224,7 @@ def commitment_instance_view(request, clientid, year, month, day, time):
             is_my_commitment = True if commitment.volunteer.user == request.user else False
             break
 
-    return render_to_response('timeslots/commitment/commitment_instance_view.html', { "instance_date": instance_date, "commitment": commitment, "client": client, "instance": instance, "is_my_commitment": is_my_commitment }, context_instance=RequestContext(request))
+    return render(request, 'timeslots/commitment/commitment_instance_view.html', { "instance_date": instance_date, "commitment": commitment, "client": client, "instance": instance, "is_my_commitment": is_my_commitment })
 
 
 @login_required
@@ -235,7 +235,7 @@ def commitment_pattern_view(request, commitmentid):
     commitment = get_object_or_404(VolunteerCommitment, id=commitmentid)
     is_my_commitment = True if commitment.volunteer.user == request.user else False
     instances = commitment.get_instances(startDate=startDate, endDate=endDate)
-    return render_to_response('timeslots/commitment/commitment_pattern_view.html', { "commitment": commitment, "is_my_commitment": is_my_commitment, "instances": instances, "startDate": startDate, "endDate": endDate }, context_instance=RequestContext(request))
+    return render(request, 'timeslots/commitment/commitment_pattern_view.html', { "commitment": commitment, "is_my_commitment": is_my_commitment, "instances": instances, "startDate": startDate, "endDate": endDate })
 
 
 @login_required
@@ -245,15 +245,15 @@ def commitment_add(request, openingid, volunteerid=None):
         # only a staff member can create a commitment for someone else
         volunteer = request.user.volunteer
     else:
-        volunteer = Volunteer.objects.get(id=volunteerid)
-    opening = ClientOpening.objects.get(id=openingid)
-    commitment, created = VolunteerCommitment.objects.get_or_create(clientopening=opening, volunteer=volunteer)
+        volunteer = get_object_or_404(Volunteer, id=volunteerid)
+    opening = get_object_or_404(ClientOpening, id=openingid)
+    commitment, created = VolunteerCommitment.objects.get_or_create(clientOpening=opening, volunteer=volunteer)
     return HttpResponseRedirect(reverse('timeslots_commitment_edit', kwargs={'commitmentid': commitment.id}))
 
 
 @login_required
 def commitment_edit(request, commitmentid):
-    commitment = VolunteerCommitment.objects.get(id=commitmentid)
+    commitment = get_object_or_404(VolunteerCommitment, id=commitmentid)
 
     if not (request.user.is_staff or commitment.volunteer == request.user.volunteer):
         # only a staff member can edit a commitment for someone else
@@ -264,17 +264,17 @@ def commitment_edit(request, commitmentid):
         if form.is_valid():
             # PROCESS DATA
             form.save()
-            HttpResponseRedirect(reverse('timeslots_commitment_edit_success'))
+            return HttpResponseRedirect(reverse('timeslots_commitment_edit_success', kwargs={'commitmentid': commitmentid}))
     else:
         form = CommitmentForm(instance=commitment)
 
-    return render_to_response('timeslots/commitment/commitment_edit.html', { 'commitment': commitment, 'form': form }, context_instance=RequestContext(request))
+    return render(request, 'timeslots/commitment/commitment_edit.html', { 'commitment': commitment, 'form': form })
 
 
-@staff_member_required
+@login_required
 def commitment_edit_success(request, commitmentid):
     commitment = VolunteerCommitment.objects.get(id=commitmentid)
-    return render_to_response('timeslots/commitment/commitment_edit_success.html', { "commitment": commitment }, context_instance=RequestContext(request))
+    return render(request, 'timeslots/commitment/commitment_edit_success.html', { "commitment": commitment })
 
 
 @staff_member_required
@@ -305,7 +305,7 @@ def user_add(request):
     else:
         form = UserForm()
 
-    return render_to_response('timeslots/user_add.html', { "form": form, "customererror": customererror }, context_instance=RequestContext(request))
+    return render(request, 'timeslots/user_add.html', { "form": form, "customererror": customererror })
 
 
 @login_required
@@ -315,13 +315,13 @@ def client_view(request, userid):
     client = get_object_or_404(Client, user__id=userid)
     openings = client.get_opening_instances(startDate=startDate, endDate=endDate)
     team = client.volunteers.all()
-    return render_to_response('timeslots/client/client_view.html', { "client": client, "openings": openings, "team": team, "startDate": startDate, "endDate": endDate  }, context_instance=RequestContext(request))
+    return render(request, 'timeslots/client/client_view.html', { "client": client, "openings": openings, "team": team, "startDate": startDate, "endDate": endDate  })
 
 
 @staff_member_required
 def clients_view(request):
     clients = Client.objects.all()
-    return render_to_response('timeslots/list_view.html', { 'listTitle': "Clients", 'listItems': clients }, context_instance=RequestContext(request))
+    return render(request, 'timeslots/list_view.html', { 'listTitle': "Clients", 'listItems': clients })
 
 
 @staff_member_required
@@ -335,13 +335,13 @@ def client_edit(request, userid):
     else:
         form = ClientForm(instance=client)
 
-    return render_to_response('timeslots/client/client_edit.html', { "client": client, "form": form }, context_instance=RequestContext(request))
+    return render(request, 'timeslots/client/client_edit.html', { "client": client, "form": form })
 
 
 @staff_member_required
 def client_edit_success(request, userid):
     client = Client.objects.get(user__id=userid)
-    return render_to_response('timeslots/client/client_edit_success.html', { "client": client }, context_instance=RequestContext(request))
+    return render(request, 'timeslots/client/client_edit_success.html', { "client": client })
 
 
 def volunteer_view(request, userid):
@@ -351,13 +351,13 @@ def volunteer_view(request, userid):
     commitments = volunteer.get_current_commitments()
     instances = volunteer.get_commitment_instances(startDate=startDate, endDate=endDate)
 
-    return render_to_response('timeslots/volunteer/volunteer_view.html', { "volunteer": volunteer, "commitments": commitments, "instances": instances, "startDate": startDate, "endDate": endDate  }, context_instance=RequestContext(request))
+    return render(request, 'timeslots/volunteer/volunteer_view.html', { "volunteer": volunteer, "commitments": commitments, "instances": instances, "startDate": startDate, "endDate": endDate  })
 
 
 @staff_member_required
 def volunteers_view(request):
     volunteers = Volunteer.objects.all()
-    return render_to_response('timeslots/list_view.html', { 'listTitle': "Volunteers", 'listItems': volunteers }, context_instance=RequestContext(request))
+    return render(request, 'timeslots/list_view.html', { 'listTitle': "Volunteers", 'listItems': volunteers })
 
 
 @staff_member_required
@@ -371,10 +371,10 @@ def volunteer_edit(request, userid):
     else:
         form = VolunteerForm(instance=volunteer)
 
-    return render_to_response('timeslots/volunteer/volunteer_edit.html', { "volunteer": volunteer, "form": form }, context_instance=RequestContext(request))
+    return render(request, 'timeslots/volunteer/volunteer_edit.html', { "volunteer": volunteer, "form": form })
 
 
 @staff_member_required
 def volunteer_edit_success(request, userid):
     volunteer = Volunteer.objects.get(user__id=userid)
-    return render_to_response('timeslots/client/volunteer_edit_success.html', { "volunteer": volunteer }, context_instance=RequestContext(request))
+    return render(request, 'timeslots/client/volunteer_edit_success.html', { "volunteer": volunteer })

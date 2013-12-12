@@ -16,6 +16,10 @@ SCHEDULE_PATTERN_TYPE_CHOICES = (
 dateformat = '{d:%b %d, %Y}'
 datetimeformat = '{d:%b %d, %Y} ({d.hour}:{d.minute:02} {d:%p})'
 
+#days_of_week_dict maps our day strings "M", "Tu", ... to the dateutil objects MO, TU, ...
+days_of_week_dict = {'M': MO, 'Tu': TU, 'W': WE, 'Th': TH, 'F': FR, 'Sa': SA, 'Su': SU}
+days_of_week_list = days_of_week_dict.keys()
+days_of_week_choices = (('M', 'Mo'), ('Tu', 'Tu'), ('W', 'We'), ('Th', 'Th'), ('F', 'Fr'), ('Sa', 'Sa'), ('Su', 'Su'))
 
 class Volunteer(models.Model):
     user = models.OneToOneField(User, db_column='userId')
@@ -147,7 +151,6 @@ class ClientOpening(models.Model):
         return self.client
 
     def _get_instance_dates(self, count=30, startDate=None, endDate=None, metadata_set=None):
-        days_of_week_dict = {'M': MO, 'Tu': TU, 'W': WE, 'Th': TH, 'F': FR, 'Sa': SA, 'Su': SU}
         if startDate is None:
             startDate = self.startDate
         if endDate is None:
@@ -184,7 +187,7 @@ class ClientOpening(models.Model):
         instance_dates = list()
         if len(metadata_set) > 0:
             instance_dates = self._get_instance_dates(metadata_set=metadata_set, startDate=startDate, endDate=endDate, **kwargs)
-        return [{ "date": instance_date, "is_filled": False, "client": self.client, "url": self.get_absolute_url } for instance_date in instance_dates]
+        return [{ "date": instance_date, "is_filled": False, "client": self.client, "url": self.get_absolute_url(), "openingid": self.id } for instance_date in instance_dates]
 
     def get_filled_instances(self, startDate=None, endDate=None, metadata_set=None, **kwargs):
         if startDate is None:
@@ -289,7 +292,7 @@ class VolunteerCommitment(models.Model):
 
     def __unicode__(self):
         return "%s visits %s, %s: %s (%s-%s)" % (
-        self.volunteer, self.clientOpening.client, self.type, self.metadata.all()[0].metadata,
+        self.volunteer, self.clientOpening.client, self.type, self.get_all_metadata_string(),
         dateformat.format(d=self.startDate), dateformat.format(d=self.endDate) if self.endDate is not None else "")
 
     def get_absolute_url(self):

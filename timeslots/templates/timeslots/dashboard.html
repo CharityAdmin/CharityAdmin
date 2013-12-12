@@ -15,7 +15,7 @@
 
 		<div class="block">
 			<a href="{% url 'timeslots_commitments_view' %}">
-				<h4>Upcoming Visits Scheduled for You{% if not multipleclients %} and {{ clients|first }}{% endif %}</h4>
+				<h4>Upcoming Visits Scheduled for You{% if clients and not multipleclients %} and {{ clients|first }}{% endif %}</h4>
 			</a>
 			<ul class="well">
 				{% for instance in commitment_instances %}
@@ -26,7 +26,7 @@
 
 		<div class="block">
 			<a href="{% url 'timeslots_openings_view' %}">
-				<h4>Upcoming Unfilled Openings for {% if not multipleclients %}{{ clients|first }}{% else %}Your Clients{% endif %}</h4>
+				<h4>Upcoming Unfilled Openings for {% if clients and not multipleclients %}{{ clients|first }}{% else %}Your Clients{% endif %}</h4>
 			</a>
 			<ul class="well">
 				{% for instance in openings %}

@@ -2,6 +2,7 @@
 
 {% block content %}
 	<h3>Edit Visit Schedule: {{ commitment }}</h3>
+	<h5><em>For opening: {{ commitment.clientOpening }}</em></h5>
 	<div>
 		<form action="." method="post" class="form-edit form-edit-commitment">
 			{% csrf_token %}
