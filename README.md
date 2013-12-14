@@ -1,4 +1,4 @@
-Linux Setup
+Ubuntu 12.04LTS Setup
 =====
 
 1. Install python 2.7.x
@@ -13,13 +13,5 @@ Linux Setup
 1. `sudo pip install psycopg2`
 1. `sudo pip install python-dateutil`
 1. Build schema `python manage.py syncdb`
-1. Run app `python manage.py runserver` 
-
-Using Postgre
-=====
-1. Install postgres 9.3.1+, using full installer (not standaline app/exe)
-1. Create empty paws db
-1. `sudo pip install postgresql-devel`
-1. `sudo pip install psycopg2`
-1. Build schema `python manage.py syncdb`
-  1. Setup credentials and update settings.py accordingly (name, username, password) 
+1. Build schema...srsly `python manage.py migrate` 
+1. Run app `python manage.py runserver [optional: ip address to bind to]` 
