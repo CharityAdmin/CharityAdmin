@@ -22,7 +22,7 @@
 	h2 {font-size: 35px; line-height: 40px; margin-bottom: 10px;}
 	h3 {font-size: 28px; line-height: 34px; margin-bottom: 8px;}
 	h4 {font-size: 21px; line-height: 30px; margin-bottom: 4px;}
-	h5 {font-size: 17px; line-height: 24px;}
+	h5 {font-size: 17px; line-height: 24px; margin-bottom: 8px;}
 	h6 {font-size: 14px; line-height: 21px;}
 	.subheader {color: #777;}
 
@@ -135,10 +135,14 @@
 	.header-outer-wrapper { background: url('../images/header-outer-wrapper-bg.gif'); }
 	.header-outer { background: url('../images/header-outer-bg.jpg') repeat-y center; }
 	.header-inner { background: url('../images/header-inner-bg.png') no-repeat center; background-size: 100%; }
+	.header {
+		max-width: 1200px;
+		margin: 0 auto;
+	}
 
 	/* other */
 	.logo {
-		margin: 30px 0 20px;
+		margin: 30px 0 20px 20px;
 		padding: 0;
 		display: inline-block;
 	}
@@ -177,10 +181,15 @@
 	.nav-primary li:hover { background: #141414; -webkit-box-shadow: inset 0px 5px 10px rgba(0, 0, 0, 1); -moz-box-shadow: inset 0px 5px 10px rgba(0, 0, 0, 1); box-shadow: inset 0px 5px 10px rgba(0, 0, 0, 1);}
 	.nav-primary li:hover > ul { display: block; }
 	.nav-primary ul > li { border-right: 1px solid #222; }
+	.nav-primary ul > li.pull-right { border-left: 1px solid #222; }
 	.nav-primary ul > li > a { border-right: 1px solid #0c0c0c; }
+	.nav-primary ul > li.pull-right > a { border-left: 1px solid #0c0c0c; }
 	.nav-primary li a { display: block; font-family: PT Sans Narrow, Helvetica, Arial, Sans Serif; font-size: 18px; padding: 0 20px; margin: 0; text-decoration: none; color: #f5f5f5; }
 	.nav-primary li a:hover { color: #fff; }
-	.nav-primary li li { clear: left; white-space: nowrap; display: block; width: 100%; background: #111; margin: 0; line-height: 40px; }
+	.nav-primary li li { clear: left; white-space: nowrap; display: block; width: 100%; background: #111; margin: 0; line-height: 40px; border-top: 1px solid transparent; border-bottom: 1px solid transparent; }
+	.nav-primary li li a { border-top: 1px solid transparent; border-bottom: 1px solid transparent; }
+	.nav-primary li li:hover { border-bottom: 1px solid #222; border-top: 1px solid #222; }
+	.nav-primary li li a:hover { border-bottom: 1px solid #0c0c0c; border-top: 1px solid #0c0c0c; }
 	.nav-primary li li:last-child,
 	.nav-primary li li:last-child a	{
 		-webkit-border-bottom-right-radius: 3px;
@@ -217,6 +226,7 @@
 		background: #fff;
 		border-top: 1px solid #d7d7d7;
 		border-bottom: 1px solid #d7d7d7;
+		min-height: 400px;
 	}
 
 	.ribbon-bottom {
@@ -501,6 +511,7 @@
 
 nav ul {
 	max-width: 1200px;
+	margin: 0 auto;
 }
 
 .nav-primary ul li:hover ul {

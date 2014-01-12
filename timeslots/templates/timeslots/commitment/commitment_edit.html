@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block content %}
+	<h3>Edit Visit Schedule: {{ commitment }}</h3>
+	<h5><em>For opening: {{ commitment.clientOpening }}</em></h5>
+	<div>
+		<form action="." method="post" class="form-edit form-edit-commitment">
+			{% csrf_token %}
+		    {% include "timeslots/partials/form_snippet.html" %}
+		    <div class="control-group">
+		    	<input type="submit" value="Save Visit Schedule" />
+		   	</div>
+		</form>
+	</div>
+{% endblock %}

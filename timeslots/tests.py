@@ -7,8 +7,9 @@ Replace this with more appropriate tests for your application.
 
 import datetime
 from datetime import tzinfo
+from django.test.client import Client
 from django.test import TestCase
-from django.utils import timezone
+from django.utils import timezone, unittest
 
 from django.contrib.auth.models import User
 from timeslots.models import Client, ClientOpening, ClientOpeningException, ClientOpeningMetadata, Volunteer, VolunteerCommitment, VolunteerCommitmentException, VolunteerCommitmentMetadata
@@ -20,6 +21,19 @@ class SimpleTest(TestCase):
         Tests that 1 + 1 always equals 2.
         """
         self.assertEqual(1 + 1, 2)
+
+
+class Dashboard_ReturnsOK_TestCase(TestCase):
+    # def setUp(self):
+    #     # Every test needs a client.
+    #     self.client = Client()
+
+    def test_details(self):
+        # Issue a GET request.
+        response = self.client.get('/')
+
+        # Check that the response is 200 OK.
+        self.assertEqual(response.status_code, 200)
 
 
 class ClientOpeningInstances_DaysOfWeek_TestCase(TestCase):

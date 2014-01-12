@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% load display_helpers %}
+
+{% block content %}
+	<div class="block">
+		<h3>{{ commitment.volunteer }} visits {{ client }} on {{ instance_date }}</h3>
+
+		{% display_address client %}
+
+		{% if user.is_staff or is_my_commitment %}
+			<div class="block">
+				<p>Can't make it? <a href="#create-exception">Mark this opening as available</a></p>
+				<p>Or you can <a href="{{ commitment.get_absolute_edit_url }}">adjust your visit schedule</a></p>
+			</div>
+		{% endif %}
+	</div>
+{% endblock %}

@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block content %}
+	<div class="block">
+		<h3>Unfilled Openings for {% if client %}{{ client }}{% else %}Your Clients{% endif %}</h3>
+		{% include "timeslots/partials/datepicker.html" %}
+
+		<ul class="well">
+			{% for instance in openings %}
+				{% include "timeslots/partials/opening_instance_row.html" with specify_client=True %}
+			{% endfor %}
+		</ul>
+	</div>
+
+{% endblock %}

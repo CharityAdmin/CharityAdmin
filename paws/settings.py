@@ -30,7 +30,7 @@ except ImportError:
         'HOST': '',
         'PORT': '',  # Set to empty string for default.
     }
-    
+
     # ACTIVE_DB = {
     #     'ENGINE': 'django.db.backends.postgresql_psycopg2',
     #     'NAME': 'paws',
@@ -218,3 +218,4 @@ LOGGING = {
 }
 
 LOGIN_REDIRECT_URL = '/dashboard'
+LOGIN_URL = '/login'

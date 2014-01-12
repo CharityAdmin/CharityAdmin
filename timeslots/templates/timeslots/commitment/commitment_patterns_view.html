@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block content %}
+	<div class="block">
+		<h3>Visit Schedules{% if client %} for {{ client }}{% endif %}</h3>
+
+		<div class="block">
+			<ul class="well">
+				{% for pattern in patterns %}
+					{% include "timeslots/partials/commitment_pattern_row.html" with use_edit_links=True %}
+				{% endfor %}
+			</ul>
+		</div>
+	</div>
+
+{% endblock %}

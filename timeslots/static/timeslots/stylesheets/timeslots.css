@@ -1,27 +1,28 @@
 /* line 43, ../sass/timeslots.scss */
 .content-container {
   max-width: 1170px;
+  margin: 0 auto;
 }
 
-/* line 47, ../sass/timeslots.scss */
+/* line 48, ../sass/timeslots.scss */
 h1 {
   display: inline-block;
   margin-right: 0.5em;
 }
 
-/* line 52, ../sass/timeslots.scss */
+/* line 53, ../sass/timeslots.scss */
 h3 {
   display: inline-block;
   margin-right: 0.5em;
 }
 
-/* line 57, ../sass/timeslots.scss */
+/* line 58, ../sass/timeslots.scss */
 h4 {
   display: inline-block;
   margin-right: 0.5em;
 }
 
-/* line 62, ../sass/timeslots.scss */
+/* line 63, ../sass/timeslots.scss */
 .well {
   margin: 0;
   padding: 1.25em 1.25em .75em;
@@ -34,20 +35,19 @@ h4 {
   border-radius: 5px;
 }
 
-/* line 70, ../sass/timeslots.scss */
+/* line 71, ../sass/timeslots.scss */
 li {
   line-height: 120%;
   margin-bottom: 0.5em;
 }
 
-/* line 75, ../sass/timeslots.scss */
+/* line 76, ../sass/timeslots.scss */
 .js-variable {
   display: none;
 }
 
-/* line 79, ../sass/timeslots.scss */
+/* line 80, ../sass/timeslots.scss */
 .edit-link {
-  float: right;
   padding-top: 1em;
   color: #00b7ff;
 }
@@ -300,13 +300,55 @@ form ul {
   color: #bb0000;
 }
 
-/* line 339, ../sass/timeslots.scss */
+/* line 336, ../sass/timeslots.scss */
+div.admin-only {
+  display: none;
+}
+
+/* line 340, ../sass/timeslots.scss */
+.is_admin div.admin-only {
+  display: block;
+}
+
+/* line 344, ../sass/timeslots.scss */
+.widget-wrapper {
+  display: inline-block;
+  margin-right: 10px;
+}
+/* line 348, ../sass/timeslots.scss */
+.widget-wrapper label {
+  font-style: italic;
+  font-weight: normal;
+}
+/* line 353, ../sass/timeslots.scss */
+.widget-wrapper.widget-wrapper-time input {
+  width: 80px;
+}
+
+/* line 361, ../sass/timeslots.scss */
 .form-edit-volunteer .control-group-user,
 .form-edit-client .control-group-user {
   display: none;
 }
 
-/* line 349, ../sass/timeslots.scss */
+/* line 366, ../sass/timeslots.scss */
+.control-group-daysOfWeek {
+  display: none;
+  margin-bottom: 20px;
+}
+/* line 370, ../sass/timeslots.scss */
+.control-group-daysOfWeek li {
+  display: inline-block;
+  margin-right: 20px;
+}
+
+/* line 377, ../sass/timeslots.scss */
+.control-group-dayOfMonth,
+.control-group-oneOffDate {
+  display: none;
+}
+
+/* line 385, ../sass/timeslots.scss */
 .alert {
   padding: 10px 35px 10px 14px;
   margin-top: 1em;
@@ -321,18 +363,18 @@ form ul {
   line-height: 130%;
 }
 
-/* line 364, ../sass/timeslots.scss */
+/* line 400, ../sass/timeslots.scss */
 .alert,
 .alert h4 {
   color: #c09853;
 }
 
-/* line 368, ../sass/timeslots.scss */
+/* line 404, ../sass/timeslots.scss */
 .alert h4 {
   margin: 0;
 }
 
-/* line 372, ../sass/timeslots.scss */
+/* line 408, ../sass/timeslots.scss */
 .alert .close {
   position: relative;
   top: -2px;
@@ -340,19 +382,19 @@ form ul {
   line-height: 20px;
 }
 
-/* line 379, ../sass/timeslots.scss */
+/* line 415, ../sass/timeslots.scss */
 .alert-success {
   color: #468847;
   background-color: #dff0d8;
   border-color: #d6e9c6;
 }
 
-/* line 385, ../sass/timeslots.scss */
+/* line 421, ../sass/timeslots.scss */
 .alert-success h4 {
   color: #468847;
 }
 
-/* line 390, ../sass/timeslots.scss */
+/* line 426, ../sass/timeslots.scss */
 .alert-danger,
 .alert-error {
   color: #b94a48;
@@ -360,7 +402,7 @@ form ul {
   border-color: #eed3d7;
 }
 
-/* line 397, ../sass/timeslots.scss */
+/* line 433, ../sass/timeslots.scss */
 .alert-danger h4,
 .alert-error h4 {
   color: #b94a48;

@@ -1,5 +1,7 @@
+{% load display_helpers %}
+
 {% for field in form %}
-	<div class="control-group control-group-{{ field.name }}">
+	<div class="control-group control-group-{{ field.name }} {{ field|field_class }}">
 		<label for="{{ field.name }}" class="control-label">{{ field.label_tag }}</label>
 		<div class="control-errors">{{ field.errors }}</div>
     	<div class="control">{{ field }}</div>

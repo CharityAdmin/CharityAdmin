@@ -1,0 +1,9 @@
+<div class="breadcrumbs">
+	{% if user.is_staff %}
+		<a href="{{ item.get_absolute_list_url }}">All {{ item.get_clean_model_name }}s</a> &raquo;
+	{% endif %}
+
+	{% if item.get_client_name %}
+		<a href="{{ item.get_absolute_list_for_client_url }}">{{ item.get_client_name }} {{ item.get_clean_model_name }}s</a> &raquo;
+	{% endif %}
+</div>
