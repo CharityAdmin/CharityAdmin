@@ -4,6 +4,7 @@
 	<h3>Edit Volunteer: {{ volunteer }}</h3>
 	<div>
 		<form action="." method="post" class="form-edit-volunteer">
+			{{ form.non_field_errors }}
 			{% csrf_token %}
 		    {% include "timeslots/partials/form_snippet.html" %}
 		    <div class="control-group">

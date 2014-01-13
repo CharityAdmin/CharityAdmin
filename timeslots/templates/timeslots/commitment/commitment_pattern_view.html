@@ -2,8 +2,8 @@
 
 {% block content %}
 	<div class="block">
-		{% include "timeslots/partials/breadcrumbs.html" with item=commitment %}
-		<h3>{{ commitment }}</h3>
+		<!-- {% include "timeslots/partials/breadcrumbs.html" with item=commitment %} -->
+		<h3><a href="{{ commitment.volunteer.get_absolute_url }}">{{ commitment.volunteer }}</a> visits <a href="{{ commitment.clientOpening.client.get_absolute_url }}">{{ commitment.clientOpening.client }}</a>, {{ commitment.pattern_description }}</h3>
 		{% include "timeslots/partials/datepicker.html" %}
 
 		{% if user.is_staff or is_my_commitment %}

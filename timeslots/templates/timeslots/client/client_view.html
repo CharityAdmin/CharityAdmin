@@ -6,15 +6,29 @@
 	<h3>{{ client }}</h3>
 
 	{% if user.is_staff %}
-		<a href="{% url 'timeslots_client_edit' client.user.id %}">Edit Client</a>
-		<a href="{% url 'timeslots_opening_add' client.user.id %}">Add Client Opening</a>
+		<a class="edit-link" href="{% url 'timeslots_client_edit' client.user.id %}">Edit Client</a>
+		<a class="add-link" href="{% url 'timeslots_opening_add' client.user.id %}">Add Client Opening</a>
 	{% endif %}
 
 	{% display_address client %}
 
+	<h4>Display Dates: </h4>
+	{% include "timeslots/partials/datepicker.html" %}
+	<br><br>
+
+	{% if commitments %}
+		<div class="block">
+			<h4>Scheduled Visits for You and {{ client }}</h4>
+			<ul class="well">
+				{% for instance in commitments %}
+					{% include "timeslots/partials/commitment_instance_row.html" with specify_client=False %}
+				{% endfor %}
+			</ul>
+		</div>
+	{% endif %}
+
 	<div class="block">
 		<h4>Openings</h4>
-		{% include "timeslots/partials/datepicker.html" %}
 		<ul class="well">
 			{% for instance in openings %}
 				{% include "timeslots/partials/opening_instance_row.html" with show_status_label=True %}

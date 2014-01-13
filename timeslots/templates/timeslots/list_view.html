@@ -2,7 +2,11 @@
 
 {% block content %}
 	<div class="block">
-		<h3>{{ listTitle }}</h3>
+		<h3>{{ listObject }}{{ listItems|pluralize }}</h3>
+
+		{% if addNewUrlName %}
+			<a class="add-link" href="{% url addNewUrlName %}">Add {{ listObject }}</a>
+		{% endif %}
 
 		<div class="block">
 			<ul class="well">

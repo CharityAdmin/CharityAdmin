@@ -2,13 +2,13 @@
 
 {% block content %}
 	<div class="block">
-		{% include "timeslots/partials/breadcrumbs.html" with item=opening %}
+		<!-- {% include "timeslots/partials/breadcrumbs.html" with item=opening %} -->
 
-		<h3>Client Opening for {{ opening.client }}</h3><br />
+		<h3>Client Opening for <a href="{{ opening.client.get_absolute_url }}">{{ opening.client }}</a></h3><br />
 		<h4>Opening Pattern: {{ opening.get_client_title }}</h4>
 
 		{% if user.is_staff or is_myopening %}
-			<a class="edit-link edit-commitments" href="#">Edit This Opening</a>
+			<a class="edit-link edit-commitments" href="{% url 'timeslots_opening_edit' opening.id %}">Edit This Opening</a>
 		{% endif %}
 		<br /><br /><br />
 		<h4>Instances of this Opening</h4>

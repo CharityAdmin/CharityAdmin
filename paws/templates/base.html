@@ -56,13 +56,23 @@
                                     </li>
                                     <li class="menu-item">
                                         <a href="{% url 'timeslots_openings_view' %}">
-                                            {% if not user.is_staff %}Your {% endif %}Clients' Openings
+                                            {% if not user.is_staff %}Your Clients' {% endif %}Openings
                                         </a>
                                     </li>
                                     {% block navigation_authenticated_additional %}{% endblock %}
                                     {% if user.is_staff %}
                                         {% block navigation_staff %}
-                                        <li class="menu-item menu-item-has-children">
+                                            <li class="menu-item">
+                                                <a href="{% url 'timeslots_clients_view' %}">
+                                                    Clients
+                                                </a>
+                                            </li>
+                                            <li class="menu-item">
+                                                <a href="{% url 'timeslots_volunteers_view' %}">
+                                                    Volunteers
+                                                </a>
+                                            </li>
+<!--                                         <li class="menu-item menu-item-has-children">
                                             <a href="#">
                                                 Admin
                                             </a>
@@ -95,7 +105,7 @@
                                                 </li>
                                                 {% endcomment %}
                                             </ul>
-                                        </li>
+                                        </li> -->
                                         {% endblock %}
                                     {% endif %}
                                     <li class="menu-item pull-right">

@@ -142,7 +142,7 @@ $(document).ready(function() {
 				defaultDate: defaultstartdate,
 				format: 'MM/DD/YY'
 			});
-			// startpicker.setDate(defaultstartdate); // THIS CAUSES A REFRESH LOOP BUG
+			// startpicker.setDate(defaultstartdate);
 
 			defaultenddate = endDate.toString("yyyy-MM-dd");
 			endpicker = new Pikaday({
@@ -150,7 +150,7 @@ $(document).ready(function() {
 				defaultDate: defaultenddate,
 				format: 'MM/DD/YY'
 			});
-			// endpicker.setDate(defaultenddate); // THIS CAUSES A REFRESH LOOP BUG
+			// endpicker.setDate(defaultenddate);
 
 			$currentSelectionLabel.text(label);
 			$currentEl.addClass("current");

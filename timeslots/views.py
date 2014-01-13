@@ -77,6 +77,14 @@ def dashboard(request):
             openings.extend(client.get_unfilled_opening_instances(startDate=startDate, endDate=endDate))
         commitment_instances = volunteer.get_commitment_instances(startDate=startDate, endDate=endDate)
 
+    elif request.user.is_staff:
+        clients = Client.objects.all()
+        volunteers = Volunteer.objects.all()
+        multipleclients = True
+        for client in clients:
+            openings.extend(client.get_unfilled_opening_instances(startDate=startDate, endDate=endDate))
+        for volunteer in volunteers:
+            commitment_instances.extend(volunteer.get_commitment_instances(startDate=startDate, endDate=endDate))
 
     return render(request, 'timeslots/dashboard.html', { "volunteer": volunteer, "clients": clients, "multipleclients": multipleclients, "openings": openings, "commitment_instances": commitment_instances, "startDate": startDate, "endDate": endDate })
 
@@ -98,6 +106,9 @@ def opening_instances_view(request, clientid=None):
         else:
             for c in volunteer.clients.all():
                 openings.extend(c.get_unfilled_opening_instances(startDate=startDate, endDate=endDate))
+    elif request.user.is_staff:
+        for c in Client.objects.all():
+            openings.extend(c.get_unfilled_opening_instances(startDate=startDate, endDate=endDate))
     openings.sort(key=lambda item:item['date'])
 
     return render(request, 'timeslots/opening/opening_instances_view.html', { "openings": openings, "client": client, "startDate": startDate, "endDate": endDate })
@@ -138,7 +149,7 @@ def opening_add(request, clientid):
         client = request.user.client
     else:
         client = Client.objects.get(user__id=clientid)
-    opening, created = ClientOpening.objects.get_or_create(client=client)
+    opening = ClientOpening.objects.create(client=client)
     return HttpResponseRedirect(reverse('timeslots_opening_edit', kwargs={'openingid': opening.id}))
 
 
@@ -155,20 +166,14 @@ def opening_edit(request, openingid):
         # metadataform = OpeningMetaDataForm(request.POST)
         if form.is_valid():
             # PROCESS DATA
-            form.save()
-            return HttpResponseRedirect(reverse('timeslots_opening_edit_success', kwargs={'openingid':opening.id}))
+            o = form.save()
+            return HttpResponseRedirect(o.get_absolute_url())
     else:
         form = OpeningForm(instance=opening)
         # initial_metadata = {'clientOpening': opening.id, 'metadata': opening.get_all_metadata_string()}
         # metadataform = OpeningMetaDataForm(initial_metadata)
 
     return render(request, 'timeslots/opening/opening_edit.html', { 'opening': opening, 'form': form })
-
-
-@staff_member_required
-def opening_edit_success(request, openingid):
-    opening = ClientOpening.objects.get(id=openingid)
-    return render(request, 'timeslots/opening/opening_edit_success.html', { "opening": opening })
 
 
 @login_required
@@ -178,6 +183,7 @@ def commitment_instances_view(request, clientid=None):
 
     volunteer = get_volunteer(request)
     client = None
+    instances = list()
     if volunteer:
         if clientid:
             client = Client.objects.get(user__id=clientid)
@@ -186,8 +192,10 @@ def commitment_instances_view(request, clientid=None):
             instances = volunteer.get_commitment_instances(startDate=startDate, endDate=endDate, client=client)
         else:
             instances = volunteer.get_commitment_instances(startDate=startDate, endDate=endDate)
-    else:
-        instances = list()
+    elif request.user.is_staff:
+        volunteers = Volunteer.objects.all()
+        for volunteer in volunteers:
+            instances.extend(volunteer.get_commitment_instances(startDate=startDate, endDate=endDate))
     return render(request, 'timeslots/commitment/commitment_instances_view.html', { "instances": instances, "client": client, "startDate": startDate, "endDate": endDate })
 
 
@@ -241,13 +249,13 @@ def commitment_pattern_view(request, commitmentid):
 @login_required
 def commitment_add(request, openingid, volunteerid=None):
     """ create commitment pattern based on openingid and volunteerid """
-    if not request.user.is_staff:
+    if volunteerid and request.user.is_staff:
         # only a staff member can create a commitment for someone else
-        volunteer = request.user.volunteer
-    else:
         volunteer = get_object_or_404(Volunteer, id=volunteerid)
+    else:
+        volunteer = request.user.volunteer
     opening = get_object_or_404(ClientOpening, id=openingid)
-    commitment, created = VolunteerCommitment.objects.get_or_create(clientOpening=opening, volunteer=volunteer)
+    commitment, created = VolunteerCommitment.objects.get_or_create(clientOpening=opening, volunteer=volunteer, type=opening.type)
     return HttpResponseRedirect(reverse('timeslots_commitment_edit', kwargs={'commitmentid': commitment.id}))
 
 
@@ -263,39 +271,32 @@ def commitment_edit(request, commitmentid):
         form = CommitmentForm(request.POST, instance=commitment)
         if form.is_valid():
             # PROCESS DATA
-            form.save()
-            return HttpResponseRedirect(reverse('timeslots_commitment_edit_success', kwargs={'commitmentid': commitmentid}))
+            c = form.save()
+            return HttpResponseRedirect(c.get_absolute_url())
     else:
         form = CommitmentForm(instance=commitment)
 
     return render(request, 'timeslots/commitment/commitment_edit.html', { 'commitment': commitment, 'form': form })
 
 
-@login_required
-def commitment_edit_success(request, commitmentid):
-    commitment = VolunteerCommitment.objects.get(id=commitmentid)
-    return render(request, 'timeslots/commitment/commitment_edit_success.html', { "commitment": commitment })
-
-
 @staff_member_required
-def user_add(request):
+def user_add(request, usertype):
     customererror = None
     if request.method == 'POST':
         form = UserForm(request.POST)
         if form.is_valid():
             # PROCESS DATA
-            type = form.cleaned_data['type']
             email = form.cleaned_data['email']
             first = form.cleaned_data['first_name']
             last = form.cleaned_data['last_name']
             user, usercreated = User.objects.get_or_create(username=email, defaults={'email': email, 'first_name': first, 'last_name': last})
 
-            if type == 'VOLUNTEER':
+            if usertype == 'volunteer':
                 volunteer, typedusercreated = Volunteer.objects.get_or_create(user=user)
-                redirectUrl = reverse('timeslots_volunteer_edit', kwargs={'userid': user.id})
+                redirectUrl = volunteer.get_absolute_edit_url()
             else:
                 client, typedusercreated = Client.objects.get_or_create(user=user)
-                redirectUrl = reverse('timeslots_client_edit', kwargs={'userid': user.id})
+                redirectUrl = client.get_absolute_edit_url()
 
             if typedusercreated:
                 # SUCCESS
@@ -305,23 +306,27 @@ def user_add(request):
     else:
         form = UserForm()
 
-    return render(request, 'timeslots/user_add.html', { "form": form, "customererror": customererror })
+    return render(request, 'timeslots/user_add.html', { "form": form, "usertype": usertype, "customererror": customererror })
 
 
 @login_required
 def client_view(request, userid):
     startDate, endDate = get_dates(request)
-
+    volunteer = get_volunteer(request)
     client = get_object_or_404(Client, user__id=userid)
     openings = client.get_opening_instances(startDate=startDate, endDate=endDate)
+    if volunteer:
+        commitments = volunteer.get_commitment_instances(startDate=startDate, endDate=endDate, client=client)
+    else:
+        commitments = None
     team = client.volunteers.all()
-    return render(request, 'timeslots/client/client_view.html', { "client": client, "openings": openings, "team": team, "startDate": startDate, "endDate": endDate  })
+    return render(request, 'timeslots/client/client_view.html', { "client": client, "openings": openings, "commitments": commitments, "team": team, "startDate": startDate, "endDate": endDate  })
 
 
 @staff_member_required
 def clients_view(request):
     clients = Client.objects.all()
-    return render(request, 'timeslots/list_view.html', { 'listTitle': "Clients", 'listItems': clients })
+    return render(request, 'timeslots/list_view.html', { 'listObject': "Client", 'listItems': clients, 'addNewUrlName': 'timeslots_client_add' })
 
 
 @staff_member_required
@@ -330,18 +335,12 @@ def client_edit(request, userid):
     if request.method == 'POST':
         form = ClientForm(request.POST, instance=client)
         if form.is_valid():
-            form.save()
-            return HttpResponseRedirect(reverse('timeslots_client_edit_success', kwargs={'userid': userid}))
+            c = form.save()
+            return HttpResponseRedirect(c.get_absolute_url())
     else:
         form = ClientForm(instance=client)
 
     return render(request, 'timeslots/client/client_edit.html', { "client": client, "form": form })
-
-
-@staff_member_required
-def client_edit_success(request, userid):
-    client = Client.objects.get(user__id=userid)
-    return render(request, 'timeslots/client/client_edit_success.html', { "client": client })
 
 
 def volunteer_view(request, userid):
@@ -357,7 +356,7 @@ def volunteer_view(request, userid):
 @staff_member_required
 def volunteers_view(request):
     volunteers = Volunteer.objects.all()
-    return render(request, 'timeslots/list_view.html', { 'listTitle': "Volunteers", 'listItems': volunteers })
+    return render(request, 'timeslots/list_view.html', { 'listObject': "Volunteer", 'listItems': volunteers, 'addNewUrlName': 'timeslots_volunteer_add' })
 
 
 @staff_member_required
@@ -366,15 +365,10 @@ def volunteer_edit(request, userid):
     if request.method == 'POST':
         form = VolunteerForm(request.POST, instance=volunteer)
         if form.is_valid():
-            form.save()
-            return HttpResponseRedirect(reverse('timeslots_volunteer_edit_success', kwargs={'userid': userid}))
+            v = form.save()
+            return HttpResponseRedirect(v.get_absolute_url())
     else:
         form = VolunteerForm(instance=volunteer)
 
     return render(request, 'timeslots/volunteer/volunteer_edit.html', { "volunteer": volunteer, "form": form })
 
-
-@staff_member_required
-def volunteer_edit_success(request, userid):
-    volunteer = Volunteer.objects.get(user__id=userid)
-    return render(request, 'timeslots/client/volunteer_edit_success.html', { "volunteer": volunteer })

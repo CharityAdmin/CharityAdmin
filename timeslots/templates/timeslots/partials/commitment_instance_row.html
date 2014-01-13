@@ -2,7 +2,11 @@
 
 <li>
 	<div>
-		<a href="{% commitment_instance_url instance %}">Visit</a>
+		{% if specify_volunteer %}
+			<a href="{{ instance.volunteer.get_absolute_url }}">{{ instance.volunteer }}</a> visits
+		{% else %}
+			<a href="{% commitment_instance_url instance %}">Visit</a>
+		{% endif %}
 		{% if specify_client %}
 			with
 			<a href="{{ instance.client.get_absolute_url }}">{{ instance.client }}</a>

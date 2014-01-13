@@ -5,6 +5,7 @@
 	<h5><em>For opening: {{ commitment.clientOpening }}</em></h5>
 	<div>
 		<form action="." method="post" class="form-edit form-edit-commitment">
+			{{ form.non_field_errors }}
 			{% csrf_token %}
 		    {% include "timeslots/partials/form_snippet.html" %}
 		    <div class="control-group">
