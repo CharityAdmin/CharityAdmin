@@ -5,13 +5,8 @@ from django.contrib.auth.models import User
 from timeslots.models import days_of_week_choices, days_of_week_list, Client, Volunteer, ClientOpening, ClientOpeningMetadata, VolunteerCommitment, VolunteerCommitmentMetadata
 from timeslots.widgets import SplitDateTimeFieldWithLabels
 
-USER_TYPE_CHOICES = (
-    ('VOLUNTEER', 'Volunteer'),
-    ('CLIENT', 'Client'),
-)
 
 class UserForm(forms.Form):
-    type = forms.ChoiceField(choices=USER_TYPE_CHOICES)
     email = forms.EmailField(max_length=100)
     first_name = forms.CharField(max_length=30)
     last_name = forms.CharField(max_length=30)
@@ -21,9 +16,11 @@ class ClientForm(forms.ModelForm):
     class Meta:
         model = Client
 
+
 class VolunteerForm(forms.ModelForm):
     class Meta:
         model = Volunteer
+
 
 class OpeningForm(forms.ModelForm):
     metadata = forms.CharField(max_length=30, required=False)
@@ -47,7 +44,7 @@ class OpeningForm(forms.ModelForm):
         # patch the initial data to include the metadata values
         super(OpeningForm, self).__init__(*args, **kwargs)
         self.initial['metadata'] = self.instance.get_all_metadata_string()
-        metadataset = self.instance.get_all_metadata_set()
+        metadataset = self.instance.get_all_metadata_list()
         openingtype = self.initial['type']
         if len(metadataset) > 0:
             if openingtype in ["Days of Week", "Days of Alt Week"]:
@@ -95,10 +92,11 @@ class OpeningForm(forms.ModelForm):
             metadata = [metadatastring]
         for item in metadata:
             md = ClientOpeningMetadata.objects.create(clientOpening=self.instance, metadata=item)
-        super(OpeningForm, self).save(commit=commit)
+        return super(OpeningForm, self).save(commit=commit)
+
 
 class CommitmentForm(forms.ModelForm):
-    metadata = forms.CharField(max_length=30)
+    metadata = forms.CharField(max_length=30, required=False)
     # for days of week, alternating days of week
     daysOfWeek = forms.MultipleChoiceField(label="Days of Week", widget=forms.widgets.CheckboxSelectMultiple(), choices=days_of_week_choices, required=False)
     # for day of month
@@ -119,17 +117,24 @@ class CommitmentForm(forms.ModelForm):
         # patch the initial data to include the metadata values
         super(CommitmentForm, self).__init__(*args, **kwargs)
         self.initial['metadata'] = self.instance.get_all_metadata_string()
-        metadataset = self.instance.get_all_metadata_set()
-        if len(metadataset) > 0:
-            commitmenttype = self.initial['type']
-            if commitmenttype in ["Days of Week", "Days of Alt Week"]:
-                opening = ClientOpening.objects.get(id=self.initial['clientOpening'])
+        metadataset = self.instance.get_all_metadata_list()
+        commitmenttype = self.initial['type']
+        opening = ClientOpening.objects.get(id=self.initial['clientOpening'])
+        if commitmenttype in ["Days of Week", "Days of Alt Week"]:
+            # days of week
+            if len(metadataset) > 0:
                 self.initial['daysOfWeek'] = metadataset
-                choicessubset = ((k, k) for k in opening.get_all_metadata_set())
-                self.fields['daysOfWeek'].choices = choicessubset
-            elif commitmenttype == "One-Off":
-                self.initial['oneOffDate'] = list(metadataset)[0]
-            else:
+            choicessubset = ((k, k) for k in opening.get_all_metadata_list())
+            self.fields['daysOfWeek'].choices = choicessubset
+        elif commitmenttype == "One-Off":
+            # one-off
+            print opening.get_all_metadata_list()
+            self.initial['oneOffDate'] = list(opening.get_all_metadata_list())[0]
+            self.fields['startDate'].widget.attrs['class'] = 'hidden'
+            self.fields['endDate'].widget.attrs['class'] = 'hidden'
+        else:
+            # day of month
+            if len(metadataset) > 0:
                 self.initial['dayOfMonth'] = list(metadataset)[0]
         self.fields['clientOpening'].widget.attrs['class'] = 'hidden'
         self.fields['volunteer'].widget.attrs['class'] = 'admin-only'
@@ -148,12 +153,14 @@ class CommitmentForm(forms.ModelForm):
         if commitmenttype in ["Days of Week", "Days of Alt Week"]:
             self.cleaned_data['metadata'] = ''.join(self.cleaned_data['daysOfWeek'])
         elif commitmenttype == "One-Off":
-            specificDate = self.cleaned_data['oneOffDate']
-            try:
-                datetime.datetime.strptime(specificDate, '%Y-%m-%d')
-            except ValueError:
-                raise forms.ValidationError("One-Off Openings require a date in the format YYYY-MM-DD")
-            self.cleaned_data['metadata'] = specificDate
+            # specificDate = self.cleaned_data['oneOffDate']
+            # try:
+            #     datetime.datetime.strptime(specificDate, '%Y-%m-%d')
+            # except ValueError:
+            #     raise forms.ValidationError("One-Off Openings require a date in the format YYYY-MM-DD")
+            print "COMMITMENT TYPE ONE-OFF"
+            print list(self.cleaned_data['clientOpening'].get_all_metadata_list())[0]
+            self.cleaned_data['metadata'] = self.cleaned_data['clientOpening'].get_all_metadata_list()
         else:
             # Day of Month
             specificDate = self.cleaned_data['dayOfMonth']
@@ -165,6 +172,8 @@ class CommitmentForm(forms.ModelForm):
             if not (1 <= specific_int <= 31):
                 raise forms.ValidationError(err_message)
             self.cleaned_data['metadata'] = specific_int
+        if not self.cleaned_data['metadata']:
+            raise forms.ValidationError("The metadata field is required.")
         return self.cleaned_data
 
     def save(self, commit=True):
@@ -182,4 +191,4 @@ class CommitmentForm(forms.ModelForm):
             metadata = metadatastring
         for item in metadata:
             md = VolunteerCommitmentMetadata.objects.create(volunteerCommitment=self.instance, metadata=item)
-        super(CommitmentForm, self).save(commit=commit)
+        return super(CommitmentForm, self).save(commit=commit)

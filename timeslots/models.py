@@ -18,7 +18,7 @@ datetimeformat = '{d:%b %d, %Y} ({d.hour}:{d.minute:02} {d:%p})'
 
 #days_of_week_dict maps our day strings "M", "Tu", ... to the dateutil objects MO, TU, ...
 days_of_week_dict = {'M': MO, 'Tu': TU, 'W': WE, 'Th': TH, 'F': FR, 'Sa': SA, 'Su': SU}
-days_of_week_list = days_of_week_dict.keys()
+days_of_week_list = ['M', 'Tu', 'W', 'Th', 'F', 'Sa', 'Su']
 days_of_week_choices = (('M', 'Mo'), ('Tu', 'Tu'), ('W', 'We'), ('Th', 'Th'), ('F', 'Fr'), ('Sa', 'Sa'), ('Su', 'Su'))
 
 class Volunteer(models.Model):
@@ -156,7 +156,7 @@ class ClientOpening(models.Model):
         if endDate is None:
             endDate = self.endDate
         if metadata_set is None:
-            metadata_set = self.get_all_metadata_set()
+            metadata_set = self.get_all_metadata_list()
         instance_list = list()
         if self.type in ["Days of Week", "Days of Alternating Week"]:
             interval = 2 if self.type == "Days of Alternating Week" else 1
@@ -187,7 +187,7 @@ class ClientOpening(models.Model):
         instance_dates = list()
         if len(metadata_set) > 0:
             instance_dates = self._get_instance_dates(metadata_set=metadata_set, startDate=startDate, endDate=endDate, **kwargs)
-        return [{ "date": instance_date, "is_filled": False, "client": self.client, "url": self.get_absolute_url(), "openingid": self.id } for instance_date in instance_dates]
+        return [{ "date": instance_date.replace(second=0, microsecond=0), "is_filled": False, "client": self.client, "url": self.get_absolute_url(), "openingid": self.id } for instance_date in instance_dates]
 
     def get_filled_instances(self, startDate=None, endDate=None, metadata_set=None, **kwargs):
         if startDate is None:
@@ -199,7 +199,7 @@ class ClientOpening(models.Model):
         instance_dates = list()
         if len(metadata_set) > 0:
             instance_dates = self._get_instance_dates(metadata_set=metadata_set, startDate=startDate, endDate=endDate, **kwargs)
-        return [{ "date": instance_date, "is_filled": True, "client": self.client, "url": self.get_absolute_url(), "openingid": self.id } for instance_date in instance_dates]
+        return [{ "date": instance_date.replace(second=0, microsecond=0), "is_filled": True, "client": self.client, "url": self.get_absolute_url(), "openingid": self.id } for instance_date in instance_dates]
 
     def get_instances(self, startDate=None, endDate=None, **kwargs):
         if startDate is None:
@@ -228,8 +228,11 @@ class ClientOpening(models.Model):
     def get_next_unfilled_instance(self, **kwargs):
         return self.get_next_unfilled_instances(count=1, **kwargs)
 
-    def get_all_metadata_set(self):
-        return set([metadataobj.metadata for metadataobj in self.metadata.all()])
+    def get_all_metadata_list(self):
+        allmetadata = [metadataobj.metadata for metadataobj in self.metadata.all()]
+        if self.type in ["Days of Week", "Days of Alternating Week"]:
+            allmetadata = sorted(allmetadata, key=days_of_week_list.index)
+        return allmetadata
 
     def get_unfilled_metadata_set(self):
         return set([metadataobj.metadata for metadataobj in self.metadata.all() if not metadataobj.is_filled()])
@@ -242,8 +245,7 @@ class ClientOpening(models.Model):
             join_string = ''
         else:
             join_string = ', '
-        combinedmetadata = join_string.join(self.get_all_metadata_set())
-        return combinedmetadata
+        return join_string.join(self.get_all_metadata_list())
 
     def is_filled(self):
         return len(self.get_filled_metadata_set()) > 0 and len(self.get_unfilled_metadata_set()) == 0
@@ -319,7 +321,7 @@ class VolunteerCommitment(models.Model):
         # displays just the Type, Metadata, and Start/End Dates
         return "%s: %s (%s-%s)" % (self.type, self.metadata.all()[0].metadata, dateformat.format(d=self.startDate), dateformat.format(d=self.endDate) if self.endDate is not None else "")
 
-    def get_all_metadata_set(self):
+    def get_all_metadata_list(self):
         return set([metadataobj.metadata for metadataobj in self.metadata.all()])
 
     def get_all_metadata_string(self):
@@ -327,11 +329,14 @@ class VolunteerCommitment(models.Model):
             join_string = ''
         else:
             join_string = ', '
-        combinedmetadata = join_string.join(self.get_all_metadata_set())
+        combinedmetadata = join_string.join(self.get_all_metadata_list())
         return combinedmetadata
 
     def get_instances(self, **kwargs):
-        return self.clientOpening.get_instances(metadata_set=self.get_all_metadata_set(), **kwargs)
+        instances = self.clientOpening.get_instances(metadata_set=self.get_all_metadata_list(), **kwargs)
+        for instance in instances:
+            instance['volunteer'] = self.volunteer;
+        return instances
 
     def get_instance(self, instance_date,  **kwargs):
         instance = None

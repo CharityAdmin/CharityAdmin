@@ -4,7 +4,7 @@
 
 {% block content %}
 	<div class="block">
-		<h3>Visit {{ client }} on {{ instance_date }}</h3>
+		<h3>Visit <a href="{{ client.get_absolute_url }}">{{ client }}</a> on <span title="For opening pattern: {{ opening }}">{{ instance_date|date:"D, M j, Y, P" }}</span></h3>
 
 		{% display_address client %}
 
