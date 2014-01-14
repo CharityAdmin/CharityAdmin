@@ -196,14 +196,16 @@ def commitment_instances_view(request, clientid=None):
         volunteers = Volunteer.objects.all()
         for volunteer in volunteers:
             instances.extend(volunteer.get_commitment_instances(startDate=startDate, endDate=endDate))
+            instances.sort(key=lambda item:item['date'])
     return render(request, 'timeslots/commitment/commitment_instances_view.html', { "instances": instances, "client": client, "startDate": startDate, "endDate": endDate })
 
 
 @login_required
-def commitment_patterns_view(request, clientid=None):
+def commitment_patterns_view(request, clientid=None, editlinks=False):
     """ Show commitment patterns. If clientid is specified, limit to that client """
     volunteer = get_volunteer(request)
     client = None
+    patterns = None
     if volunteer:
         if clientid:
             client = Client.objects.get(user__id=clientid)
@@ -212,9 +214,10 @@ def commitment_patterns_view(request, clientid=None):
             patterns = volunteer.commitments.filter(clientOpening__client=client)
         else:
             patterns = volunteer.commitments.all()
-    else:
-        instances = list()
-    return render(request, 'timeslots/commitment/commitment_patterns_view.html', { "patterns": patterns, "client": client })
+    elif request.user.is_staff:
+        patterns = VolunteerCommitment.objects.all()
+
+    return render(request, 'timeslots/commitment/commitment_patterns_view.html', { "patterns": patterns, "client": client, "editlinks": editlinks })
 
 
 @login_required

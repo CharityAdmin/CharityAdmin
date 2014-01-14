@@ -22,3 +22,7 @@ def display_address(client):
 def field_class(formfield):
 	fieldclass = formfield.field.widget.attrs['class'] if formfield.field.widget.attrs and 'class' in formfield.field.widget.attrs else ""
 	return fieldclass
+
+@register.filter()
+def negate(value):
+	return not value

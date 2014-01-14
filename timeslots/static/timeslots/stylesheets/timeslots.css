@@ -407,3 +407,20 @@ div.admin-only {
 .alert-error h4 {
   color: #b94a48;
 }
+
+/* line 440, ../sass/timeslots.scss */
+.data-table {
+  display: table;
+}
+
+/* line 444, ../sass/timeslots.scss */
+.data-row {
+  display: table-row;
+}
+
+/* line 448, ../sass/timeslots.scss */
+.data-cell {
+  display: table-cell;
+  padding-right: 10px;
+  padding-bottom: 8px;
+}

@@ -5,7 +5,7 @@
 		<h3>{% if not user.is_staff %}Your {% endif %}Scheduled Visits{% if client %} for {{ client }}{% endif %}</h3>
 		{% include "timeslots/partials/datepicker.html" %}
 
-		<a class="edit-link edit-commitments pull-right" href="{% if client %}{% url 'timeslots_commitment_patterns_view' client.user.id %}{% else %}{% url 'timeslots_commitment_patterns_view' %}{% endif %}">Edit {% if not user.is_staff %}My {% endif %}Visit Schedule{% if client %} for {{ client }}{% endif %}</a>
+		<a class="edit-link edit-commitments pull-right" href="{% if client %}{% url 'timeslots_commitment_patterns_view' client.user.id %}{% else %}{% url 'timeslots_commitment_patterns_edit' %}{% endif %}">Edit {% if not user.is_staff %}My {% endif %}Visit Schedule{% if client %} for {{ client }}{% endif %}</a>
 
 		<div class="block">
 			<!-- <h3>Commitment Instances</h3> -->
