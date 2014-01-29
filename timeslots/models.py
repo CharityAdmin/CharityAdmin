@@ -327,7 +327,7 @@ class VolunteerCommitment(models.Model):
 
     def pattern_description(self, prefix="Visit "):
         # displays just the Type, Metadata, and Start/End Dates
-        return "%s: %s (%s-%s)" % (self.type, self.metadata.all()[0].metadata, dateformat.format(d=self.startDate), dateformat.format(d=self.endDate) if self.endDate is not None else "")
+        return "%s: %s (%s-%s)" % (self.type, self.get_all_metadata_string(), dateformat.format(d=self.startDate), dateformat.format(d=self.endDate) if self.endDate is not None else "")
 
     def get_all_metadata_list(self):
         return set([metadataobj.metadata for metadataobj in self.metadata.all()])

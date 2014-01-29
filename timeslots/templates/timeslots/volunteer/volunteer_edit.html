@@ -11,5 +11,8 @@
 		    	<input type="submit" value="Save Volunteer" />
 		   	</div>
 		</form>
+		{% if volunteer.commitments %}
+			<a class="edit-link" href="{% url 'timeslots_commitment_patterns_edit' volunteer.user.id %}">Edit Scheduled Visits</a>
+		{% endif %}
 	</div>
 {% endblock %}

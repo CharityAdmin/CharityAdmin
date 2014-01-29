@@ -38,15 +38,19 @@ def get_dates(request):
     return startDate, endDate
 
 
-def get_volunteer(request):
+def get_volunteer(request, volunteerid=None):
     """
     Utility function to prevent us from Does Not Exist exception when trying to
     get a volunteer for a user who doesn't have one (this returns None)
     """
-    try:
-        volunteer = request.user.volunteer
-    except Volunteer.DoesNotExist:
-        volunteer = None
+    volunteer = None
+    if volunteerid and request.user.is_staff:
+        volunteer = Volunteer.objects.get(user__id=volunteerid)
+    else:
+        try:
+            volunteer = request.user.volunteer
+        except Volunteer.DoesNotExist:
+            pass
     return volunteer
 
 
@@ -126,6 +130,23 @@ def opening_pattern_view(request, openingid):
 
 
 @login_required
+def opening_patterns_view(request, clientid=None, editlinks=False):
+    """ Show a list of opening patterns. If clientid is specified, limit to that client. """
+    client = None
+    patterns = None
+    if clientid:
+        client = Client.objects.get(user__id=clientid)
+    if client:
+        if not request.user.is_staff and client not in volunteer.clients.all():
+            return HttpResponseForbidden
+        patterns = client.openings.all()
+    elif request.user.is_staff:
+        patterns = ClientOpening.objects.all()
+
+    return render(request, 'timeslots/opening/opening_patterns_view.html', { "patterns": patterns, "client": client, "editlinks": editlinks })
+
+
+@login_required
 def opening_instance_view(request, clientid, year, month, day, time):
     """ Show a single opening instance """
     volunteer = get_volunteer(request)
@@ -201,21 +222,25 @@ def commitment_instances_view(request, clientid=None):
 
 
 @login_required
-def commitment_patterns_view(request, clientid=None, editlinks=False):
-    """ Show commitment patterns. If clientid is specified, limit to that client """
-    volunteer = get_volunteer(request)
+def commitment_patterns_view(request, clientid=None, editlinks=False, volunteerid=None):
+    """ Show commitment patterns. If clientid is specified, limit to that client. If volunteerid is specified and user is staff, show that volunteer. """
+    volunteer = get_volunteer(request, volunteerid)
     client = None
     patterns = None
+    if clientid:
+        client = Client.objects.get(user__id=clientid)
     if volunteer:
-        if clientid:
-            client = Client.objects.get(user__id=clientid)
+        if client:
             if not request.user.is_staff and client not in volunteer.clients.all():
                 return HttpResponseForbidden
             patterns = volunteer.commitments.filter(clientOpening__client=client)
         else:
             patterns = volunteer.commitments.all()
     elif request.user.is_staff:
-        patterns = VolunteerCommitment.objects.all()
+        if client:
+            patterns = VolunteerCommitment.objects.filter(clientOpening__client=client)
+        else:
+            patterns = VolunteerCommitment.objects.all()
 
     return render(request, 'timeslots/commitment/commitment_patterns_view.html', { "patterns": patterns, "client": client, "editlinks": editlinks })
 

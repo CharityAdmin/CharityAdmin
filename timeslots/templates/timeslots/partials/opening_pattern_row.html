@@ -9,6 +9,10 @@
 			<a href="{% url 'timeslots_commitment_add' pattern.id volunteer.id %}">
 				{{ pattern }}
 			</a>
+		{% elif use_edit_links %}
+			<a href="{{ pattern.get_absolute_edit_url }}">
+				Edit: {{ pattern }}
+			</a>
 		{% else %}
 			<span class="pattern-display">
 				{{ pattern }}

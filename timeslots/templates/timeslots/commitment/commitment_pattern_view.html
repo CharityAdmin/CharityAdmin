@@ -7,7 +7,7 @@
 		{% include "timeslots/partials/datepicker.html" %}
 
 		{% if user.is_staff or is_my_commitment %}
-			<a class="edit-link edit-commitments" href="{% url 'timeslots_commitment_patterns_edit' %}">Edit Visit Schedule</a>
+			<a class="edit-link edit-commitments" href="{% url 'timeslots_commitment_edit' commitment.id %}">Edit Visit Schedule</a>
 		{% endif %}
 
 		<div class="block">

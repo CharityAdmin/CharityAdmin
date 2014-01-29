@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% load display_helpers %}
+
+{% block content %}
+	<div class="block">
+		<h3>{% if editlinks %}Select {% endif %}Opening Pattern{% if editlinks %} to Edit {% else %}s{% if client %} for {{ client }}{% endif %}{% endif %}</h3>
+
+		<div class="block">
+			<ul class="well">
+				{% for pattern in patterns %}
+					{% include "timeslots/partials/opening_pattern_row.html" with use_edit_links=editlinks show_subtle_edit_links=editlinks|negate %}
+				{% endfor %}
+			</ul>
+		</div>
+	</div>
+
+{% endblock %}

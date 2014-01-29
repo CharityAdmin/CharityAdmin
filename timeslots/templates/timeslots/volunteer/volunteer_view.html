@@ -45,12 +45,13 @@
 		<h3>Commitment Patterns</h3>
 		<ul class="well">
 			{% for commitment in commitments %}
+				<!-- {% include "timeslots/partials/commitment_pattern_row.html" %} -->
 				<li>
 					<div>
 						Visit
 						<a href="{{ commitment.clientOpening.client.get_absolute_url }}">{{ commitment.clientOpening.client }}</a>
 						on
-						<a href="#">{{ commitment.pattern_description }}</a>
+						<a href="{{ commitment.get_absolute_url }}">{{ commitment.pattern_description }}</a>
 					</div>
 				</li>
 			{% endfor %}
