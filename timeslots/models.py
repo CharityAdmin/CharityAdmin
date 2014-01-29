@@ -115,6 +115,11 @@ class Client(models.Model):
             commitments.extend(opening.volunteercommitment_set.all())
         return commitments
 
+    def get_unfilled_openings(self, **kwargs):
+        # this includes all openings for the client which are not ENTIRELY filled
+        openings = (x for x in self.openings.all() if not x.is_filled())
+        return openings
+
 
 class ClientOpening(models.Model):
     client = models.ForeignKey(Client, db_column='clientId', related_name='openings')
@@ -248,12 +253,15 @@ class ClientOpening(models.Model):
         return join_string.join(self.get_all_metadata_list())
 
     def is_filled(self):
+        # Has all instances filled
         return len(self.get_filled_metadata_set()) > 0 and len(self.get_unfilled_metadata_set()) == 0
 
     def is_partially_filled(self):
+        # Has some instances unfilled, some instances filled
         return len(self.get_filled_metadata_set()) > 0 and len(self.get_unfilled_metadata_set()) > 0
 
     def is_unfilled(self):
+        # Has no instances filled
         return len(self.get_unfilled_metadata_set()) > 0 and len(self.get_filled_metadata_set()) is 0
 
     def get_filled_status(self):

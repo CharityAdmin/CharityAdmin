@@ -261,6 +261,25 @@ def commitment_add(request, openingid, volunteerid=None):
     commitment, created = VolunteerCommitment.objects.get_or_create(clientOpening=opening, volunteer=volunteer, type=opening.type)
     return HttpResponseRedirect(reverse('timeslots_commitment_edit', kwargs={'commitmentid': commitment.id}))
 
+@login_required
+def commitment_add_opening_select(request, volunteerid):
+    if not (request.user.is_staff or request.user.id == volunteerid):
+        # only staff members or the volunteer themselves
+        return HttpResponseForbidden()
+
+    if request.user.id == volunteerid:
+        volunteer = request.user.volunteer
+    else:
+        volunteer = get_object_or_404(Volunteer, user__id=volunteerid)
+
+    clients = volunteer.clients.all()
+
+    if len(clients) == 1:
+        openings = clients[0].openings.all()
+        if len(openings) == 1:
+            return HttpResponseRedirect(reverse('timeslots_commitment_add', kwargs={ 'openingid': openings[0].id, 'volunteerid': volunteer.id }))
+    return render(request, 'timeslots/commitment/commitment_add_opening_select.html', { 'volunteer': volunteer, 'clients': clients })
+
 
 @login_required
 def commitment_edit(request, commitmentid):

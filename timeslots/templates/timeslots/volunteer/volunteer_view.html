@@ -3,6 +3,11 @@
 {% block content %}
 	<h3>{{ volunteer }}</h3>
 
+	{% if user.is_staff %}
+		<a class="edit-link" href="{% url 'timeslots_volunteer_edit' volunteer.user.id %}">Edit Volunteer</a>
+		<a class="add-link" href="{% url 'timeslots_commitment_add_opening_select' volunteer.user.id %}">Add Scheduled Visit</a>
+	{% endif %}
+
 	<div class="block">
 		<div class="phone">
 			Phone:

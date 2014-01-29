@@ -1,10 +1,18 @@
 <li>
 	<a href="{{ pattern.get_absolute_url }}">
-		<span class="label pattern-label{% if pattern.is_unfilled %} label-danger{% endif %}{% if pattern.is_partially_filled %} label-warning{% endif %}">
-			{{ pattern.get_filled_status }}
-		</span>
-		<span class="pattern-display">
-			{{ pattern }}
-		</span>
+		{% if show_status_label %}
+			<span class="label pattern-label{% if pattern.is_unfilled %} label-danger{% endif %}{% if pattern.is_partially_filled %} label-warning{% endif %}">
+				{{ pattern.get_filled_status }}
+			</span>
+		{% endif %}
+		{% if use_fill_links %}
+			<a href="{% url 'timeslots_commitment_add' pattern.id volunteer.id %}">
+				{{ pattern }}
+			</a>
+		{% else %}
+			<span class="pattern-display">
+				{{ pattern }}
+			</span>
+		{% endif %}
 	</a>
 </li>

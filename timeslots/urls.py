@@ -33,6 +33,7 @@ urlpatterns = patterns(
     url(r'^client/(?P<clientid>\d+)/scheduledvisits/$', 'timeslots.views.commitment_instances_view', name='timeslots_commitments_view'),
     url(r'^client/(?P<clientid>\d+)/scheduledvisit/(?P<year>\d+)/(?P<month>\d+)/(?P<day>\d+)/(?P<time>\d+)$', 'timeslots.views.commitment_instance_view', name='timeslots_commitment_instance_view'),
     url(r'^scheduledvisit/add/(?P<openingid>\d+)/$', 'timeslots.views.commitment_add', name='timeslots_commitment_add'),
+    url(r'^scheduledvisit/add/v/(?P<volunteerid>\d+)/selectopening/$', 'timeslots.views.commitment_add_opening_select', name='timeslots_commitment_add_opening_select'),
     url(r'^scheduledvisit/add/(?P<openingid>\d+)/v/(?P<volunteerid>\d+)$', 'timeslots.views.commitment_add', name='timeslots_commitment_add'),
     url(r'^scheduledvisit/(?P<commitmentid>\d+)/$', 'timeslots.views.commitment_pattern_view', name='timeslots_commitment_view'),
     url(r'^scheduledvisit/(?P<commitmentid>\d+)/edit/$', 'timeslots.views.commitment_edit', name='timeslots_commitment_edit'),
