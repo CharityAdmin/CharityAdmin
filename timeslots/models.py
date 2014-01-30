@@ -173,7 +173,7 @@ class ClientOpening(models.Model):
             instance_list = list([self.startDate])
         return instance_list
 
-    def get_instance(self, instance_date,  **kwargs):
+    def get_instance(self, instance_date, **kwargs):
         instance = None
         opening_instances = self.get_instances(count=1, startDate=instance_date)
         if len(opening_instances) > 0:
@@ -192,7 +192,19 @@ class ClientOpening(models.Model):
         instance_dates = list()
         if len(metadata_set) > 0:
             instance_dates = self._get_instance_dates(metadata_set=metadata_set, startDate=startDate, endDate=endDate, **kwargs)
-        return [{ "date": instance_date.replace(second=0, microsecond=0), "is_filled": False, "client": self.client, "url": self.get_absolute_url(), "openingid": self.id } for instance_date in instance_dates]
+
+        exception_dates = [e.date for e in self.exceptions.all()]
+
+        instances = [{
+            "date": instance_date.replace(second=0, microsecond=0),
+            "is_filled": False,
+            "client": self.client,
+            "url": self.get_absolute_url(),
+            "openingid": self.id,
+            "exception": True if instance_date in exception_dates else False
+        } for instance_date in instance_dates]
+
+        return instances
 
     def get_filled_instances(self, startDate=None, endDate=None, metadata_set=None, **kwargs):
         if startDate is None:
@@ -204,7 +216,19 @@ class ClientOpening(models.Model):
         instance_dates = list()
         if len(metadata_set) > 0:
             instance_dates = self._get_instance_dates(metadata_set=metadata_set, startDate=startDate, endDate=endDate, **kwargs)
-        return [{ "date": instance_date.replace(second=0, microsecond=0), "is_filled": True, "client": self.client, "url": self.get_absolute_url(), "openingid": self.id } for instance_date in instance_dates]
+
+        exception_dates = [e.date for e in self.exceptions.all()]
+
+        instances = [{
+            "date": instance_date.replace(second=0, microsecond=0),
+            "is_filled": True,
+            "client": self.client,
+            "url": self.get_absolute_url(),
+            "openingid": self.id,
+            "exception": True if instance_date in exception_dates else False
+        } for instance_date in instance_dates]
+
+        return instances
 
     def get_instances(self, startDate=None, endDate=None, **kwargs):
         if startDate is None:
@@ -285,11 +309,14 @@ class ClientOpeningMetadata(models.Model):
 
 
 class ClientOpeningException(models.Model):
-    clientOpening = models.ForeignKey(ClientOpening, db_column='clientOpeningId')
+    clientOpening = models.ForeignKey(ClientOpening, db_column='clientOpeningId', related_name="exceptions")
     date = models.DateTimeField('Exception Date')
 
     def __unicode__(self):
         return "On %s, client exception to %s" % (datetimeformat.format(d=self.date), self.clientOpening)
+
+    def get_instance(self):
+        return self.clientOpening.get_instance(self.date)
 
 
 class VolunteerCommitment(models.Model):
@@ -358,9 +385,6 @@ class VolunteerCommitment(models.Model):
 
 class VolunteerCommitmentMetadata(models.Model):
     volunteerCommitment = models.ForeignKey(VolunteerCommitment, related_name="metadata", db_column='volunteerCommitmentId')
-    # FEATURE REQUEST: prettify/validate the metadata field:
-    #                  use a select box when the volunteerCommitment is set to day of week,
-    #                  calendar when day of month or one-off date
     metadata = models.CharField(max_length=20)
 
     def __unicode__(self):

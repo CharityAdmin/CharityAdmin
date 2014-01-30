@@ -27,10 +27,12 @@ urlpatterns = patterns(
     url(r'^openings/$', 'timeslots.views.opening_instances_view', name='timeslots_openings_view'),
     url(r'^client/(?P<clientid>\d+)/openings/$', 'timeslots.views.opening_instances_view', name='timeslots_openings_view'),
     url(r'^client/(?P<clientid>\d+)/openingpatterns/edit/$', 'timeslots.views.opening_patterns_view', { 'editlinks': True }, name='timeslots_opening_patterns_edit'),
-    url(r'^client/(?P<clientid>\d+)/opening/(?P<year>\d+)/(?P<month>\d+)/(?P<day>\d+)/(?P<time>\d+)$', 'timeslots.views.opening_instance_view', name='timeslots_opening_instance_view'),
+    url(r'^client/(?P<clientid>\d+)/opening/(?P<year>\d+)/(?P<month>\d+)/(?P<day>\d+)/(?P<time>\d+)/$', 'timeslots.views.opening_instance_view', name='timeslots_opening_instance_view'),
     url(r'^opening/add/(?P<clientid>\d+)/$', 'timeslots.views.opening_add', name='timeslots_opening_add'),
     url(r'^opening/(?P<openingid>\d+)/$', 'timeslots.views.opening_pattern_view', name='timeslots_opening_view'),
     url(r'^opening/(?P<openingid>\d+)/edit/$', 'timeslots.views.opening_edit', name='timeslots_opening_edit'),
+    url(r'^opening/(?P<openingid>\d+)/exception/(?P<year>\d+)/(?P<month>\d+)/(?P<day>\d+)/(?P<time>\d+)/$', 'timeslots.views.opening_exception_view', name='timeslots_opening_exception_view'),
+    url(r'^opening/(?P<openingid>\d+)/exception/(?P<year>\d+)/(?P<month>\d+)/(?P<day>\d+)/(?P<time>\d+)/delete/$', 'timeslots.views.opening_exception_delete', name='timeslots_opening_exception_delete'),
 
     # Commitments/Scheduled Visits Instances/Pattners View & Edit
     url(r'^scheduledvisits/$', 'timeslots.views.commitment_instances_view', name='timeslots_commitments_view'),

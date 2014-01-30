@@ -2,7 +2,7 @@ import datetime
 from django.db import models
 from django import forms
 from django.contrib.auth.models import User
-from timeslots.models import days_of_week_choices, days_of_week_list, Client, Volunteer, ClientOpening, ClientOpeningMetadata, VolunteerCommitment, VolunteerCommitmentMetadata
+from timeslots.models import days_of_week_choices, days_of_week_list, Client, Volunteer, ClientOpening, ClientOpeningMetadata, ClientOpeningException, VolunteerCommitment, VolunteerCommitmentMetadata
 from timeslots.widgets import SplitDateTimeFieldWithLabels
 
 
@@ -20,6 +20,21 @@ class ClientForm(forms.ModelForm):
 class VolunteerForm(forms.ModelForm):
     class Meta:
         model = Volunteer
+
+
+# class OpeningExceptionForm(forms.ModelForm):
+#     class Meta:
+#         model = ClientOpeningException
+
+#     def __init__(self, *args, **kwargs):
+#         super(OpeningExceptionForm, self).__init__(*args, **kwargs)
+#         self.fields['clientOpening'].widget = forms.HiddenInput()
+#         self.fields['date'].widget = forms.HiddenInput()
+
+
+class OpeningExceptionForm(forms.Form):
+    clientOpening = forms.CharField(max_length=10, widget=forms.widgets.HiddenInput())
+    date = forms.DateTimeField(widget=forms.widgets.HiddenInput())
 
 
 class OpeningForm(forms.ModelForm):
@@ -128,7 +143,6 @@ class CommitmentForm(forms.ModelForm):
             self.fields['daysOfWeek'].choices = choicessubset
         elif commitmenttype == "One-Off":
             # one-off
-            print opening.get_all_metadata_list()
             self.initial['oneOffDate'] = list(opening.get_all_metadata_list())[0]
             self.fields['startDate'].widget.attrs['class'] = 'hidden'
             self.fields['endDate'].widget.attrs['class'] = 'hidden'
@@ -158,8 +172,6 @@ class CommitmentForm(forms.ModelForm):
             #     datetime.datetime.strptime(specificDate, '%Y-%m-%d')
             # except ValueError:
             #     raise forms.ValidationError("One-Off Openings require a date in the format YYYY-MM-DD")
-            print "COMMITMENT TYPE ONE-OFF"
-            print list(self.cleaned_data['clientOpening'].get_all_metadata_list())[0]
             self.cleaned_data['metadata'] = self.cleaned_data['clientOpening'].get_all_metadata_list()
         else:
             # Day of Month

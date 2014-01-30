@@ -8,7 +8,7 @@ from django.utils import timezone
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from timeslots.models import Client, ClientOpening, ClientOpeningException, ClientOpeningMetadata, Volunteer, VolunteerCommitment, VolunteerCommitmentException, VolunteerCommitmentMetadata
-from timeslots.forms import UserForm, ClientForm, VolunteerForm, OpeningForm, CommitmentForm
+from timeslots.forms import UserForm, ClientForm, VolunteerForm, OpeningForm, CommitmentForm, OpeningExceptionForm
 
 ##
 ## VIEW UTILITY FUNCTIONS
@@ -160,13 +160,15 @@ def opening_instance_view(request, clientid, year, month, day, time):
             opening = o
             break
 
-    return render(request, 'timeslots/opening/opening_instance_view.html', { "instance_date": instance_date, "opening": opening, "client": client, "instance": instance })
+    if opening:
+        exception_form = OpeningExceptionForm({ 'clientOpening': opening.id, 'date': instance_date })
+    return render(request, 'timeslots/opening/opening_instance_view.html', { "instance_date": instance_date, "opening": opening, "client": client, "instance": instance, "exception_form": exception_form })
 
 @login_required
 def opening_add(request, clientid):
     """ create opening based on client userid and volunteer userid """
     if not request.user.is_staff:
-        # only a staff member can create a opening for someone else
+        # only a staff member can create an opening for someone else
         client = request.user.client
     else:
         client = Client.objects.get(user__id=clientid)
@@ -196,6 +198,56 @@ def opening_edit(request, openingid):
 
     return render(request, 'timeslots/opening/opening_edit.html', { 'opening': opening, 'form': form })
 
+
+@staff_member_required
+def opening_exception_view(request, openingid, year, month, day, time):
+    """ View an opening exception, or add by POSTing """
+    """ This view is odd because we don't actually want the user to see a form they can edit, the exception is created by clicking a link from another page """
+    exception = None
+    opening = None
+    form = None
+    if request.method == "POST":
+        # We're adding a new exception
+        form = OpeningExceptionForm(request.POST)
+        if form.is_valid():
+            opening = ClientOpening.objects.get(id=form.cleaned_data['clientOpening'])
+            date = timezone.make_aware(form.cleaned_data['date'], timezone.UTC())
+            exception, created = ClientOpeningException.objects.get_or_create(clientOpening=opening, date=date)
+    if opening is None:
+        opening = get_object_or_404(ClientOpening, id=openingid)
+    if exception is None:
+        date = timezone.make_aware(datetime.datetime(int(year), int(month), int(day), int(time[0:2]), int(time[2:4])), timezone.UTC())
+        exception = get_object_or_404(ClientOpeningException, clientOpening=opening, date=date)
+    if form is None:
+        form = OpeningExceptionForm({ 'clientOpening': exception.clientOpening.id, 'date': exception.date })
+    return render(request, 'timeslots/opening/opening_exception.html', { 'opening': opening, 'exception': exception, 'form': form, 'instance': instance })
+
+
+# @staff_required
+# def opening_exception_add(request, openingid, year, month, day, time):
+#     """ Add an opening exception """
+#     opening = get_object_or_404(ClientOpening, id=openingid)
+#     exceptiondate = timezone.make_aware(datetime.datetime(int(year), int(month), int(day), int(time[0:2]), int(time[2:4])), timezone.UTC())
+#     exception, created = ClientOpeningException.objects.get_or_create(clientOpening=opening, date=exceptiondate)
+#     return render(request, 'timeslots/opening/opening_exception.html', { 'opening': opening, 'exception': exception })
+
+
+@staff_member_required
+def opening_exception_delete(request, openingid, year, month, day, time):
+    """ Delete an opening exception """
+    # opening = get_object_or_404(ClientOpening, id=openingid)
+    # exceptiondate = timezone.make_aware(datetime.datetime(int(year), int(month), int(day), int(time[0:2]), int(time[2:4])), timezone.UTC())
+    # exception = ClientOpeningException.objects.get(clientOpening=opening, date=exceptiondate)
+    if request.method == "POST":
+        # We're adding a new exception
+        form = OpeningExceptionForm(request.POST)
+        if form.is_valid():
+            opening = ClientOpening.objects.get(id=form.cleaned_data['clientOpening'])
+            date = form.cleaned_data['date']
+            exception = ClientOpeningException.objects.get(clientOpening=opening, date=date)
+            exception.delete()
+            return HttpResponseRedirect(opening.get_absolute_url())
+    raise Exception("Error while trying to delete an Opening Exception")
 
 @login_required
 def commitment_instances_view(request, clientid=None):

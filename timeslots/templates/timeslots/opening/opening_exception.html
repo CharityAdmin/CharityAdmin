@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% load display_helpers %}
+
+{% block content %}
+	<div class="block">
+		<h3>Exception to Visit with <a href="{{ opening.client.get_absolute_url }}">{{ opening.client }}</a> on <span title="For opening pattern: {{ opening }}">{{ exception.date|date:"D, M j, Y, P" }}</span></h3>
+
+		<div class="block">
+			Need a visit on this day?
+			<form method="POST" action="{% opening_exception_delete_url exception.get_instance %}" class="link-form">
+				{% csrf_token %}
+    			{% include "timeslots/partials/form_snippet.html" %}
+				<button>Remove the exception</button>
+			</form>
+		</div>
+	</div>
+{% endblock %}

@@ -171,6 +171,31 @@ a span {
 	text-decoration: underline;
 }
 
+.link-form {
+	display: inline;
+
+	button {
+		border-width: 0;
+		background: transparent none;
+		padding: 0;
+		margin: 0;
+		text-decoration: underline;
+		display: inline;
+		color: #333;
+		font-family: inherit;
+		font-size: inherit;
+		font-weight: inherit;
+	}
+
+	div {
+		display: none;
+	}
+}
+
+///
+/// DATE SELECTOR
+///
+
 .date-selector-wrapper {
 	position: relative;
 	display: inline-block;
@@ -453,3 +478,15 @@ div.admin-only {
 	padding-bottom: 8px;
 }
 
+///
+/// EXCEPTIONS
+///
+
+li.exception {
+	text-decoration: line-through;
+	color: #777;
+
+	a {
+		color: #777;
+	}
+}
