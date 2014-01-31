@@ -121,6 +121,13 @@ class Client(models.Model):
         openings = (x for x in self.openings.all() if not x.is_filled())
         return openings
 
+    def get_address_urlencoded(self, **kwargs):
+        # for Google Maps link
+        addressString = self.address + ", " + self.city + " " + self.state + " " + self.zipcode
+        urlEncoded = urllib.urlencode({ 'q': addressString })
+        return urlEncoded
+
+
 
 class ClientOpening(models.Model):
     client = models.ForeignKey(Client, db_column='clientId', related_name='openings')
