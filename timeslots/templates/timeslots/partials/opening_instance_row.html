@@ -1,6 +1,6 @@
 {% load display_helpers %}
 
-<li class="opening-instance-row" {% if instance.openingexception %} class="exception" title="This visit is not required due to an exception."{% endif %}>
+<li class="opening-instance-row opening-{{ instance.openingid }}" {% if instance.openingexception %} class="exception" title="This visit is not required due to an exception."{% endif %}>
 	{% if show_status_label %}
 		<span class="label {% if not instance.is_filled %}label-danger un{% endif %}filled_label">
 	 		{% if not instance.is_filled %}Un{% endif %}filled

@@ -19,9 +19,11 @@ def get_dates(request):
     """
     Utility function to return default start and end dates
     if they aren't provided in the URL parameters (or, eventually, via AJAX/Session variable)
-    Standard default is startDate = now, endDate = 30 days from now
+    Standard default is startDate = now, endDate = defaultDays (see below) from now
     """
     from dateutil import parser
+
+    defaultDays = 14
 
     startDate = request.GET.get('startdate')
     endDate = request.GET.get('enddate')
@@ -33,7 +35,7 @@ def get_dates(request):
     if endDate:
         endDate = parser.parse(endDate)
     else:
-        endDate = timezone.now() + datetime.timedelta(days=30)
+        endDate = timezone.now() + datetime.timedelta(days=defaultDays)
 
     return startDate, endDate
 
@@ -77,8 +79,7 @@ def dashboard(request):
         clients = volunteer.clients.all()
         if len(clients) > 1:
             multipleclients = True
-        for client in clients:
-            openings.extend(client.get_unfilled_opening_instances(startDate=startDate, endDate=endDate))
+        openings = volunteer.get_unfilled_client_opening_instances(startDate=startDate, endDate=endDate)
         commitment_instances = volunteer.get_commitment_instances(startDate=startDate, endDate=endDate)
 
     elif request.user.is_staff:
@@ -108,8 +109,7 @@ def opening_instances_view(request, clientid=None):
                 return HttpResponseForbidden
             openings = client.get_unfilled_opening_instances(startDate=startDate, endDate=endDate)
         else:
-            for c in volunteer.clients.all():
-                openings.extend(c.get_unfilled_opening_instances(startDate=startDate, endDate=endDate))
+            openings = volunteer.get_unfilled_client_opening_instances(startDate=startDate, endDate=endDate)
     elif request.user.is_staff:
         for c in Client.objects.all():
             openings.extend(c.get_unfilled_opening_instances(startDate=startDate, endDate=endDate))
@@ -385,13 +385,9 @@ def commitment_exception_view(request, commitmentid, year, month, day, time):
     exception = None
     form = None
     if request.method == "POST":
-        print "POSTED"
         # We're adding a new exception
         form = CommitmentExceptionForm(request.POST)
-        print "GOT FORM: "
-        print form
         if form.is_valid():
-            print "FORM IS VALID"
             commitment = VolunteerCommitment.objects.get(id=form.cleaned_data['commitment'])
             date = timezone.make_aware(form.cleaned_data['date'], timezone.UTC())
             exception, created = VolunteerCommitmentException.objects.get_or_create(volunteerCommitment=commitment, date=date)

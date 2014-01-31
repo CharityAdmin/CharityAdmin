@@ -22,6 +22,7 @@ days_of_week_dict = {'M': MO, 'Tu': TU, 'W': WE, 'Th': TH, 'F': FR, 'Sa': SA, 'S
 days_of_week_list = ['M', 'Tu', 'W', 'Th', 'F', 'Sa', 'Su']
 days_of_week_choices = (('M', 'Mo'), ('Tu', 'Tu'), ('W', 'We'), ('Th', 'Th'), ('F', 'Fr'), ('Sa', 'Sa'), ('Su', 'Su'))
 
+
 class Volunteer(models.Model):
     user = models.OneToOneField(User, db_column='userId')
     trained = models.BooleanField(default=False)
@@ -65,8 +66,15 @@ class Volunteer(models.Model):
         instances = list()
         for commitment in self.get_commitments(client=client):
             instances.extend(commitment.get_instances(startDate=startDate, endDate=endDate, **kwargs))
-        # instances.sort()
+        instances.sort(key=lambda item:item['date'])
         return instances
+
+    def get_unfilled_client_opening_instances(self, startDate=None, endDate=None, **kwargs):
+        openings = list()
+        for opening in ClientOpening.objects.filter(client__volunteers=self):
+            openings.extend(opening.get_unfilled_instances(startDate=startDate, endDate=endDate))
+        openings.sort(key=lambda item:item['date'])
+        return openings
 
 
 class Client(models.Model):
@@ -126,7 +134,6 @@ class Client(models.Model):
         addressString = self.address + ", " + self.city + " " + self.state + " " + self.zipcode
         urlEncoded = urllib.urlencode({ 'q': addressString })
         return urlEncoded
-
 
 
 class ClientOpening(models.Model):
@@ -190,13 +197,12 @@ class ClientOpening(models.Model):
                 instance = opening_instance
         return instance
 
-    def get_unfilled_instances(self, startDate=None, endDate=None, metadata_set=None, **kwargs):
+    def get_unfilled_instances(self, startDate=None, endDate=None, **kwargs):
         if startDate is None:
             startDate = self.startDate
         if endDate is None:
             endDate = self.endDate
-        if metadata_set is None:
-            metadata_set = self.get_unfilled_metadata_set()
+        metadata_set = self.get_unfilled_metadata_set()
         instance_dates = list()
         if len(metadata_set) > 0:
             instance_dates = self._get_instance_dates(metadata_set=metadata_set, startDate=startDate, endDate=endDate, **kwargs)
@@ -214,13 +220,12 @@ class ClientOpening(models.Model):
 
         return instances
 
-    def get_filled_instances(self, startDate=None, endDate=None, metadata_set=None, **kwargs):
+    def get_filled_instances(self, startDate=None, endDate=None, **kwargs):
         if startDate is None:
             startDate = self.startDate
         if endDate is None:
             endDate = self.endDate
-        if metadata_set is None:
-            metadata_set = self.get_filled_metadata_set()
+        metadata_set = self.get_filled_metadata_set()
         instance_dates = list()
         if len(metadata_set) > 0:
             instance_dates = self._get_instance_dates(metadata_set=metadata_set, startDate=startDate, endDate=endDate, **kwargs)
@@ -252,7 +257,10 @@ class ClientOpening(models.Model):
         # return distinct list of instances (since filled_instance comes first,
         # any overlapping filled and unfilled instance should show as filled)
         seen = set()
-        return [instance for instance in instances if instance['date'] not in seen and not seen.add(instance['date'])]
+        distinct = [instance for instance in instances if instance['date'] not in seen and not seen.add(instance['date'])]
+        print "GET OPENING INSTANCES"
+        print distinct
+        return distinct
 
     def get_next_instances(self, startDate=None, endDate=None, **kwargs):
         if startDate is None:
@@ -336,9 +344,11 @@ class VolunteerCommitment(models.Model):
     notes = models.CharField(max_length=255, blank=True, null=True)
 
     def __unicode__(self):
-        return "%s visits %s, %s: %s (%s-%s)" % (
-        self.volunteer, self.clientOpening.client, self.type, self.get_all_metadata_string(),
-        dateformat.format(d=self.startDate), dateformat.format(d=self.endDate) if self.endDate is not None else "")
+        title = "%s visits %s, %s: %s (%s-%s)" % (
+                    self.volunteer, self.clientOpening.client, self.type, self.get_all_metadata_string(),
+                    dateformat.format(d=self.startDate), dateformat.format(d=self.endDate) if self.endDate is not None else ""
+                )
+        return title
 
     def get_absolute_url(self):
         return reverse('timeslots_commitment_view', kwargs={'commitmentid': self.id})
@@ -365,7 +375,10 @@ class VolunteerCommitment(models.Model):
         return "%s: %s (%s-%s)" % (self.type, self.get_all_metadata_string(), dateformat.format(d=self.startDate), dateformat.format(d=self.endDate) if self.endDate is not None else "")
 
     def get_all_metadata_list(self):
-        return set([metadataobj.metadata for metadataobj in self.metadata.all()])
+        allmetadata = [metadataobj.metadata for metadataobj in self.metadata.all()]
+        if self.type in ["Days of Week", "Days of Alternating Week"]:
+            allmetadata = sorted(allmetadata, key=days_of_week_list.index)
+        return allmetadata
 
     def get_all_metadata_string(self):
         if self.type in ["Days of Week", "Days of Alternating Week"]:
@@ -376,11 +389,14 @@ class VolunteerCommitment(models.Model):
         return combinedmetadata
 
     def get_instances(self, **kwargs):
-        instances = self.clientOpening.get_instances(metadata_set=self.get_all_metadata_list(), **kwargs)
+        instances = self.clientOpening.get_instances(**kwargs)
         # get exceptions
         for instance in instances:
             # mark instances with volunteer exceptions
             instance['volunteer'] = self.volunteer;
+            instance['commitmentid'] = self.id;
+        print "VOLUNTEER GET INSTANCES"
+        print instances
         return instances
 
     def get_instance(self, instance_date,  **kwargs):
