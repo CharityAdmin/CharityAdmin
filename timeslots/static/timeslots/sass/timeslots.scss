@@ -360,6 +360,10 @@ form ul {
 	color: $color-danger;
 }
 
+.errorlist li {
+	color: $color-danger;
+}
+
 div.admin-only {
 	display: none;
 }
@@ -369,7 +373,7 @@ div.admin-only {
 }
 
 .widget-wrapper {
-	display: inline-block;
+	// display: inline-block;
 	margin-right: 10px;
 
 	label {
