@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block content %}
+	<h3>Adding Scheduled Visit for {{ volunteer }}</h3><br>
+	<h4>&raquo; Select Client Opening to Schedule</h4>
+	{% for client in volunteer.clients.all %}
+		<div class="block">
+			<a href="{{ client.get_absolute_url }}">
+				<h4>{{ client }}</h4>
+			</a>
+			<ul class="well">
+				{% for pattern in client.get_unfilled_openings %}
+					{% include "timeslots/partials/opening_pattern_row.html" with use_fill_links=True volunteer=volunteer %}
+				{% endfor %}
+			</ul>
+		</div>
+	{% endfor %}
+{% endblock %}

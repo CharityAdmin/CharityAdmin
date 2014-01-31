@@ -8,7 +8,7 @@ from django.utils import timezone
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from timeslots.models import Client, ClientOpening, ClientOpeningException, ClientOpeningMetadata, Volunteer, VolunteerCommitment, VolunteerCommitmentException, VolunteerCommitmentMetadata
-from timeslots.forms import UserForm, ClientForm, VolunteerForm, OpeningForm, CommitmentForm
+from timeslots.forms import UserForm, ClientForm, VolunteerForm, OpeningForm, CommitmentForm, OpeningExceptionForm, CommitmentExceptionForm
 
 ##
 ## VIEW UTILITY FUNCTIONS
@@ -19,9 +19,11 @@ def get_dates(request):
     """
     Utility function to return default start and end dates
     if they aren't provided in the URL parameters (or, eventually, via AJAX/Session variable)
-    Standard default is startDate = now, endDate = 30 days from now
+    Standard default is startDate = now, endDate = defaultDays (see below) from now
     """
     from dateutil import parser
+
+    defaultDays = 14
 
     startDate = request.GET.get('startdate')
     endDate = request.GET.get('enddate')
@@ -33,20 +35,24 @@ def get_dates(request):
     if endDate:
         endDate = parser.parse(endDate)
     else:
-        endDate = timezone.now() + datetime.timedelta(days=30)
+        endDate = timezone.now() + datetime.timedelta(days=defaultDays)
 
     return startDate, endDate
 
 
-def get_volunteer(request):
+def get_volunteer(request, volunteerid=None):
     """
     Utility function to prevent us from Does Not Exist exception when trying to
     get a volunteer for a user who doesn't have one (this returns None)
     """
-    try:
-        volunteer = request.user.volunteer
-    except Volunteer.DoesNotExist:
-        volunteer = None
+    volunteer = None
+    if volunteerid and request.user.is_staff:
+        volunteer = Volunteer.objects.get(user__id=volunteerid)
+    else:
+        try:
+            volunteer = request.user.volunteer
+        except Volunteer.DoesNotExist:
+            pass
     return volunteer
 
 
@@ -73,8 +79,7 @@ def dashboard(request):
         clients = volunteer.clients.all()
         if len(clients) > 1:
             multipleclients = True
-        for client in clients:
-            openings.extend(client.get_unfilled_opening_instances(startDate=startDate, endDate=endDate))
+        openings = volunteer.get_unfilled_client_opening_instances(startDate=startDate, endDate=endDate)
         commitment_instances = volunteer.get_commitment_instances(startDate=startDate, endDate=endDate)
 
     elif request.user.is_staff:
@@ -104,8 +109,7 @@ def opening_instances_view(request, clientid=None):
                 return HttpResponseForbidden
             openings = client.get_unfilled_opening_instances(startDate=startDate, endDate=endDate)
         else:
-            for c in volunteer.clients.all():
-                openings.extend(c.get_unfilled_opening_instances(startDate=startDate, endDate=endDate))
+            openings = volunteer.get_unfilled_client_opening_instances(startDate=startDate, endDate=endDate)
     elif request.user.is_staff:
         for c in Client.objects.all():
             openings.extend(c.get_unfilled_opening_instances(startDate=startDate, endDate=endDate))
@@ -126,6 +130,23 @@ def opening_pattern_view(request, openingid):
 
 
 @login_required
+def opening_patterns_view(request, clientid=None, editlinks=False):
+    """ Show a list of opening patterns. If clientid is specified, limit to that client. """
+    client = None
+    patterns = None
+    if clientid:
+        client = Client.objects.get(user__id=clientid)
+    if client:
+        if not request.user.is_staff and client not in volunteer.clients.all():
+            return HttpResponseForbidden
+        patterns = client.openings.all()
+    elif request.user.is_staff:
+        patterns = ClientOpening.objects.all()
+
+    return render(request, 'timeslots/opening/opening_patterns_view.html', { "patterns": patterns, "client": client, "editlinks": editlinks })
+
+
+@login_required
 def opening_instance_view(request, clientid, year, month, day, time):
     """ Show a single opening instance """
     volunteer = get_volunteer(request)
@@ -139,13 +160,15 @@ def opening_instance_view(request, clientid, year, month, day, time):
             opening = o
             break
 
-    return render(request, 'timeslots/opening/opening_instance_view.html', { "instance_date": instance_date, "opening": opening, "client": client, "instance": instance })
+    if opening:
+        exception_form = OpeningExceptionForm({ 'clientOpening': opening.id, 'date': instance_date })
+    return render(request, 'timeslots/opening/opening_instance_view.html', { "instance_date": instance_date, "opening": opening, "client": client, "instance": instance, "exception_form": exception_form })
 
 @login_required
 def opening_add(request, clientid):
     """ create opening based on client userid and volunteer userid """
     if not request.user.is_staff:
-        # only a staff member can create a opening for someone else
+        # only a staff member can create an opening for someone else
         client = request.user.client
     else:
         client = Client.objects.get(user__id=clientid)
@@ -176,6 +199,48 @@ def opening_edit(request, openingid):
     return render(request, 'timeslots/opening/opening_edit.html', { 'opening': opening, 'form': form })
 
 
+@staff_member_required
+def opening_exception_view(request, openingid, year, month, day, time):
+    """ View an opening exception, or add by POSTing """
+    """ This view is odd because we don't actually want the user to see a form they can edit, the exception is created by clicking a link from another page """
+    exception = None
+    opening = None
+    form = None
+    if request.method == "POST":
+        # We're adding a new exception
+        form = OpeningExceptionForm(request.POST)
+        if form.is_valid():
+            opening = ClientOpening.objects.get(id=form.cleaned_data['clientOpening'])
+            date = timezone.make_aware(form.cleaned_data['date'], timezone.UTC())
+            exception, created = ClientOpeningException.objects.get_or_create(clientOpening=opening, date=date)
+    if opening is None:
+        opening = get_object_or_404(ClientOpening, id=openingid)
+    if exception is None:
+        date = timezone.make_aware(datetime.datetime(int(year), int(month), int(day), int(time[0:2]), int(time[2:4])), timezone.UTC())
+        exception = get_object_or_404(ClientOpeningException, clientOpening=opening, date=date)
+    if form is None:
+        form = OpeningExceptionForm({ 'clientOpening': exception.clientOpening.id, 'date': exception.date })
+    return render(request, 'timeslots/opening/opening_exception.html', { 'opening': opening, 'exception': exception, 'form': form })
+
+
+@staff_member_required
+def opening_exception_delete(request, openingid, year, month, day, time):
+    """ Delete an opening exception """
+    # opening = get_object_or_404(ClientOpening, id=openingid)
+    # exceptiondate = timezone.make_aware(datetime.datetime(int(year), int(month), int(day), int(time[0:2]), int(time[2:4])), timezone.UTC())
+    # exception = ClientOpeningException.objects.get(clientOpening=opening, date=exceptiondate)
+    if request.method == "POST":
+        # We're adding a new exception
+        form = OpeningExceptionForm(request.POST)
+        if form.is_valid():
+            opening = ClientOpening.objects.get(id=form.cleaned_data['clientOpening'])
+            date = form.cleaned_data['date']
+            exception = ClientOpeningException.objects.get(clientOpening=opening, date=date)
+            exception.delete()
+            return HttpResponseRedirect(reverse('timeslots_opening_instance_view', kwargs={'clientid': opening.client.user.id, 'year':exception.date.year, 'month': exception.date.month, 'day': exception.date.day, 'time': exception.date.strftime('%H%M')}))
+    raise Exception("Error while trying to delete an Opening Exception")
+
+
 @login_required
 def commitment_instances_view(request, clientid=None):
     """ Show commitment instances based on startDate and endDate url parameters. If clientid is specified, limit to that client """
@@ -201,21 +266,25 @@ def commitment_instances_view(request, clientid=None):
 
 
 @login_required
-def commitment_patterns_view(request, clientid=None, editlinks=False):
-    """ Show commitment patterns. If clientid is specified, limit to that client """
-    volunteer = get_volunteer(request)
+def commitment_patterns_view(request, clientid=None, editlinks=False, volunteerid=None):
+    """ Show commitment patterns. If clientid is specified, limit to that client. If volunteerid is specified and user is staff, show that volunteer. """
+    volunteer = get_volunteer(request, volunteerid)
     client = None
     patterns = None
+    if clientid:
+        client = Client.objects.get(user__id=clientid)
     if volunteer:
-        if clientid:
-            client = Client.objects.get(user__id=clientid)
+        if client:
             if not request.user.is_staff and client not in volunteer.clients.all():
                 return HttpResponseForbidden
             patterns = volunteer.commitments.filter(clientOpening__client=client)
         else:
             patterns = volunteer.commitments.all()
     elif request.user.is_staff:
-        patterns = VolunteerCommitment.objects.all()
+        if client:
+            patterns = VolunteerCommitment.objects.filter(clientOpening__client=client)
+        else:
+            patterns = VolunteerCommitment.objects.all()
 
     return render(request, 'timeslots/commitment/commitment_patterns_view.html', { "patterns": patterns, "client": client, "editlinks": editlinks })
 
@@ -234,8 +303,10 @@ def commitment_instance_view(request, clientid, year, month, day, time):
             commitment = c
             is_my_commitment = True if commitment.volunteer.user == request.user else False
             break
+    if commitment:
+        exception_form = CommitmentExceptionForm({ 'commitment': commitment.id, 'date': instance_date })
 
-    return render(request, 'timeslots/commitment/commitment_instance_view.html', { "instance_date": instance_date, "commitment": commitment, "client": client, "instance": instance, "is_my_commitment": is_my_commitment })
+    return render(request, 'timeslots/commitment/commitment_instance_view.html', { "instance_date": instance_date, "commitment": commitment, "client": client, "instance": instance, "is_my_commitment": is_my_commitment, "exception_form": exception_form })
 
 
 @login_required
@@ -261,6 +332,25 @@ def commitment_add(request, openingid, volunteerid=None):
     commitment, created = VolunteerCommitment.objects.get_or_create(clientOpening=opening, volunteer=volunteer, type=opening.type)
     return HttpResponseRedirect(reverse('timeslots_commitment_edit', kwargs={'commitmentid': commitment.id}))
 
+@login_required
+def commitment_add_opening_select(request, volunteerid):
+    if not (request.user.is_staff or request.user.id == volunteerid):
+        # only staff members or the volunteer themselves
+        return HttpResponseForbidden()
+
+    if request.user.id == volunteerid:
+        volunteer = request.user.volunteer
+    else:
+        volunteer = get_object_or_404(Volunteer, user__id=volunteerid)
+
+    clients = volunteer.clients.all()
+
+    if len(clients) == 1:
+        openings = clients[0].openings.all()
+        if len(openings) == 1:
+            return HttpResponseRedirect(reverse('timeslots_commitment_add', kwargs={ 'openingid': openings[0].id, 'volunteerid': volunteer.id }))
+    return render(request, 'timeslots/commitment/commitment_add_opening_select.html', { 'volunteer': volunteer, 'clients': clients })
+
 
 @login_required
 def commitment_edit(request, commitmentid):
@@ -280,6 +370,61 @@ def commitment_edit(request, commitmentid):
         form = CommitmentForm(instance=commitment)
 
     return render(request, 'timeslots/commitment/commitment_edit.html', { 'commitment': commitment, 'form': form })
+
+
+@login_required
+def commitment_exception_view(request, commitmentid, year, month, day, time):
+    """ View a commitment exception, or add by POSTing """
+    """ This view is odd because we don't actually want the user to see a form they can edit, the exception is created by clicking a link from another page """
+
+    commitment = get_object_or_404(VolunteerCommitment, id=commitmentid)
+    if not (request.user.is_staff or request.user.id == commitment.volunteer.user.id):
+        # only a staff member or the committed volunteer can create a commitment exception
+        return HttpResponseForbidden
+
+    exception = None
+    form = None
+    if request.method == "POST":
+        # We're adding a new exception
+        form = CommitmentExceptionForm(request.POST)
+        if form.is_valid():
+            commitment = VolunteerCommitment.objects.get(id=form.cleaned_data['commitment'])
+            date = timezone.make_aware(form.cleaned_data['date'], timezone.UTC())
+            exception, created = VolunteerCommitmentException.objects.get_or_create(volunteerCommitment=commitment, date=date)
+
+            #also create a new one-off opening
+            opening = ClientOpening.objects.create(client=commitment.clientOpening.client, type="One-Off", startDate=date)
+            ometadata = ClientOpeningMetadata.objects.create(clientOpening=opening, metadata=date.strftime('%Y-%m-%d'))
+    if exception is None:
+        date = timezone.make_aware(datetime.datetime(int(year), int(month), int(day), int(time[0:2]), int(time[2:4])), timezone.UTC())
+        exception = get_object_or_404(VolunteerCommitmentException, volunteerCommitment=commitment, date=date)
+    if form is None:
+        form = CommitmentExceptionForm({ 'commitment': exception.volunteerCommitment.id, 'date': exception.date })
+    return render(request, 'timeslots/commitment/commitment_exception.html', { 'commitment': commitment, 'exception': exception, 'form': form })
+
+
+@login_required
+def commitment_exception_delete(request, commitmentid, year, month, day, time):
+    """ Delete a commitment exception """
+    if not (request.user.is_staff or request.user.id == commitment.volunteer.user.id):
+        # only a staff member or the committed volunteer can create a commitment exception
+        return HttpResponseForbidden
+
+    if request.method == "POST":
+        # We're deleting the exception
+        form = CommitmentExceptionForm(request.POST)
+        if form.is_valid():
+            commitment = VolunteerCommitment.objects.get(id=form.cleaned_data['commitment'])
+            date = form.cleaned_data['date']
+            exception = VolunteerCommitmentException.objects.get(volunteerCommitment=commitment, date=date)
+            exception.delete()
+
+            #also delete the one-off opening (metadata will be deleted by cascade)
+            opening = ClientOpening.objects.filter(client=commitment.clientOpening.client, type="One-Off", metadata__metadata=date.strftime('%Y-%m-%d')).order_by("-id")[0]
+            opening.delete()
+
+            return HttpResponseRedirect(reverse('timeslots_commitment_instance_view', kwargs={'clientid': commitment.clientOpening.client.user.id, 'year':exception.date.year, 'month': exception.date.month, 'day': exception.date.day, 'time': exception.date.strftime('%H%M')}))
+    raise Exception("Error while trying to delete a Commitment Exception")
 
 
 @staff_member_required

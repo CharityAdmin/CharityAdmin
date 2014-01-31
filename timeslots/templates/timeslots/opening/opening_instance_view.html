@@ -4,19 +4,39 @@
 
 {% block content %}
 	<div class="block">
-		<h3>Visit <a href="{{ client.get_absolute_url }}">{{ client }}</a> on <span title="For opening pattern: {{ opening }}">{{ instance_date|date:"D, M j, Y, P" }}</span></h3>
+		<h3>Visit <a href="{{ client.get_absolute_url }}">{{ client }}</a> on <span title="Based on opening pattern: {{ opening }}">{{ instance_date|date:"D, M j, Y, P" }}</span></h3>
 
 		{% display_address client %}
 
 		<div class="block">
-			{% if instance.is_filled %}
-				<p>This opening is filled. <a href="{% commitment_instance_url instance %}">View the commitment</a>
-<!-- 				{% if user.is_staff %}
-					<a href="{% url 'timeslots_commitment_edit' instance.openingid %}">Edit the commitment</a>
-				{% endif %} -->
-				</p>
+			{% if instance.openingexception %}
+				<p>This visit is not required due to an exception.</p>
+				{% if user.is_staff %}
+					Need a visit on this day?
+					<form method="POST" action="{% opening_exception_delete_url instance %}" class="link-form">
+						{% csrf_token %}
+		    			{% include "timeslots/partials/form_snippet.html" with form=exception_form %}
+						<button>Remove the exception</button>
+					</form>
+				{% endif %}
 			{% else %}
-				<p>This opening is unfilled. <a href="{% url 'timeslots_commitment_add' instance.openingid %}">Fill this opening</a></p>
+				{% if instance.is_filled %}
+					<p>This opening is filled. <a href="{% commitment_instance_url instance %}">View the commitment</a>
+	<!-- 				{% if user.is_staff %}
+						<a href="{% url 'timeslots_commitment_edit' instance.openingid %}">Edit the commitment</a>
+					{% endif %} -->
+					</p>
+				{% else %}
+					<p>This opening is unfilled. <a href="{% url 'timeslots_commitment_add' instance.openingid %}">Fill this opening</a></p>
+				{% endif %}
+				{% if user.is_staff %}
+					Don't need a visit on this day?
+					<form method="POST" action="{% opening_exception_add_url instance %}" class="link-form">
+						{% csrf_token %}
+		    			{% include "timeslots/partials/form_snippet.html" with form=exception_form %}
+						<button>Mark this date as an exception</button>
+					</form>
+				{% endif %}
 			{% endif %}
 		</div>
 	</div>

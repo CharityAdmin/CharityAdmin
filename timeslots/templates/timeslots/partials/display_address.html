@@ -17,7 +17,7 @@
 				{% if client.city and client.state %}, {% endif %}
 				{{ client.state }} {{ client.zip }}
 				{% if client.address %}
-					<a class="map-link" href="#">map</a>
+					<a class="map-link" href="http://maps.google.com/?{{ client.get_address_urlencoded }}&amp;output=classic" target="_map">map</a>
 				{% endif %}
 			</div>
 		{% endif %}

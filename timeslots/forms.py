@@ -1,4 +1,5 @@
 import datetime
+from dateutil.parser import parse
 from django.db import models
 from django import forms
 from django.contrib.auth.models import User
@@ -22,7 +23,18 @@ class VolunteerForm(forms.ModelForm):
         model = Volunteer
 
 
+class OpeningExceptionForm(forms.Form):
+    clientOpening = forms.CharField(max_length=10, widget=forms.widgets.HiddenInput())
+    date = forms.DateTimeField(widget=forms.widgets.HiddenInput())
+
+
+class CommitmentExceptionForm(forms.Form):
+    commitment = forms.CharField(max_length=10, widget=forms.widgets.HiddenInput())
+    date = forms.DateTimeField(widget=forms.widgets.HiddenInput())
+
+
 class OpeningForm(forms.ModelForm):
+    time = forms.CharField(max_length=10, label="Arrival Time", required=False)
     metadata = forms.CharField(max_length=30, required=False)
     # for days of week, alternating days of week
     daysOfWeek = forms.MultipleChoiceField(label="Days of Week", widget=forms.widgets.CheckboxSelectMultiple(), choices=days_of_week_choices, required=False)
@@ -33,7 +45,7 @@ class OpeningForm(forms.ModelForm):
 
     class Meta:
         model = ClientOpening
-        fields = ('client', 'type', 'daysOfWeek', 'dayOfMonth', 'oneOffDate', 'metadata', 'startDate', 'endDate', 'notes')
+        fields = ('client', 'type', 'daysOfWeek', 'dayOfMonth', 'oneOffDate', 'metadata', 'time', 'startDate', 'endDate', 'notes')
         widgets = {
             'notes': forms.Textarea(attrs={'cols': 80, 'rows': 4, 'class': 'notes'}),
             'startDate': SplitDateTimeFieldWithLabels(),
@@ -56,6 +68,9 @@ class OpeningForm(forms.ModelForm):
         # self.fields['metadata'].widget.attrs['class'] = 'hidden'
         self.fields['client'].widget.attrs['class'] = 'hidden'
         self.fields['metadata'].widget.attrs['class'] = 'hidden'
+        if self.initial['startDate'] is not None:
+            self.initial['time'] = self.initial['startDate'].time()
+
 
     def clean(self):
         commitmenttype = self.cleaned_data['type']
@@ -75,6 +90,22 @@ class OpeningForm(forms.ModelForm):
             if not (1 <= specific_int <= 31):
                 raise forms.ValidationError(err_message)
             self.cleaned_data['metadata'] = specific_int
+
+        # on clean, set the StartDate time based on the time field
+        # and the EndDate time to midnight
+        if self.cleaned_data['time']:
+            time = self.cleaned_data['time']
+            try:
+                time = parse(time)
+            except ValueError:
+                raise forms.ValidationError("Arrival Time requires a standard time format (e.g., 9:00pm or 10am)")
+            self.cleaned_data['time'] = time
+            self.cleaned_data['startDate'] = self.cleaned_data['startDate'].replace(hour=time.hour, minute=time.minute, second=0, microsecond=0)
+            if self.cleaned_data['endDate'] is not None:
+                self.cleaned_data['endDate'] = self.cleaned_data['endDate'].replace(hour=23, minute=59, second=59, microsecond=0)
+        else:
+            raise forms.ValidationError("The Arrival Time is required")
+
         return self.cleaned_data
 
     def save(self, commit=True):
@@ -128,7 +159,6 @@ class CommitmentForm(forms.ModelForm):
             self.fields['daysOfWeek'].choices = choicessubset
         elif commitmenttype == "One-Off":
             # one-off
-            print opening.get_all_metadata_list()
             self.initial['oneOffDate'] = list(opening.get_all_metadata_list())[0]
             self.fields['startDate'].widget.attrs['class'] = 'hidden'
             self.fields['endDate'].widget.attrs['class'] = 'hidden'
@@ -158,8 +188,6 @@ class CommitmentForm(forms.ModelForm):
             #     datetime.datetime.strptime(specificDate, '%Y-%m-%d')
             # except ValueError:
             #     raise forms.ValidationError("One-Off Openings require a date in the format YYYY-MM-DD")
-            print "COMMITMENT TYPE ONE-OFF"
-            print list(self.cleaned_data['clientOpening'].get_all_metadata_list())[0]
             self.cleaned_data['metadata'] = self.cleaned_data['clientOpening'].get_all_metadata_list()
         else:
             # Day of Month
@@ -174,6 +202,10 @@ class CommitmentForm(forms.ModelForm):
             self.cleaned_data['metadata'] = specific_int
         if not self.cleaned_data['metadata']:
             raise forms.ValidationError("The metadata field is required.")
+        # set start and end date times correctly
+        self.cleaned_data['startDate'] = self.cleaned_data['startDate'].replace(hour=0, minute=0, second=0, microsecond=0)
+        if self.cleaned_data['endDate']:
+            self.cleaned_data['endDate'] = self.cleaned_data['endDate'].replace(hour=11, minute=59, second=59, microsecond=0)
         return self.cleaned_data
 
     def save(self, commit=True):

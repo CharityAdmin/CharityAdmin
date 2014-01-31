@@ -1,4 +1,3 @@
-// timeslots js goes here
 $(document).ready(function() {
 
 	// ------------------ //
@@ -237,5 +236,11 @@ $(document).ready(function() {
 		editstartdatepicker = setupDatePicker('id_startDate_0', $('#id_startDate_0').val());
 		editenddatepicker = setupDatePicker('id_endDate_0', $('#id_endDate_0').val());
 	}
+
+
+	// ---------- //
+	// Timepicker //
+	// ---------- //
+	$("#id_time").timepicker({ 'minTime': '7:00am', 'maxTime': '9:00pm'});
 
 });

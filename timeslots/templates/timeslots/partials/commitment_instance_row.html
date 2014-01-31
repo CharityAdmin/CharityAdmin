@@ -1,6 +1,6 @@
 {% load display_helpers %}
 
-<li>
+<li class="commitment-instance-row commitment-{{ instance.commitmentid }}">
 	<div>
 		{% if specify_volunteer %}
 			<a href="{{ instance.volunteer.get_absolute_url }}">{{ instance.volunteer }}</a> visits

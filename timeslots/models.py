@@ -1,4 +1,5 @@
 import datetime
+import urllib
 from dateutil.rrule import *
 from django.db import models
 from django.contrib.auth.models import User
@@ -20,6 +21,7 @@ datetimeformat = '{d:%b %d, %Y} ({d.hour}:{d.minute:02} {d:%p})'
 days_of_week_dict = {'M': MO, 'Tu': TU, 'W': WE, 'Th': TH, 'F': FR, 'Sa': SA, 'Su': SU}
 days_of_week_list = ['M', 'Tu', 'W', 'Th', 'F', 'Sa', 'Su']
 days_of_week_choices = (('M', 'Mo'), ('Tu', 'Tu'), ('W', 'We'), ('Th', 'Th'), ('F', 'Fr'), ('Sa', 'Sa'), ('Su', 'Su'))
+
 
 class Volunteer(models.Model):
     user = models.OneToOneField(User, db_column='userId')
@@ -64,8 +66,15 @@ class Volunteer(models.Model):
         instances = list()
         for commitment in self.get_commitments(client=client):
             instances.extend(commitment.get_instances(startDate=startDate, endDate=endDate, **kwargs))
-        # instances.sort()
+        instances.sort(key=lambda item:item['date'])
         return instances
+
+    def get_unfilled_client_opening_instances(self, startDate=None, endDate=None, **kwargs):
+        openings = list()
+        for opening in ClientOpening.objects.filter(client__volunteers=self):
+            openings.extend(opening.get_unfilled_instances(startDate=startDate, endDate=endDate))
+        openings.sort(key=lambda item:item['date'])
+        return openings
 
 
 class Client(models.Model):
@@ -114,6 +123,17 @@ class Client(models.Model):
         for opening in openings:
             commitments.extend(opening.volunteercommitment_set.all())
         return commitments
+
+    def get_unfilled_openings(self, **kwargs):
+        # this includes all openings for the client which are not ENTIRELY filled
+        openings = (x for x in self.openings.all() if not x.is_filled())
+        return openings
+
+    def get_address_urlencoded(self, **kwargs):
+        # for Google Maps link
+        addressString = self.address + ", " + self.city + " " + self.state + " " + self.zipcode
+        urlEncoded = urllib.urlencode({ 'q': addressString })
+        return urlEncoded
 
 
 class ClientOpening(models.Model):
@@ -168,7 +188,7 @@ class ClientOpening(models.Model):
             instance_list = list([self.startDate])
         return instance_list
 
-    def get_instance(self, instance_date,  **kwargs):
+    def get_instance(self, instance_date, **kwargs):
         instance = None
         opening_instances = self.get_instances(count=1, startDate=instance_date)
         if len(opening_instances) > 0:
@@ -177,29 +197,51 @@ class ClientOpening(models.Model):
                 instance = opening_instance
         return instance
 
-    def get_unfilled_instances(self, startDate=None, endDate=None, metadata_set=None, **kwargs):
+    def get_unfilled_instances(self, startDate=None, endDate=None, **kwargs):
         if startDate is None:
             startDate = self.startDate
         if endDate is None:
             endDate = self.endDate
-        if metadata_set is None:
-            metadata_set = self.get_unfilled_metadata_set()
+        metadata_set = self.get_unfilled_metadata_set()
         instance_dates = list()
         if len(metadata_set) > 0:
             instance_dates = self._get_instance_dates(metadata_set=metadata_set, startDate=startDate, endDate=endDate, **kwargs)
-        return [{ "date": instance_date.replace(second=0, microsecond=0), "is_filled": False, "client": self.client, "url": self.get_absolute_url(), "openingid": self.id } for instance_date in instance_dates]
 
-    def get_filled_instances(self, startDate=None, endDate=None, metadata_set=None, **kwargs):
+        exception_dates = [e.date for e in self.exceptions.all()]
+
+        instances = [{
+            "date": instance_date.replace(second=0, microsecond=0),
+            "is_filled": False,
+            "client": self.client,
+            "url": self.get_absolute_url(),
+            "openingid": self.id,
+            "openingexception": True if instance_date in exception_dates else False
+        } for instance_date in instance_dates]
+
+        return instances
+
+    def get_filled_instances(self, startDate=None, endDate=None, **kwargs):
         if startDate is None:
             startDate = self.startDate
         if endDate is None:
             endDate = self.endDate
-        if metadata_set is None:
-            metadata_set = self.get_filled_metadata_set()
+        metadata_set = self.get_filled_metadata_set()
         instance_dates = list()
         if len(metadata_set) > 0:
             instance_dates = self._get_instance_dates(metadata_set=metadata_set, startDate=startDate, endDate=endDate, **kwargs)
-        return [{ "date": instance_date.replace(second=0, microsecond=0), "is_filled": True, "client": self.client, "url": self.get_absolute_url(), "openingid": self.id } for instance_date in instance_dates]
+
+        exception_dates = [e.date for e in self.exceptions.all()]
+
+        instances = [{
+            "date": instance_date.replace(second=0, microsecond=0),
+            "is_filled": True,
+            "client": self.client,
+            "url": self.get_absolute_url(),
+            "openingid": self.id,
+            "openingexception": True if instance_date in exception_dates else False
+        } for instance_date in instance_dates]
+
+        return instances
 
     def get_instances(self, startDate=None, endDate=None, **kwargs):
         if startDate is None:
@@ -215,7 +257,8 @@ class ClientOpening(models.Model):
         # return distinct list of instances (since filled_instance comes first,
         # any overlapping filled and unfilled instance should show as filled)
         seen = set()
-        return [instance for instance in instances if instance['date'] not in seen and not seen.add(instance['date'])]
+        distinct = [instance for instance in instances if instance['date'] not in seen and not seen.add(instance['date'])]
+        return distinct
 
     def get_next_instances(self, startDate=None, endDate=None, **kwargs):
         if startDate is None:
@@ -248,12 +291,15 @@ class ClientOpening(models.Model):
         return join_string.join(self.get_all_metadata_list())
 
     def is_filled(self):
+        # Has all instances filled
         return len(self.get_filled_metadata_set()) > 0 and len(self.get_unfilled_metadata_set()) == 0
 
     def is_partially_filled(self):
+        # Has some instances unfilled, some instances filled
         return len(self.get_filled_metadata_set()) > 0 and len(self.get_unfilled_metadata_set()) > 0
 
     def is_unfilled(self):
+        # Has no instances filled
         return len(self.get_unfilled_metadata_set()) > 0 and len(self.get_filled_metadata_set()) is 0
 
     def get_filled_status(self):
@@ -277,11 +323,14 @@ class ClientOpeningMetadata(models.Model):
 
 
 class ClientOpeningException(models.Model):
-    clientOpening = models.ForeignKey(ClientOpening, db_column='clientOpeningId')
+    clientOpening = models.ForeignKey(ClientOpening, db_column='clientOpeningId', related_name="exceptions")
     date = models.DateTimeField('Exception Date')
 
     def __unicode__(self):
         return "On %s, client exception to %s" % (datetimeformat.format(d=self.date), self.clientOpening)
+
+    def get_instance(self):
+        return self.clientOpening.get_instance(self.date)
 
 
 class VolunteerCommitment(models.Model):
@@ -293,9 +342,11 @@ class VolunteerCommitment(models.Model):
     notes = models.CharField(max_length=255, blank=True, null=True)
 
     def __unicode__(self):
-        return "%s visits %s, %s: %s (%s-%s)" % (
-        self.volunteer, self.clientOpening.client, self.type, self.get_all_metadata_string(),
-        dateformat.format(d=self.startDate), dateformat.format(d=self.endDate) if self.endDate is not None else "")
+        title = "%s visits %s, %s: %s (%s-%s)" % (
+                    self.volunteer, self.clientOpening.client, self.type, self.get_all_metadata_string(),
+                    dateformat.format(d=self.startDate), dateformat.format(d=self.endDate) if self.endDate is not None else ""
+                )
+        return title
 
     def get_absolute_url(self):
         return reverse('timeslots_commitment_view', kwargs={'commitmentid': self.id})
@@ -319,10 +370,13 @@ class VolunteerCommitment(models.Model):
 
     def pattern_description(self, prefix="Visit "):
         # displays just the Type, Metadata, and Start/End Dates
-        return "%s: %s (%s-%s)" % (self.type, self.metadata.all()[0].metadata, dateformat.format(d=self.startDate), dateformat.format(d=self.endDate) if self.endDate is not None else "")
+        return "%s: %s (%s-%s)" % (self.type, self.get_all_metadata_string(), dateformat.format(d=self.startDate), dateformat.format(d=self.endDate) if self.endDate is not None else "")
 
     def get_all_metadata_list(self):
-        return set([metadataobj.metadata for metadataobj in self.metadata.all()])
+        allmetadata = [metadataobj.metadata for metadataobj in self.metadata.all()]
+        if self.type in ["Days of Week", "Days of Alternating Week"]:
+            allmetadata = sorted(allmetadata, key=days_of_week_list.index)
+        return allmetadata
 
     def get_all_metadata_string(self):
         if self.type in ["Days of Week", "Days of Alternating Week"]:
@@ -333,9 +387,12 @@ class VolunteerCommitment(models.Model):
         return combinedmetadata
 
     def get_instances(self, **kwargs):
-        instances = self.clientOpening.get_instances(metadata_set=self.get_all_metadata_list(), **kwargs)
+        instances = self.clientOpening.get_instances(**kwargs)
+        # get exceptions
         for instance in instances:
+            # mark instances with volunteer exceptions
             instance['volunteer'] = self.volunteer;
+            instance['commitmentid'] = self.id;
         return instances
 
     def get_instance(self, instance_date,  **kwargs):
@@ -350,9 +407,6 @@ class VolunteerCommitment(models.Model):
 
 class VolunteerCommitmentMetadata(models.Model):
     volunteerCommitment = models.ForeignKey(VolunteerCommitment, related_name="metadata", db_column='volunteerCommitmentId')
-    # FEATURE REQUEST: prettify/validate the metadata field:
-    #                  use a select box when the volunteerCommitment is set to day of week,
-    #                  calendar when day of month or one-off date
     metadata = models.CharField(max_length=20)
 
     def __unicode__(self):
@@ -367,3 +421,6 @@ class VolunteerCommitmentException(models.Model):
 
     def __unicode__(self):
         return "On %s, volunteer exception to %s " % (datetimeformat.format(d=self.date), self.volunteerCommitment)
+
+    def get_instance(self):
+        return self.volunteerCommitment.get_instance(self.date)

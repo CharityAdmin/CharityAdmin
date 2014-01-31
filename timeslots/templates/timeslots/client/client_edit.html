@@ -2,6 +2,12 @@
 
 {% block content %}
 	<h3>Edit Client: {{ client }}</h3>
+	{% if client.openings %}
+		<a class="edit-link" href="{% url 'timeslots_opening_patterns_edit' client.user.id %}">Edit Client Openings</a>
+	{% endif %}
+	{% if client.get_commitments %}
+		<a class="edit-link" href="{% url 'timeslots_commitment_patterns_edit_client' client.user.id %}">Edit Scheduled Visits</a>
+	{% endif %}
 	<div>
 		<form action="." method="post" class="form-edit-client">
 			{{ form.non_field_errors }}

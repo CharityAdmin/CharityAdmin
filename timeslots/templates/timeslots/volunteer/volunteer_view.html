@@ -3,6 +3,11 @@
 {% block content %}
 	<h3>{{ volunteer }}</h3>
 
+	{% if user.is_staff %}
+		<a class="edit-link" href="{% url 'timeslots_volunteer_edit' volunteer.user.id %}">Edit Volunteer</a>
+		<a class="add-link" href="{% url 'timeslots_commitment_add_opening_select' volunteer.user.id %}">Add Scheduled Visit</a>
+	{% endif %}
+
 	<div class="block">
 		<div class="phone">
 			Phone:
@@ -40,12 +45,13 @@
 		<h3>Commitment Patterns</h3>
 		<ul class="well">
 			{% for commitment in commitments %}
+				<!-- {% include "timeslots/partials/commitment_pattern_row.html" %} -->
 				<li>
 					<div>
 						Visit
 						<a href="{{ commitment.clientOpening.client.get_absolute_url }}">{{ commitment.clientOpening.client }}</a>
 						on
-						<a href="#">{{ commitment.pattern_description }}</a>
+						<a href="{{ commitment.get_absolute_url }}">{{ commitment.pattern_description }}</a>
 					</div>
 				</li>
 			{% endfor %}

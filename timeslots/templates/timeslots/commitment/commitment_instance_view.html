@@ -8,11 +8,29 @@
 
 		{% display_address client %}
 
-		{% if user.is_staff or is_my_commitment %}
-			<div class="block">
-				<p>Can't make it? <a href="#create-exception">Mark this opening as available</a></p>
-				<p>Or you can <a href="{{ commitment.get_absolute_edit_url }}">adjust your visit schedule</a></p>
-			</div>
+		{% if instance.openingexception %}
+			<p>An exception has been made to the regularly scheduled visit; this day has been marked as open.</p>
+			{% if user.is_staff or is_my_commitment %}
+				{% if user.is_staff %}Is the original volunteer{% else %}Are you{% endif %} able to make the visit?
+				<form method="POST" action="{% commitment_exception_delete_url commitment.id instance %}" class="link-form">
+					{% csrf_token %}
+	    			{% include "timeslots/partials/form_snippet.html" with form=exception_form %}
+					<button>Remove the exception</button>
+				</form>
+			{% endif %}
+		{% else %}
+			{% if user.is_staff or is_my_commitment %}
+				<div class="block">
+					Can't make it?
+					<form method="POST" action="{% commitment_exception_add_url commitment.id instance %}" class="link-form">
+						{% csrf_token %}
+		    			{% include "timeslots/partials/form_snippet.html" with form=exception_form %}
+						<button>Mark this date as open</button>
+					</form>
+					<p></p><!-- Hacky! But needed to space correctly (browsers break the p if it's wrapped around the form)  -->
+					<p>Or you can <a href="{{ commitment.get_absolute_edit_url }}">adjust your visit schedule</a></p>
+				</div>
+			{% endif %}
 		{% endif %}
 	</div>
 {% endblock %}

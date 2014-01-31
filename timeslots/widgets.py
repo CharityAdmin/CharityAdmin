@@ -3,7 +3,9 @@ from timeslots.models import days_of_week_list
 
 class SplitDateTimeFieldWithLabels(widgets.SplitDateTimeWidget):
 	def format_output(self, rendered_widgets):
-		return u'<div class="widget-wrapper widget-wrapper-date"><label>Date</label> %s</div><div class="widget-wrapper widget-wrapper-time"><label>Time</label> %s</div>' % (rendered_widgets[0], rendered_widgets[1])
+		return u'<div class="widget-wrapper widget-wrapper-date">%s</div><div class="widget-wrapper widget-wrapper-time hidden"><label>Time</label> %s</div>' % (rendered_widgets[0], rendered_widgets[1])
+		# show time field, labels
+		# return u'<div class="widget-wrapper widget-wrapper-date"><label>Date</label> %s</div><div class="widget-wrapper widget-wrapper-time"><label>Time</label> %s</div>' % (rendered_widgets[0], rendered_widgets[1])
 
 
 # class OpeningMetadataWidget(widgets.MultiWidget):
