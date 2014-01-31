@@ -4,7 +4,8 @@
 
 {% block content %}
 	<div class="block">
-		<h3>Exception to Visit with <a href="{{ opening.client.get_absolute_url }}">{{ opening.client }}</a> on <span title="For opening pattern: {{ opening }}">{{ exception.date|date:"D, M j, Y, P" }}</span></h3>
+		<h3>Exception to Visit with <a href="{{ opening.client.get_absolute_url }}">{{ opening.client }}</a> on
+			<a href="{% opening_instance_url exception.get_instance %}" title="Based on opening pattern: {{ opening }}">{{ exception.date|date:"D, M j, Y, P" }}</a></h3>
 
 		<div class="block">
 			Need a visit on this day?

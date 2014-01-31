@@ -1,4 +1,5 @@
 import datetime
+import urllib
 from dateutil.rrule import *
 from django.db import models
 from django.contrib.auth.models import User
@@ -201,7 +202,7 @@ class ClientOpening(models.Model):
             "client": self.client,
             "url": self.get_absolute_url(),
             "openingid": self.id,
-            "exception": True if instance_date in exception_dates else False
+            "openingexception": True if instance_date in exception_dates else False
         } for instance_date in instance_dates]
 
         return instances
@@ -225,7 +226,7 @@ class ClientOpening(models.Model):
             "client": self.client,
             "url": self.get_absolute_url(),
             "openingid": self.id,
-            "exception": True if instance_date in exception_dates else False
+            "openingexception": True if instance_date in exception_dates else False
         } for instance_date in instance_dates]
 
         return instances
@@ -369,7 +370,9 @@ class VolunteerCommitment(models.Model):
 
     def get_instances(self, **kwargs):
         instances = self.clientOpening.get_instances(metadata_set=self.get_all_metadata_list(), **kwargs)
+        # get exceptions
         for instance in instances:
+            # mark instances with volunteer exceptions
             instance['volunteer'] = self.volunteer;
         return instances
 
@@ -399,3 +402,6 @@ class VolunteerCommitmentException(models.Model):
 
     def __unicode__(self):
         return "On %s, volunteer exception to %s " % (datetimeformat.format(d=self.date), self.volunteerCommitment)
+
+    def get_instance(self):
+        return self.volunteerCommitment.get_instance(self.date)

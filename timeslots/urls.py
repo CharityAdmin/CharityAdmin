@@ -48,5 +48,6 @@ urlpatterns = patterns(
     url(r'^scheduledvisit/add/(?P<openingid>\d+)/v/(?P<volunteerid>\d+)$', 'timeslots.views.commitment_add', name='timeslots_commitment_add'),
     url(r'^scheduledvisit/(?P<commitmentid>\d+)/$', 'timeslots.views.commitment_pattern_view', name='timeslots_commitment_view'),
     url(r'^scheduledvisit/(?P<commitmentid>\d+)/edit/$', 'timeslots.views.commitment_edit', name='timeslots_commitment_edit'),
-
+    url(r'^scheduledvisit/(?P<commitmentid>\d+)/exception/(?P<year>\d+)/(?P<month>\d+)/(?P<day>\d+)/(?P<time>\d+)/$', 'timeslots.views.commitment_exception_view', name='timeslots_commitment_exception_view'),
+    url(r'^scheduledvisit/(?P<commitmentid>\d+)/exception/(?P<year>\d+)/(?P<month>\d+)/(?P<day>\d+)/(?P<time>\d+)/delete/$', 'timeslots.views.commitment_exception_delete', name='timeslots_commitment_exception_delete'),
 )

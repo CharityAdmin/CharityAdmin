@@ -2,7 +2,7 @@ import datetime
 from django.db import models
 from django import forms
 from django.contrib.auth.models import User
-from timeslots.models import days_of_week_choices, days_of_week_list, Client, Volunteer, ClientOpening, ClientOpeningMetadata, ClientOpeningException, VolunteerCommitment, VolunteerCommitmentMetadata
+from timeslots.models import days_of_week_choices, days_of_week_list, Client, Volunteer, ClientOpening, ClientOpeningMetadata, VolunteerCommitment, VolunteerCommitmentMetadata
 from timeslots.widgets import SplitDateTimeFieldWithLabels
 
 
@@ -34,6 +34,11 @@ class VolunteerForm(forms.ModelForm):
 
 class OpeningExceptionForm(forms.Form):
     clientOpening = forms.CharField(max_length=10, widget=forms.widgets.HiddenInput())
+    date = forms.DateTimeField(widget=forms.widgets.HiddenInput())
+
+
+class CommitmentExceptionForm(forms.Form):
+    commitment = forms.CharField(max_length=10, widget=forms.widgets.HiddenInput())
     date = forms.DateTimeField(widget=forms.widgets.HiddenInput())
 
 
