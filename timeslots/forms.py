@@ -93,13 +93,8 @@ class OpeningForm(forms.ModelForm):
 
         # on clean, set the StartDate time based on the time field
         # and the EndDate time to midnight
-        print "CLEANED DATA"
-        print self.cleaned_data
         if self.cleaned_data['time']:
             time = self.cleaned_data['time']
-
-            print "TIMETIME"
-            print time
             try:
                 time = parse(time)
             except ValueError:

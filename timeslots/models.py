@@ -258,8 +258,6 @@ class ClientOpening(models.Model):
         # any overlapping filled and unfilled instance should show as filled)
         seen = set()
         distinct = [instance for instance in instances if instance['date'] not in seen and not seen.add(instance['date'])]
-        print "GET OPENING INSTANCES"
-        print distinct
         return distinct
 
     def get_next_instances(self, startDate=None, endDate=None, **kwargs):
@@ -395,8 +393,6 @@ class VolunteerCommitment(models.Model):
             # mark instances with volunteer exceptions
             instance['volunteer'] = self.volunteer;
             instance['commitmentid'] = self.id;
-        print "VOLUNTEER GET INSTANCES"
-        print instances
         return instances
 
     def get_instance(self, instance_date,  **kwargs):
