@@ -138,7 +138,7 @@ class Client(models.Model):
 
 class ClientOpening(models.Model):
     client = models.ForeignKey(Client, db_column='clientId', related_name='openings')
-    startDate = models.DateTimeField('Start Date', default=timezone.now())
+    startDate = models.DateTimeField('Start Date', default=timezone.now().replace(hour=12, minute=0, second=0, microsecond=0))
     endDate = models.DateTimeField('End Date', blank=True, null=True)
     type = models.CharField(max_length=20, choices=SCHEDULE_PATTERN_TYPE_CHOICES, default='Days of Week')
     notes = models.CharField(max_length=255, blank=True, null=True)
