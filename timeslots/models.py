@@ -26,7 +26,7 @@ days_of_week_choices = (('M', 'Mo'), ('Tu', 'Tu'), ('W', 'We'), ('Th', 'Th'), ('
 class Volunteer(models.Model):
     user = models.OneToOneField(User, db_column='userId')
     trained = models.BooleanField(default=False)
-    clients = models.ManyToManyField('Client', related_name='volunteers')
+    clients = models.ManyToManyField('Client')
     phone = models.CharField(max_length=20, null=True, blank=True)
 
     def __unicode__(self):
@@ -85,6 +85,8 @@ class Client(models.Model):
     state = models.CharField(max_length=2, choices=STATE_CHOICES, blank=True, null=True)
     zipcode = models.CharField(max_length=10, blank=True, null=True)
     phone = models.CharField(max_length=20, null=True, blank=True)
+    volunteers = models.ManyToManyField('Volunteer', through=Volunteer.clients.through)
+
 
     def __unicode__(self):
         return self.user.first_name + " " + self.user.last_name if (
