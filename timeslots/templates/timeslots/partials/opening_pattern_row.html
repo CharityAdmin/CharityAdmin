@@ -1,7 +1,7 @@
 <li>
 	<a href="{{ pattern.get_absolute_url }}">
 		{% if show_status_label %}
-			<span class="label pattern-label{% if pattern.is_unfilled %} label-danger{% endif %}{% if pattern.is_partially_filled %} label-warning{% endif %}">
+			<span class="label pattern-label{% if pattern.is_unfilled %} label-danger{% endif %}{% if pattern.is_partially_filled %} label-warning{% endif %}{% if pattern.is_filled %} label-success{% endif %}{% if pattern.is_blank %} label-empty{% endif %}">
 				{{ pattern.get_filled_status }}
 			</span>
 		{% endif %}

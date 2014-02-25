@@ -33,18 +33,27 @@
 	</div>
 
 	<div class="block">
+		<h4>Recurring Openings{% if not user.is_staff %} for Your Clients{% endif %}</h4>
+		<ul class="well">
+			{% for pattern in opening_patterns %}
+				{% include "timeslots/partials/opening_pattern_row.html" with show_status_label=True %}
+			{% endfor %}
+		</ul>
+	</div>
+
+	<div class="block">
 		<h4>Upcoming Commitments</h4>
 		<ul class="well">
-			{% for instance in instances %}
+			{% for instance in commitment_instances %}
 				{% include "timeslots/partials/commitment_instance_row.html" with specify_client=True %}
 			{% endfor %}
 		</ul>
 	</div>
 
 	<div class="block">
-		<h3>Commitment Patterns</h3>
+		<h4>Commitment Patterns</h4>
 		<ul class="well">
-			{% for commitment in commitments %}
+			{% for commitment in commitment_patterns %}
 				<!-- {% include "timeslots/partials/commitment_pattern_row.html" %} -->
 				<li>
 					<div>

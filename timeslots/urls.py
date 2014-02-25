@@ -10,6 +10,8 @@ urlpatterns = patterns(
     url(r'^$', 'timeslots.views.home', name='timeslots_home'),
     url(r'^dashboard/$', 'timeslots.views.dashboard', name='timeslots_dashboard'),
     url(r'^user/add/$', 'timeslots.views.user_add', name='timeslots_user_add'),
+    url(r'^signup/$', 'timeslots.views.volunteer_signup', name='timeslots_volunteer_signup'),
+    url(r'^signup/success$', 'timeslots.views.volunteer_signup_success', name='timeslots_volunteer_signup_success'),
 
     # Client Create/Edit
     url(r'^clients/$', 'timeslots.views.clients_view', name='timeslots_clients_view'),

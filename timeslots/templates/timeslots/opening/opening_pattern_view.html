@@ -5,13 +5,22 @@
 		<!-- {% include "timeslots/partials/breadcrumbs.html" with item=opening %} -->
 
 		<h3>Client Opening for <a href="{{ opening.client.get_absolute_url }}">{{ opening.client }}</a></h3><br />
-		<h4>Opening Pattern: {{ opening.get_client_title }}</h4>
+		<h4>Opening Schedule: {{ opening.get_client_title }}</h4>
+
+		{% if opening.is_filled %}
+			<p>This opening schedule is filled.</p>
+		{% else %}
+			<p>
+				This opening schedule is not filled. 
+				<a href="{% url 'timeslots_commitment_add' opening.id %}">Fill this opening schedule</a>
+			</p>
+		{% endif %}
 
 		{% if user.is_staff or is_myopening %}
-			<a class="edit-link edit-commitments" href="{% url 'timeslots_opening_edit' opening.id %}">Edit This Opening</a>
+			<a class="edit-link edit-commitments" href="{% url 'timeslots_opening_edit' opening.id %}">Edit This Opening Schedule</a>
 		{% endif %}
 		<br /><br /><br />
-		<h4>Instances of this Opening</h4>
+		<h4>Dates based on this Opening Schedule</h4>
 		{% include "timeslots/partials/datepicker.html" %}
 
 		<div class="block">

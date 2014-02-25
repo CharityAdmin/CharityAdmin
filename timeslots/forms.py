@@ -3,6 +3,7 @@ from dateutil.parser import parse
 from django.db import models
 from django import forms
 from django.contrib.auth.models import User
+from django.contrib.auth.hashers import make_password
 from timeslots.models import days_of_week_choices, days_of_week_list, Client, Volunteer, ClientOpening, ClientOpeningMetadata, VolunteerCommitment, VolunteerCommitmentMetadata
 from timeslots.widgets import SplitDateTimeFieldWithLabels
 
@@ -14,14 +15,76 @@ class UserForm(forms.Form):
 
 
 class ClientForm(forms.ModelForm):
+    # for admin eyes only
     class Meta:
         model = Client
 
 
 class VolunteerForm(forms.ModelForm):
+    # for admin eyes only
     class Meta:
         model = Volunteer
+        
 
+class VolunteerSignupForm(forms.ModelForm):
+    # this one is end-user facing
+    email = forms.EmailField(max_length=100, required=True)
+    email_confirm = forms.EmailField(max_length=100, required=True)
+    first_name = forms.CharField(max_length=30, required=True)
+    last_name = forms.CharField(max_length=30, required=True)
+    password = forms.CharField(max_length=100, widget=forms.widgets.PasswordInput())
+    
+    class Meta:
+        model = Volunteer
+        # exclude = ['user', 'trained', 'clients']
+        fields = ['first_name', 'last_name', 'email', 'email_confirm', 'password', 'phone']
+        
+    def __init__(self, *args, **kwargs):
+        super(VolunteerSignupForm, self).__init__(*args, **kwargs)
+        self.fields['email_confirm'].label = "Confirm Email"
+        if (self.instance.pk):
+            user = self.instance.user
+            self.initial['email'] = user.email
+            self.initial['first_name'] = user.first_name
+            self.initial['last_name'] = user.last_name
+        
+    def clean_password(self):
+        if not self.instance.pk and not self.cleaned_data['password']:
+            raise forms.ValidationError("Password is required")
+        return self.cleaned_data['password']
+        
+    def clean(self):
+        if not self.cleaned_data['email'] == self.cleaned_data['email_confirm']:
+            raise forms.ValidationError("Please confirm your email addresses match")
+        return self.cleaned_data
+        
+    def save(self, commit=True):
+        if (self.instance.pk):
+            # Editing an existing Volunteer
+            user = self.instance.user
+            changed = False
+            if self.cleaned_data['email'] != user.email:
+                user.email = self.cleaned_data['email']
+                changed = True
+            if self.cleaned_data['first_name'] != user.first_name:
+                user.first_name = self.cleaned_data['first_name']
+                changed = True
+            if self.cleaned_data['last_name'] != user.last_name:
+                user.last_name = self.cleaned_data['last_name']
+                changed = True
+            if changed:
+                user.save()
+        else:
+            # Creating a new volunteer
+            first = self.cleaned_data['first_name']
+            last = self.cleaned_data['last_name']
+            email = self.cleaned_data['email']
+            password = self.cleaned_data['password']
+            user, created = User.objects.get_or_create(username=email, defaults={'email': email, 'first_name': first, 'last_name': last, 'password': make_password(password)})
+            vol = super(VolunteerSignupForm, self).save(commit=False)
+            vol.user = user
+        super(VolunteerSignupForm, self).save(commit=commit)
+        
 
 class OpeningExceptionForm(forms.Form):
     clientOpening = forms.CharField(max_length=10, widget=forms.widgets.HiddenInput())

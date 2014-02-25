@@ -1,14 +1,17 @@
 import datetime
 from django.http import Http404, HttpResponseRedirect, HttpResponseForbidden
 from django.shortcuts import render, get_object_or_404
+from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
 from django.contrib.admin.views.decorators import staff_member_required
 from django.template import RequestContext
 from django.utils import timezone
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
+from django.contrib.auth.hashers import make_password
+from django.db.models import Q
 from timeslots.models import Client, ClientOpening, ClientOpeningException, ClientOpeningMetadata, Volunteer, VolunteerCommitment, VolunteerCommitmentException, VolunteerCommitmentMetadata
-from timeslots.forms import UserForm, ClientForm, VolunteerForm, OpeningForm, CommitmentForm, OpeningExceptionForm, CommitmentExceptionForm
+from timeslots.forms import UserForm, ClientForm, VolunteerForm, VolunteerSignupForm, OpeningForm, CommitmentForm, OpeningExceptionForm, CommitmentExceptionForm
 
 ##
 ## VIEW UTILITY FUNCTIONS
@@ -65,6 +68,25 @@ def home(request):
     return render(request, 'timeslots/home.html', {'poll': None})
 
 
+def volunteer_signup(request):
+    if request.method == "POST":
+        form = VolunteerSignupForm(request.POST)
+        if form.is_valid():
+            form.save()
+            # TODO: Decide if we want new users logged in after signing up. I don't think so, but if we do uncomment the next three lines
+            # new_user = authenticate(username=form.cleaned_data['email'],
+            #                         password=form.cleaned_data['password'])
+            # login(request, new_user)
+            return HttpResponseRedirect(reverse('timeslots_volunteer_signup_success'))
+    else:
+        form = VolunteerSignupForm()
+    
+    return render(request, 'timeslots/volunteer/volunteer_signup.html', { 'form': form })
+
+
+def volunteer_signup_success(request):
+    return render(request, 'timeslots/volunteer/volunteer_signup_success.html')
+
 @login_required
 def dashboard(request):
     startDate, endDate = get_dates(request)
@@ -72,26 +94,29 @@ def dashboard(request):
     volunteer = get_volunteer(request)
     clients = None
     multipleclients = False
-    openings = list()
+    opening_instances = list()
+    opening_patterns = list()
     commitment_instances = list()
 
     if volunteer is not None:
         clients = volunteer.clients.all()
         if len(clients) > 1:
             multipleclients = True
-        openings = volunteer.get_unfilled_client_opening_instances(startDate=startDate, endDate=endDate)
+        opening_instances = volunteer.get_unfilled_client_opening_instances(startDate=startDate, endDate=endDate)
+        opening_patterns = volunteer.get_openings()
         commitment_instances = volunteer.get_commitment_instances(startDate=startDate, endDate=endDate)
 
     elif request.user.is_staff:
         clients = Client.objects.all()
         volunteers = Volunteer.objects.all()
         multipleclients = True
+        opening_patterns = ClientOpening.objects.filter(Q(endDate__gte=timezone.now()) | Q(endDate__isnull=True), startDate__lte=timezone.now())
         for client in clients:
-            openings.extend(client.get_unfilled_opening_instances(startDate=startDate, endDate=endDate))
+            opening_instances.extend(client.get_unfilled_opening_instances(startDate=startDate, endDate=endDate))
         for volunteer in volunteers:
             commitment_instances.extend(volunteer.get_commitment_instances(startDate=startDate, endDate=endDate))
 
-    return render(request, 'timeslots/dashboard.html', { "volunteer": volunteer, "clients": clients, "multipleclients": multipleclients, "openings": openings, "commitment_instances": commitment_instances, "startDate": startDate, "endDate": endDate })
+    return render(request, 'timeslots/dashboard.html', { "volunteer": volunteer, "clients": clients, "multipleclients": multipleclients, "opening_patterns": opening_patterns, "opening_instances": opening_instances, "commitment_instances": commitment_instances, "startDate": startDate, "endDate": endDate })
 
 
 @login_required
@@ -406,15 +431,16 @@ def commitment_exception_view(request, commitmentid, year, month, day, time):
 @login_required
 def commitment_exception_delete(request, commitmentid, year, month, day, time):
     """ Delete a commitment exception """
-    if not (request.user.is_staff or request.user.id == commitment.volunteer.user.id):
-        # only a staff member or the committed volunteer can create a commitment exception
-        return HttpResponseForbidden
-
     if request.method == "POST":
         # We're deleting the exception
         form = CommitmentExceptionForm(request.POST)
         if form.is_valid():
             commitment = VolunteerCommitment.objects.get(id=form.cleaned_data['commitment'])
+            
+            if not (request.user.is_staff or request.user.id == commitment.volunteer.user.id):
+                # only a staff member or the committed volunteer can create a commitment exception
+                return HttpResponseForbidden
+            
             date = form.cleaned_data['date']
             exception = VolunteerCommitmentException.objects.get(volunteerCommitment=commitment, date=date)
             exception.delete()
@@ -437,20 +463,18 @@ def user_add(request, usertype):
             email = form.cleaned_data['email']
             first = form.cleaned_data['first_name']
             last = form.cleaned_data['last_name']
-            user, usercreated = User.objects.get_or_create(username=email, defaults={'email': email, 'first_name': first, 'last_name': last})
+            user, usercreated = User.objects.get_or_create(username=email, defaults={'email': email, 'first_name': first, 'last_name': last, 'password': make_password(None)})
 
             if usertype == 'volunteer':
+                # TODO: Send an email to the volunteer with a password reset link
                 volunteer, typedusercreated = Volunteer.objects.get_or_create(user=user)
                 redirectUrl = volunteer.get_absolute_edit_url()
             else:
                 client, typedusercreated = Client.objects.get_or_create(user=user)
                 redirectUrl = client.get_absolute_edit_url()
 
-            if typedusercreated:
-                # SUCCESS
-                return HttpResponseRedirect(redirectUrl)
-            else:
-                customererror = "Error: Email address %s already has an associated %s" % (email, type.lowercase())
+            # Whether or not we've created a new user, we want to send the admin to the edit page for that user (i.e., if they try to create a user who already exists, just show the dit screen)
+            return HttpResponseRedirect(redirectUrl)
     else:
         form = UserForm()
 
@@ -495,10 +519,11 @@ def volunteer_view(request, userid):
     startDate, endDate = get_dates(request)
 
     volunteer = get_object_or_404(Volunteer, user__id=userid)
-    commitments = volunteer.get_current_commitments()
-    instances = volunteer.get_commitment_instances(startDate=startDate, endDate=endDate)
+    commitment_patterns = volunteer.get_current_commitments()
+    commitment_instances = volunteer.get_commitment_instances(startDate=startDate, endDate=endDate)
+    opening_patterns = volunteer.get_openings()
 
-    return render(request, 'timeslots/volunteer/volunteer_view.html', { "volunteer": volunteer, "commitments": commitments, "instances": instances, "startDate": startDate, "endDate": endDate  })
+    return render(request, 'timeslots/volunteer/volunteer_view.html', { "volunteer": volunteer, "commitment_patterns": commitment_patterns, "commitment_instances": commitment_instances, "opening_patterns": opening_patterns, "startDate": startDate, "endDate": endDate })
 
 
 @staff_member_required
