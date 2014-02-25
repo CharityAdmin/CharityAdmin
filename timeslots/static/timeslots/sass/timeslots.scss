@@ -80,8 +80,13 @@ li {
 
 .paws-btn {
 	@extend .btn;
+	color: #fff;
 	text-decoration: none;
 	margin-top: -0.75em;
+	
+	&:visited {
+		color: #fff;
+	}
 }
 
 .edit-link {

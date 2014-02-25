@@ -26,15 +26,17 @@
 						{% endfor %} -->
 					</div>
 				</li>
+			{% empty %}
+				<li>No teammates assigned</li>
 			{% endfor %}
 		</ul>
 	</div>
 
-	<h4>Display Dates: </h4>
-	{% include "timeslots/partials/datepicker.html" %}
-	<br><br>
-
 	{% if commitments %}
+		<h4>Display Dates: </h4>
+		{% include "timeslots/partials/datepicker.html" %}
+		<br><br>
+	
 		<div class="block">
 			<h4>Scheduled Visits for You and {{ client }}</h4>
 			<ul class="well">
