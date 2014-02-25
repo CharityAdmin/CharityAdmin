@@ -16,7 +16,7 @@ SCHEDULE_PATTERN_TYPE_CHOICES = (
 )
 
 dateformat = '{d:%b %d, %Y}'
-timeformat = '({d.hour}:{d.minute:02} {d:%p})'
+timeformat = '({d.hour}:{d.minute:02} {d:%p})' # TODO: This shows the time in 24-hours, need to fix.
 datetimeformat = '{d:%b %d, %Y} ({d.hour}:{d.minute:02} {d:%p})'
 
 #days_of_week_dict maps our day strings "M", "Tu", ... to the dateutil objects MO, TU, ...

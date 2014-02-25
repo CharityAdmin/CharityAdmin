@@ -113,8 +113,10 @@ def dashboard(request):
         opening_patterns = ClientOpening.objects.filter(Q(endDate__gte=timezone.now()) | Q(endDate__isnull=True), startDate__lte=timezone.now())
         for client in clients:
             opening_instances.extend(client.get_unfilled_opening_instances(startDate=startDate, endDate=endDate))
+            opening_instances.sort(key=lambda item:item['date'])
         for volunteer in volunteers:
             commitment_instances.extend(volunteer.get_commitment_instances(startDate=startDate, endDate=endDate))
+            commitment_instances.sort(key=lambda item:item['date'])
 
     return render(request, 'timeslots/dashboard.html', { "volunteer": volunteer, "clients": clients, "multipleclients": multipleclients, "opening_patterns": opening_patterns, "opening_instances": opening_instances, "commitment_instances": commitment_instances, "startDate": startDate, "endDate": endDate })
 

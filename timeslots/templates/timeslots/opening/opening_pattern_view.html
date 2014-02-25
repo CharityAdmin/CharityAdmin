@@ -4,22 +4,25 @@
 	<div class="block">
 		<!-- {% include "timeslots/partials/breadcrumbs.html" with item=opening %} -->
 
-		<h3>Client Opening for <a href="{{ opening.client.get_absolute_url }}">{{ opening.client }}</a></h3><br />
-		<h4>Opening Schedule: {{ opening.get_client_title }}</h4>
-
+		<h3>Opening Schedule for <a href="{{ opening.client.get_absolute_url }}">{{ opening.client }}</a> {{ opening.get_client_title }}</h3>
+		
+		{% if user.is_staff or is_myopening %}
+			<a class="edit-link edit-commitments" href="{% url 'timeslots_opening_edit' opening.id %}">Edit This Opening Schedule</a>
+		{% endif %}
+		<br />
 		{% if opening.is_filled %}
 			<p>This opening schedule is filled.</p>
 		{% else %}
 			<p>
 				This opening schedule is not filled. 
-				<a href="{% url 'timeslots_commitment_add' opening.id %}">Fill this opening schedule</a>
+				{% if not user.is_staff %}
+				<!-- TODO: This is broken if you're an admin (it doesn't know which volunteer to use to fill the opening) -->
+				<a class="edit-link" href="{% url 'timeslots_commitment_add' opening.id %}">Fill this opening schedule</a>
+				{% endif %}
 			</p>
 		{% endif %}
 
-		{% if user.is_staff or is_myopening %}
-			<a class="edit-link edit-commitments" href="{% url 'timeslots_opening_edit' opening.id %}">Edit This Opening Schedule</a>
-		{% endif %}
-		<br /><br /><br />
+		<br />
 		<h4>Dates based on this Opening Schedule</h4>
 		{% include "timeslots/partials/datepicker.html" %}
 

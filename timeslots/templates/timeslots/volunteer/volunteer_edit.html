@@ -2,6 +2,9 @@
 
 {% block content %}
 	<h3>Edit Volunteer: {{ volunteer }}</h3>
+	{% if volunteer.commitments.all %}
+		<a class="edit-link" href="{% url 'timeslots_commitment_patterns_edit' volunteer.user.id %}">Edit Scheduled Visits</a>
+	{% endif %}
 	<div>
 		<form action="." method="post" class="form-edit-volunteer">
 			{{ form.non_field_errors }}
@@ -11,8 +14,5 @@
 		    	<input type="submit" value="Save Volunteer" />
 		   	</div>
 		</form>
-		{% if volunteer.commitments %}
-			<a class="edit-link" href="{% url 'timeslots_commitment_patterns_edit' volunteer.user.id %}">Edit Scheduled Visits</a>
-		{% endif %}
 	</div>
 {% endblock %}

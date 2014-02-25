@@ -20,9 +20,10 @@
 					<a class="data-cell" href="{{ volunteer.get_absolute_url }}">{{ volunteer }}</a>
 					<a class="data-cell" href="mailto:{{ volunteer.user.email }}">{{ volunteer.user.email }}</a>
 					<div class="data-cell">
-						{% for commitment in volunteer.commitments.all %}
+						<!-- TODO: The below code shows all commitment string, we only want for this specific client -->
+						<!-- {% for commitment in volunteer.commitments.all %}
 							<span class="commitment">{{ commitment.get_all_metadata_string }}</span>
-						{% endfor %}
+						{% endfor %} -->
 					</div>
 				</li>
 			{% endfor %}
@@ -49,17 +50,21 @@
 		<ul class="well">
 			{% for pattern in client.openings.all %}
 				{% include "timeslots/partials/opening_pattern_row.html" with show_status_label=True %}
+			{% empty %}
+				<li>No Client Opening Schedules found</li>
 			{% endfor %}
 		</ul>
 	</div>
 
-	<div class="block">
-		<h4>Opening Dates</h4>
-		<ul class="well">
-			{% for instance in openings %}
-				{% include "timeslots/partials/opening_instance_row.html" with show_status_label=True %}
-			{% endfor %}
-		</ul>
-	</div>
+	{% if openings %}
+		<div class="block">
+			<h4>Opening Dates</h4>
+			<ul class="well">
+				{% for instance in openings %}
+					{% include "timeslots/partials/opening_instance_row.html" with show_status_label=True %}
+				{% endfor %}
+			</ul>
+		</div>
+	{% endif %}
 
 {% endblock %}
