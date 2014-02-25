@@ -1,17 +1,19 @@
 {% load display_helpers %}
 
-<li class="commitment-instance-row commitment-{{ instance.commitmentid }}">
-	<div>
-		{% if specify_volunteer %}
-			<a href="{{ instance.volunteer.get_absolute_url }}">{{ instance.volunteer }}</a> visits
-		{% else %}
-			<a href="{% commitment_instance_url instance %}">Visit</a>
-		{% endif %}
-		{% if specify_client %}
-			with
-			<a href="{{ instance.client.get_absolute_url }}">{{ instance.client }}</a>
-		{% endif %}
-		on
-		<a href="{% commitment_instance_url instance %}">{{ instance.date|date:"D N j, Y, P" }}</a>
-	</div>
-</li>
+{% if include_exceptions or not instance.commitmentexception %}
+	<li class="commitment-instance-row commitment-{{ instance.commitmentid }}">
+		<div>
+			{% if specify_volunteer %}
+				<a href="{{ instance.volunteer.get_absolute_url }}">{{ instance.volunteer }}</a> visits
+			{% else %}
+				<a href="{% commitment_instance_url instance %}">Visit</a>
+			{% endif %}
+			{% if specify_client %}
+				with
+				<a href="{{ instance.client.get_absolute_url }}">{{ instance.client }}</a>
+			{% endif %}
+			on
+			<a href="{% commitment_instance_url instance %}">{{ instance.date|date:"D N j, Y, P" }}</a>
+		</div>
+	</li>
+{% endif %}

@@ -29,7 +29,7 @@
 					</form>
 				{% endif %}
 			{% else %}
-				{% if instance.is_filled %}
+				{% if instance.is_filled and not instance.commitmentexception %}
 					<p>This opening date is filled. <a href="{% commitment_instance_url instance %}">View the commitment</a>
 	<!-- 				{% if user.is_staff %}
 						<a href="{% url 'timeslots_commitment_edit' instance.openingid %}">Edit the commitment</a>
