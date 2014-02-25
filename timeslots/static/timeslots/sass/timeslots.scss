@@ -1,6 +1,7 @@
 @import "compass/css3/border-radius";
 @import "compass/css3/transition";
-
+// should move the button styling to PAWS stylesheet I think (need to scss-ify that)
+@import "_buttons"; 
 ///
 /// CUSTOM MIXINS
 ///
@@ -77,9 +78,29 @@ li {
 	display: none;
 }
 
+.paws-btn {
+	@extend .btn;
+	text-decoration: none;
+	margin-top: -0.75em;
+}
+
 .edit-link {
-	padding-top: 1em;
-	color: $color-bright-link;
+	// padding-top: 1em;
+	// color: $color-bright-link;
+	@extend .paws-btn;
+	@extend .btn-xsmall;
+	@extend .btn-primary;
+}
+
+.add-link {
+	@extend .paws-btn;
+	@extend .btn-xsmall;
+	@extend .btn-success;
+}
+
+input[type="submit"] {
+	@extend .btn;
+	@extend .btn-default;
 }
 
 a.map-link {

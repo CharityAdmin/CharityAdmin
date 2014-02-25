@@ -2,7 +2,7 @@
 
 {% block content %}
 	<h3>Edit Client: {{ client }}</h3>
-	{% if client.openings %}
+	{% if client.openings.all %}
 		<a class="edit-link" href="{% url 'timeslots_opening_patterns_edit' client.user.id %}">Edit Client Openings</a>
 	{% endif %}
 	{% if client.get_commitments %}

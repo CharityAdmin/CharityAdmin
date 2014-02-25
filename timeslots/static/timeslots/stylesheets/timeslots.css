@@ -1,28 +1,426 @@
-/* line 43, ../sass/timeslots.scss */
+/* line 14, ../sass/_buttons.scss */
+.btn, .paws-btn, .edit-link, .add-link, input[type="submit"] {
+  display: inline-block;
+  margin-bottom: 0;
+  font-weight: normal;
+  text-align: center;
+  vertical-align: middle;
+  cursor: pointer;
+  background-image: none;
+  border: 1px solid transparent;
+  white-space: nowrap;
+  padding: 6px 12px;
+  font-size: 14px;
+  line-height: 1.42857;
+  border-radius: 4px;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  -o-user-select: none;
+  user-select: none;
+}
+/* line 27, ../sass/_buttons.scss */
+.btn:focus, .paws-btn:focus, .edit-link:focus, .add-link:focus, input[type="submit"]:focus {
+  outline: thin dotted #333;
+  outline: 5px auto -webkit-focus-ring-color;
+  outline-offset: -2px;
+}
+/* line 32, ../sass/_buttons.scss */
+.btn:hover, .paws-btn:hover, .edit-link:hover, .add-link:hover, input[type="submit"]:hover, .btn:focus, .paws-btn:focus, .edit-link:focus, .add-link:focus, input[type="submit"]:focus {
+  color: #333333;
+  text-decoration: none;
+}
+/* line 38, ../sass/_buttons.scss */
+.btn:active, .paws-btn:active, .edit-link:active, .add-link:active, input[type="submit"]:active, .btn.active, .active.paws-btn, .active.edit-link, .active.add-link, input.active[type="submit"] {
+  outline: 0;
+  background-image: none;
+  -webkit-box-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);
+  box-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);
+}
+/* line 46, ../sass/_buttons.scss */
+.btn.disabled, .disabled.paws-btn, .disabled.edit-link, .disabled.add-link, input.disabled[type="submit"], .btn[disabled], [disabled].paws-btn, [disabled].edit-link, [disabled].add-link, input[disabled][type="submit"], fieldset[disabled] .btn, fieldset[disabled] .paws-btn, fieldset[disabled] .edit-link, fieldset[disabled] .add-link, fieldset[disabled] input[type="submit"] {
+  cursor: not-allowed;
+  pointer-events: none;
+  opacity: 0.65;
+  filter: alpha(opacity=65);
+  -webkit-box-shadow: none;
+  box-shadow: none;
+}
+
+/* line 59, ../sass/_buttons.scss */
+.btn-default, input[type="submit"] {
+  color: #333333;
+  background-color: white;
+  border-color: #cccccc;
+  background-image: -moz-linear-gradient(top, white, #e0e0e0);
+  background-image: -webkit-gradient(linear, 0 0, 0 100%, from(white), to(#e0e0e0));
+  background-image: -webkit-linear-gradient(top, white, #e0e0e0);
+  background-image: -o-linear-gradient(top, white, #e0e0e0);
+  background-image: linear-gradient(to bottom, #ffffff, #e0e0e0);
+  background-repeat: repeat-x;
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='$background', endColorstr='$background_endgradient', GradientType=0);
+}
+/* line 25, ../sass/_shared.scss */
+.btn-default:hover, input[type="submit"]:hover, .btn-default:focus, input[type="submit"]:focus, .btn-default:active, input[type="submit"]:active, .btn-default.active, input.active[type="submit"] {
+  color: #333333;
+  background-color: #ebebeb;
+  border-color: #adadad;
+  background-image: -moz-linear-gradient(top, whitesmoke, #d6d6d6);
+  background-image: -webkit-gradient(linear, 0 0, 0 100%, from(white), to(#d6d6d6));
+  background-image: -webkit-linear-gradient(top, whitesmoke, #d6d6d6);
+  background-image: -o-linear-gradient(top, whitesmoke, #d6d6d6);
+  background-image: linear-gradient(to bottom, #f5f5f5, #d6d6d6);
+  background-repeat: repeat-x;
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='$background_active', endColorstr='$background_endgradient_active', GradientType=0);
+}
+/* line 42, ../sass/_shared.scss */
+.open .btn-default.dropdown-toggle, .open input.dropdown-toggle[type="submit"] {
+  color: #333333;
+  background-color: #ebebeb;
+  border-color: #adadad;
+}
+/* line 48, ../sass/_shared.scss */
+.btn-default:active, input[type="submit"]:active, .btn-default.active, input.active[type="submit"] {
+  background-image: none;
+}
+/* line 51, ../sass/_shared.scss */
+.open .btn-default.dropdown-toggle, .open input.dropdown-toggle[type="submit"] {
+  background-image: none;
+}
+/* line 61, ../sass/_shared.scss */
+.btn-default.disabled, input.disabled[type="submit"], .btn-default.disabled:hover, input.disabled[type="submit"]:hover, .btn-default.disabled:focus, input.disabled[type="submit"]:focus, .btn-default.disabled:active, input.disabled[type="submit"]:active, .btn-default.disabled.active, input.disabled.active[type="submit"], .btn-default[disabled], input[disabled][type="submit"], .btn-default[disabled]:hover, input[disabled][type="submit"]:hover, .btn-default[disabled]:focus, input[disabled][type="submit"]:focus, .btn-default[disabled]:active, input[disabled][type="submit"]:active, .btn-default[disabled].active, input[disabled].active[type="submit"], fieldset[disabled] .btn-default, fieldset[disabled] input[type="submit"], fieldset[disabled] .btn-default:hover, fieldset[disabled] input[type="submit"]:hover, fieldset[disabled] .btn-default:focus, fieldset[disabled] input[type="submit"]:focus, fieldset[disabled] .btn-default:active, fieldset[disabled] input[type="submit"]:active, fieldset[disabled] .btn-default.active, fieldset[disabled] input.active[type="submit"] {
+  background-color: white;
+  border-color: #cccccc;
+}
+
+/* line 62, ../sass/_buttons.scss */
+.btn-primary, .edit-link {
+  color: white;
+  background-color: #00b7ff;
+  border-color: #00a5e6;
+  background-image: -moz-linear-gradient(top, #00b7ff, #008bc2);
+  background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#00b7ff), to(#008bc2));
+  background-image: -webkit-linear-gradient(top, #00b7ff, #008bc2);
+  background-image: -o-linear-gradient(top, #00b7ff, #008bc2);
+  background-image: linear-gradient(to bottom, #00b7ff, #008bc2);
+  background-repeat: repeat-x;
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='$background', endColorstr='$background_endgradient', GradientType=0);
+}
+/* line 25, ../sass/_shared.scss */
+.btn-primary:hover, .edit-link:hover, .btn-primary:focus, .edit-link:focus, .btn-primary:active, .edit-link:active, .btn-primary.active, .active.edit-link {
+  color: white;
+  background-color: #009ad6;
+  border-color: #0079a8;
+  background-image: -moz-linear-gradient(top, #00a8eb, #007cad);
+  background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#00b7ff), to(#007cad));
+  background-image: -webkit-linear-gradient(top, #00a8eb, #007cad);
+  background-image: -o-linear-gradient(top, #00a8eb, #007cad);
+  background-image: linear-gradient(to bottom, #00a8eb, #007cad);
+  background-repeat: repeat-x;
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='$background_active', endColorstr='$background_endgradient_active', GradientType=0);
+}
+/* line 42, ../sass/_shared.scss */
+.open .btn-primary.dropdown-toggle, .open .dropdown-toggle.edit-link {
+  color: white;
+  background-color: #009ad6;
+  border-color: #0079a8;
+}
+/* line 48, ../sass/_shared.scss */
+.btn-primary:active, .edit-link:active, .btn-primary.active, .active.edit-link {
+  background-image: none;
+}
+/* line 51, ../sass/_shared.scss */
+.open .btn-primary.dropdown-toggle, .open .dropdown-toggle.edit-link {
+  background-image: none;
+}
+/* line 61, ../sass/_shared.scss */
+.btn-primary.disabled, .disabled.edit-link, .btn-primary.disabled:hover, .disabled.edit-link:hover, .btn-primary.disabled:focus, .disabled.edit-link:focus, .btn-primary.disabled:active, .disabled.edit-link:active, .btn-primary.disabled.active, .disabled.active.edit-link, .btn-primary[disabled], [disabled].edit-link, .btn-primary[disabled]:hover, [disabled].edit-link:hover, .btn-primary[disabled]:focus, [disabled].edit-link:focus, .btn-primary[disabled]:active, [disabled].edit-link:active, .btn-primary[disabled].active, [disabled].active.edit-link, fieldset[disabled] .btn-primary, fieldset[disabled] .edit-link, fieldset[disabled] .btn-primary:hover, fieldset[disabled] .edit-link:hover, fieldset[disabled] .btn-primary:focus, fieldset[disabled] .edit-link:focus, fieldset[disabled] .btn-primary:active, fieldset[disabled] .edit-link:active, fieldset[disabled] .btn-primary.active, fieldset[disabled] .active.edit-link {
+  background-color: #00b7ff;
+  border-color: #00a5e6;
+}
+
+/* line 66, ../sass/_buttons.scss */
+.btn-warning {
+  color: white;
+  background-color: #f0ad4e;
+  border-color: #eea236;
+  background-image: -moz-linear-gradient(top, #f0ad4e, #eb9316);
+  background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#f0ad4e), to(#eb9316));
+  background-image: -webkit-linear-gradient(top, #f0ad4e, #eb9316);
+  background-image: -o-linear-gradient(top, #f0ad4e, #eb9316);
+  background-image: linear-gradient(to bottom, #f0ad4e, #eb9316);
+  background-repeat: repeat-x;
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='$background', endColorstr='$background_endgradient', GradientType=0);
+}
+/* line 25, ../sass/_shared.scss */
+.btn-warning:hover, .btn-warning:focus, .btn-warning:active, .btn-warning.active {
+  color: white;
+  background-color: #ed9c28;
+  border-color: #d58512;
+  background-image: -moz-linear-gradient(top, #eea43b, #da8712);
+  background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#f0ad4e), to(#da8712));
+  background-image: -webkit-linear-gradient(top, #eea43b, #da8712);
+  background-image: -o-linear-gradient(top, #eea43b, #da8712);
+  background-image: linear-gradient(to bottom, #eea43b, #da8712);
+  background-repeat: repeat-x;
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='$background_active', endColorstr='$background_endgradient_active', GradientType=0);
+}
+/* line 42, ../sass/_shared.scss */
+.open .btn-warning.dropdown-toggle {
+  color: white;
+  background-color: #ed9c28;
+  border-color: #d58512;
+}
+/* line 48, ../sass/_shared.scss */
+.btn-warning:active, .btn-warning.active {
+  background-image: none;
+}
+/* line 51, ../sass/_shared.scss */
+.open .btn-warning.dropdown-toggle {
+  background-image: none;
+}
+/* line 61, ../sass/_shared.scss */
+.btn-warning.disabled, .btn-warning.disabled:hover, .btn-warning.disabled:focus, .btn-warning.disabled:active, .btn-warning.disabled.active, .btn-warning[disabled], .btn-warning[disabled]:hover, .btn-warning[disabled]:focus, .btn-warning[disabled]:active, .btn-warning[disabled].active, fieldset[disabled] .btn-warning, fieldset[disabled] .btn-warning:hover, fieldset[disabled] .btn-warning:focus, fieldset[disabled] .btn-warning:active, fieldset[disabled] .btn-warning.active {
+  background-color: #f0ad4e;
+  border-color: #eea236;
+}
+
+/* line 70, ../sass/_buttons.scss */
+.btn-danger {
+  color: white;
+  background-color: #d9534f;
+  border-color: #d43f3a;
+  background-image: -moz-linear-gradient(top, #d9534f, #c12e2a);
+  background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#d9534f), to(#c12e2a));
+  background-image: -webkit-linear-gradient(top, #d9534f, #c12e2a);
+  background-image: -o-linear-gradient(top, #d9534f, #c12e2a);
+  background-image: linear-gradient(to bottom, #d9534f, #c12e2a);
+  background-repeat: repeat-x;
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='$background', endColorstr='$background_endgradient', GradientType=0);
+}
+/* line 25, ../sass/_shared.scss */
+.btn-danger:hover, .btn-danger:focus, .btn-danger:active, .btn-danger.active {
+  color: white;
+  background-color: #d2322d;
+  border-color: #ac2925;
+  background-image: -moz-linear-gradient(top, #d5433e, #b02a26);
+  background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#d9534f), to(#b02a26));
+  background-image: -webkit-linear-gradient(top, #d5433e, #b02a26);
+  background-image: -o-linear-gradient(top, #d5433e, #b02a26);
+  background-image: linear-gradient(to bottom, #d5433e, #b02a26);
+  background-repeat: repeat-x;
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='$background_active', endColorstr='$background_endgradient_active', GradientType=0);
+}
+/* line 42, ../sass/_shared.scss */
+.open .btn-danger.dropdown-toggle {
+  color: white;
+  background-color: #d2322d;
+  border-color: #ac2925;
+}
+/* line 48, ../sass/_shared.scss */
+.btn-danger:active, .btn-danger.active {
+  background-image: none;
+}
+/* line 51, ../sass/_shared.scss */
+.open .btn-danger.dropdown-toggle {
+  background-image: none;
+}
+/* line 61, ../sass/_shared.scss */
+.btn-danger.disabled, .btn-danger.disabled:hover, .btn-danger.disabled:focus, .btn-danger.disabled:active, .btn-danger.disabled.active, .btn-danger[disabled], .btn-danger[disabled]:hover, .btn-danger[disabled]:focus, .btn-danger[disabled]:active, .btn-danger[disabled].active, fieldset[disabled] .btn-danger, fieldset[disabled] .btn-danger:hover, fieldset[disabled] .btn-danger:focus, fieldset[disabled] .btn-danger:active, fieldset[disabled] .btn-danger.active {
+  background-color: #d9534f;
+  border-color: #d43f3a;
+}
+
+/* line 74, ../sass/_buttons.scss */
+.btn-success, .add-link {
+  color: white;
+  background-color: #5cb85c;
+  border-color: #4cae4c;
+  background-image: -moz-linear-gradient(top, #5cb85c, #419641);
+  background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#5cb85c), to(#419641));
+  background-image: -webkit-linear-gradient(top, #5cb85c, #419641);
+  background-image: -o-linear-gradient(top, #5cb85c, #419641);
+  background-image: linear-gradient(to bottom, #5cb85c, #419641);
+  background-repeat: repeat-x;
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='$background', endColorstr='$background_endgradient', GradientType=0);
+}
+/* line 25, ../sass/_shared.scss */
+.btn-success:hover, .add-link:hover, .btn-success:focus, .add-link:focus, .btn-success:active, .add-link:active, .btn-success.active, .active.add-link {
+  color: white;
+  background-color: #47a447;
+  border-color: #398439;
+  background-image: -moz-linear-gradient(top, #4eb24e, #3b873b);
+  background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#5cb85c), to(#3b873b));
+  background-image: -webkit-linear-gradient(top, #4eb24e, #3b873b);
+  background-image: -o-linear-gradient(top, #4eb24e, #3b873b);
+  background-image: linear-gradient(to bottom, #4eb24e, #3b873b);
+  background-repeat: repeat-x;
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='$background_active', endColorstr='$background_endgradient_active', GradientType=0);
+}
+/* line 42, ../sass/_shared.scss */
+.open .btn-success.dropdown-toggle, .open .dropdown-toggle.add-link {
+  color: white;
+  background-color: #47a447;
+  border-color: #398439;
+}
+/* line 48, ../sass/_shared.scss */
+.btn-success:active, .add-link:active, .btn-success.active, .active.add-link {
+  background-image: none;
+}
+/* line 51, ../sass/_shared.scss */
+.open .btn-success.dropdown-toggle, .open .dropdown-toggle.add-link {
+  background-image: none;
+}
+/* line 61, ../sass/_shared.scss */
+.btn-success.disabled, .disabled.add-link, .btn-success.disabled:hover, .disabled.add-link:hover, .btn-success.disabled:focus, .disabled.add-link:focus, .btn-success.disabled:active, .disabled.add-link:active, .btn-success.disabled.active, .disabled.active.add-link, .btn-success[disabled], [disabled].add-link, .btn-success[disabled]:hover, [disabled].add-link:hover, .btn-success[disabled]:focus, [disabled].add-link:focus, .btn-success[disabled]:active, [disabled].add-link:active, .btn-success[disabled].active, [disabled].active.add-link, fieldset[disabled] .btn-success, fieldset[disabled] .add-link, fieldset[disabled] .btn-success:hover, fieldset[disabled] .add-link:hover, fieldset[disabled] .btn-success:focus, fieldset[disabled] .add-link:focus, fieldset[disabled] .btn-success:active, fieldset[disabled] .add-link:active, fieldset[disabled] .btn-success.active, fieldset[disabled] .active.add-link {
+  background-color: #5cb85c;
+  border-color: #4cae4c;
+}
+
+/* line 78, ../sass/_buttons.scss */
+.btn-info {
+  color: white;
+  background-color: #5bc0de;
+  border-color: #46b8da;
+  background-image: -moz-linear-gradient(top, #5bc0de, #2aabd2);
+  background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#5bc0de), to(#2aabd2));
+  background-image: -webkit-linear-gradient(top, #5bc0de, #2aabd2);
+  background-image: -o-linear-gradient(top, #5bc0de, #2aabd2);
+  background-image: linear-gradient(to bottom, #5bc0de, #2aabd2);
+  background-repeat: repeat-x;
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='$background', endColorstr='$background_endgradient', GradientType=0);
+}
+/* line 25, ../sass/_shared.scss */
+.btn-info:hover, .btn-info:focus, .btn-info:active, .btn-info.active {
+  color: white;
+  background-color: #39b3d7;
+  border-color: #269abc;
+  background-image: -moz-linear-gradient(top, #4ab9db, #279dc1);
+  background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#5bc0de), to(#279dc1));
+  background-image: -webkit-linear-gradient(top, #4ab9db, #279dc1);
+  background-image: -o-linear-gradient(top, #4ab9db, #279dc1);
+  background-image: linear-gradient(to bottom, #4ab9db, #279dc1);
+  background-repeat: repeat-x;
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='$background_active', endColorstr='$background_endgradient_active', GradientType=0);
+}
+/* line 42, ../sass/_shared.scss */
+.open .btn-info.dropdown-toggle {
+  color: white;
+  background-color: #39b3d7;
+  border-color: #269abc;
+}
+/* line 48, ../sass/_shared.scss */
+.btn-info:active, .btn-info.active {
+  background-image: none;
+}
+/* line 51, ../sass/_shared.scss */
+.open .btn-info.dropdown-toggle {
+  background-image: none;
+}
+/* line 61, ../sass/_shared.scss */
+.btn-info.disabled, .btn-info.disabled:hover, .btn-info.disabled:focus, .btn-info.disabled:active, .btn-info.disabled.active, .btn-info[disabled], .btn-info[disabled]:hover, .btn-info[disabled]:focus, .btn-info[disabled]:active, .btn-info[disabled].active, fieldset[disabled] .btn-info, fieldset[disabled] .btn-info:hover, fieldset[disabled] .btn-info:focus, fieldset[disabled] .btn-info:active, fieldset[disabled] .btn-info.active {
+  background-color: #5bc0de;
+  border-color: #46b8da;
+}
+
+/* line 87, ../sass/_buttons.scss */
+.btn-link {
+  color: #00b7ff;
+  font-weight: normal;
+  cursor: pointer;
+  border-radius: 0;
+}
+/* line 96, ../sass/_buttons.scss */
+.btn-link, .btn-link:active, .btn-link[disabled], fieldset[disabled] .btn-link {
+  background-color: transparent;
+  -webkit-box-shadow: none;
+  box-shadow: none;
+}
+/* line 103, ../sass/_buttons.scss */
+.btn-link, .btn-link:hover, .btn-link:focus, .btn-link:active {
+  border-color: transparent;
+}
+/* line 107, ../sass/_buttons.scss */
+.btn-link:hover, .btn-link:focus {
+  color: #0080b3;
+  text-decoration: underline;
+  background-color: transparent;
+}
+/* line 115, ../sass/_buttons.scss */
+.btn-link[disabled]:hover, .btn-link[disabled]:focus, fieldset[disabled] .btn-link:hover, fieldset[disabled] .btn-link:focus {
+  color: #999999;
+  text-decoration: none;
+}
+
+/* line 126, ../sass/_buttons.scss */
+.btn-large {
+  padding: 10px 16px;
+  font-size: 18px;
+  line-height: 1.33;
+  border-radius: 6px;
+}
+
+/* line 131, ../sass/_buttons.scss */
+.btn-small,
+.btn-xsmall,
+.edit-link,
+.add-link {
+  padding: 5px 10px;
+  font-size: 12px;
+  line-height: 1.5;
+  border-radius: 3px;
+}
+
+/* line 135, ../sass/_buttons.scss */
+.btn-xsmall, .edit-link, .add-link {
+  padding: 1px 5px;
+}
+
+/* line 143, ../sass/_buttons.scss */
+.btn-block {
+  display: block;
+  width: 100%;
+  padding-left: 0;
+  padding-right: 0;
+}
+
+/* line 151, ../sass/_buttons.scss */
+.btn-block + .btn-block {
+  margin-top: 5px;
+}
+
+/* line 159, ../sass/_buttons.scss */
+input[type="submit"].btn-block,
+input[type="reset"].btn-block,
+input[type="button"].btn-block {
+  width: 100%;
+}
+
+/* line 44, ../sass/timeslots.scss */
 .content-container {
   max-width: 1170px;
   margin: 0 auto;
 }
 
-/* line 48, ../sass/timeslots.scss */
+/* line 49, ../sass/timeslots.scss */
 h1 {
   display: inline-block;
   margin-right: 0.5em;
 }
 
-/* line 53, ../sass/timeslots.scss */
+/* line 54, ../sass/timeslots.scss */
 h3 {
   display: inline-block;
   margin-right: 0.5em;
 }
 
-/* line 58, ../sass/timeslots.scss */
+/* line 59, ../sass/timeslots.scss */
 h4 {
   display: inline-block;
   margin-right: 0.5em;
 }
 
-/* line 63, ../sass/timeslots.scss */
+/* line 64, ../sass/timeslots.scss */
 .well {
   margin: 0;
   padding: 1.25em 1.25em .75em;
@@ -35,45 +433,45 @@ h4 {
   border-radius: 5px;
 }
 
-/* line 71, ../sass/timeslots.scss */
+/* line 72, ../sass/timeslots.scss */
 li {
   line-height: 120%;
   margin-bottom: 0.5em;
 }
 
-/* line 76, ../sass/timeslots.scss */
+/* line 77, ../sass/timeslots.scss */
 .js-variable {
   display: none;
 }
 
-/* line 80, ../sass/timeslots.scss */
-.edit-link {
-  padding-top: 1em;
-  color: #00b7ff;
+/* line 81, ../sass/timeslots.scss */
+.paws-btn, .edit-link, .add-link {
+  text-decoration: none;
+  margin-top: -0.75em;
 }
 
-/* line 85, ../sass/timeslots.scss */
+/* line 106, ../sass/timeslots.scss */
 a.map-link {
   color: #00b7ff;
 }
 
-/* line 89, ../sass/timeslots.scss */
+/* line 110, ../sass/timeslots.scss */
 .block {
   margin-bottom: 2em;
 }
-/* line 92, ../sass/timeslots.scss */
+/* line 113, ../sass/timeslots.scss */
 .block .more-link {
   display: block;
   margin-left: 1.5em;
   margin-top: 0.25em;
   color: #666666;
 }
-/* line 99, ../sass/timeslots.scss */
+/* line 120, ../sass/timeslots.scss */
 .block .more-link:hover {
   color: #222222;
 }
 
-/* line 105, ../sass/timeslots.scss */
+/* line 126, ../sass/timeslots.scss */
 .label {
   margin: 0 5px;
   padding: 1px 3px 0;
@@ -92,67 +490,67 @@ a.map-link {
   -o-border-radius: 3px;
   border-radius: 3px;
 }
-/* line 120, ../sass/timeslots.scss */
+/* line 141, ../sass/timeslots.scss */
 .label.label-danger {
   background-color: #bb0000;
 }
-/* line 124, ../sass/timeslots.scss */
+/* line 145, ../sass/timeslots.scss */
 .label.label-warning {
   background-color: #ff8888;
 }
-/* line 128, ../sass/timeslots.scss */
+/* line 149, ../sass/timeslots.scss */
 .label.label-success {
   background-color: #00aa00;
 }
-/* line 132, ../sass/timeslots.scss */
+/* line 153, ../sass/timeslots.scss */
 .label.label-empty {
   background-color: #888;
 }
 
-/* line 138, ../sass/timeslots.scss */
+/* line 159, ../sass/timeslots.scss */
 .text-danger,
 a.text-danger {
   color: #bb0000;
 }
 
-/* line 143, ../sass/timeslots.scss */
+/* line 164, ../sass/timeslots.scss */
 .text-warning,
 a.text-warning {
   color: #ff8888;
 }
 
-/* line 148, ../sass/timeslots.scss */
+/* line 169, ../sass/timeslots.scss */
 .text-success,
 a.text-success {
   color: #00aa00;
 }
 
-/* line 158, ../sass/timeslots.scss */
+/* line 179, ../sass/timeslots.scss */
 .unfilled_label,
 .filled_label {
   width: 60px;
 }
 
-/* line 162, ../sass/timeslots.scss */
+/* line 183, ../sass/timeslots.scss */
 .filled_label {
   visibility: hidden;
 }
 
-/* line 166, ../sass/timeslots.scss */
+/* line 187, ../sass/timeslots.scss */
 .pattern-label {
   width: 100px;
 }
 
-/* line 175, ../sass/timeslots.scss */
+/* line 196, ../sass/timeslots.scss */
 a span {
   text-decoration: underline;
 }
 
-/* line 179, ../sass/timeslots.scss */
+/* line 200, ../sass/timeslots.scss */
 .link-form {
   display: inline;
 }
-/* line 182, ../sass/timeslots.scss */
+/* line 203, ../sass/timeslots.scss */
 .link-form button {
   border-width: 0;
   background: transparent none;
@@ -165,12 +563,12 @@ a span {
   font-size: inherit;
   font-weight: inherit;
 }
-/* line 195, ../sass/timeslots.scss */
+/* line 216, ../sass/timeslots.scss */
 .link-form div {
   display: none;
 }
 
-/* line 204, ../sass/timeslots.scss */
+/* line 225, ../sass/timeslots.scss */
 .date-selector-wrapper {
   position: relative;
   display: inline-block;
@@ -180,7 +578,7 @@ a span {
   min-width: 250px;
   margin-right: 10px;
 }
-/* line 213, ../sass/timeslots.scss */
+/* line 234, ../sass/timeslots.scss */
 .date-selector-wrapper .date-selector {
   position: absolute;
   top: 0;
@@ -203,7 +601,7 @@ a span {
   -o-transition: height 0.2s ease-in;
   transition: height 0.2s ease-in;
 }
-/* line 228, ../sass/timeslots.scss */
+/* line 249, ../sass/timeslots.scss */
 .date-selector-wrapper .date-selector .select-time-period-label {
   width: 95%;
   opacity: 0;
@@ -218,49 +616,49 @@ a span {
   -o-transition: opacity 0.2s ease-in 0.5s;
   transition: opacity 0.2s ease-in 0.5s;
 }
-/* line 239, ../sass/timeslots.scss */
+/* line 260, ../sass/timeslots.scss */
 .date-selector-wrapper .date-selector .date-selector-arrow {
   position: absolute;
   right: 7px;
   top: 5px;
 }
-/* line 244, ../sass/timeslots.scss */
+/* line 265, ../sass/timeslots.scss */
 .date-selector-wrapper .date-selector .date-selector-arrow:after {
   content: "\25BE";
   color: #777;
 }
-/* line 250, ../sass/timeslots.scss */
+/* line 271, ../sass/timeslots.scss */
 .date-selector-wrapper .date-selector .date-selector-menu {
   display: none;
 }
-/* line 256, ../sass/timeslots.scss */
+/* line 277, ../sass/timeslots.scss */
 .date-selector-wrapper .date-selector .date-selector-menu:hover .date-selector-menu-item.current,
 .date-selector-wrapper .date-selector .date-selector-menu.date-selection-active .date-selector-menu-item.current {
   background-color: transparent;
 }
-/* line 262, ../sass/timeslots.scss */
+/* line 283, ../sass/timeslots.scss */
 .date-selector-wrapper .date-selector .date-selector-menu.date-selection-active .date-selector-menu-item.custom-dates {
   background-color: #dddddd;
 }
-/* line 267, ../sass/timeslots.scss */
+/* line 288, ../sass/timeslots.scss */
 .date-selector-wrapper .date-selector .date-selector-menu-item {
   margin: 0.3em -7px;
   padding: 6px 7px;
 }
-/* line 271, ../sass/timeslots.scss */
+/* line 292, ../sass/timeslots.scss */
 .date-selector-wrapper .date-selector .date-selector-menu-item.current {
   background-color: #dddddd;
 }
-/* line 275, ../sass/timeslots.scss */
+/* line 296, ../sass/timeslots.scss */
 .date-selector-wrapper .date-selector .date-selector-menu-item.custom-dates {
   padding: 0 7px;
   margin-bottom: 0;
 }
-/* line 281, ../sass/timeslots.scss */
+/* line 302, ../sass/timeslots.scss */
 .date-selector-wrapper .date-selector .date-selector-menu-item:hover, .date-selector-wrapper .date-selector .date-selector-menu-item.current:hover {
   background-color: #dddddd !important;
 }
-/* line 296, ../sass/timeslots.scss */
+/* line 317, ../sass/timeslots.scss */
 .date-selector-wrapper .date-selector .date-input {
   width: 100px;
   display: inline-block;
@@ -273,27 +671,27 @@ a span {
   background-color: transparent;
   border-color: transparent;
 }
-/* line 309, ../sass/timeslots.scss */
+/* line 330, ../sass/timeslots.scss */
 .date-selector-wrapper .date-selector .date-input:hover {
   background-color: #fff;
   border-color: #ddd;
 }
-/* line 314, ../sass/timeslots.scss */
+/* line 335, ../sass/timeslots.scss */
 .date-selector-wrapper .date-selector .date-input:focus {
   background-color: #fff;
   border-color: #00aa00;
 }
-/* line 320, ../sass/timeslots.scss */
+/* line 341, ../sass/timeslots.scss */
 .date-selector-wrapper .date-selector span.date-input-preview {
   background-color: transparent;
   border-color: transparent;
   text-decoration: underline;
 }
-/* line 328, ../sass/timeslots.scss */
+/* line 349, ../sass/timeslots.scss */
 .date-selector-wrapper .date-selector.hover, .date-selector-wrapper .date-selector.active {
   border-color: #b4b3b4;
 }
-/* line 331, ../sass/timeslots.scss */
+/* line 352, ../sass/timeslots.scss */
 .date-selector-wrapper .date-selector.hover .select-time-period-label, .date-selector-wrapper .date-selector.active .select-time-period-label {
   opacity: 1;
   -webkit-transition: opacity 0.2s ease-out;
@@ -302,85 +700,85 @@ a span {
   -o-transition: opacity 0.2s ease-out 0s;
   transition: opacity 0.2s ease-out 0s;
 }
-/* line 339, ../sass/timeslots.scss */
+/* line 360, ../sass/timeslots.scss */
 .date-selector-wrapper .date-selector.active .date-selector-menu {
   display: block;
 }
-/* line 343, ../sass/timeslots.scss */
+/* line 364, ../sass/timeslots.scss */
 .date-selector-wrapper .date-selector.active .current-selection {
   margin-bottom: 0.5em;
 }
 
-/* line 354, ../sass/timeslots.scss */
+/* line 375, ../sass/timeslots.scss */
 form ul {
   margin: 0;
   padding: 0;
 }
 
-/* line 359, ../sass/timeslots.scss */
+/* line 380, ../sass/timeslots.scss */
 .control-group {
   margin-bottom: 10px;
 }
 
-/* line 363, ../sass/timeslots.scss */
+/* line 384, ../sass/timeslots.scss */
 .control-errors {
   font-size: 80%;
   color: #bb0000;
 }
 
-/* line 368, ../sass/timeslots.scss */
+/* line 389, ../sass/timeslots.scss */
 .errorlist li {
   color: #bb0000;
 }
 
-/* line 372, ../sass/timeslots.scss */
+/* line 393, ../sass/timeslots.scss */
 div.admin-only {
   display: none;
 }
 
-/* line 376, ../sass/timeslots.scss */
+/* line 397, ../sass/timeslots.scss */
 .is_admin div.admin-only {
   display: block;
 }
 
-/* line 380, ../sass/timeslots.scss */
+/* line 401, ../sass/timeslots.scss */
 .widget-wrapper {
   margin-right: 10px;
 }
-/* line 384, ../sass/timeslots.scss */
+/* line 405, ../sass/timeslots.scss */
 .widget-wrapper label {
   font-style: italic;
   font-weight: normal;
 }
-/* line 389, ../sass/timeslots.scss */
+/* line 410, ../sass/timeslots.scss */
 .widget-wrapper.widget-wrapper-time input {
   width: 80px;
 }
 
-/* line 397, ../sass/timeslots.scss */
+/* line 418, ../sass/timeslots.scss */
 .form-edit-volunteer .control-group-user,
 .form-edit-client .control-group-user {
   display: none;
 }
 
-/* line 402, ../sass/timeslots.scss */
+/* line 423, ../sass/timeslots.scss */
 .control-group-daysOfWeek {
   display: none;
   margin-bottom: 20px;
 }
-/* line 406, ../sass/timeslots.scss */
+/* line 427, ../sass/timeslots.scss */
 .control-group-daysOfWeek li {
   display: inline-block;
   margin-right: 20px;
 }
 
-/* line 413, ../sass/timeslots.scss */
+/* line 434, ../sass/timeslots.scss */
 .control-group-dayOfMonth,
 .control-group-oneOffDate {
   display: none;
 }
 
-/* line 421, ../sass/timeslots.scss */
+/* line 442, ../sass/timeslots.scss */
 .alert {
   padding: 10px 35px 10px 14px;
   margin-top: 1em;
@@ -395,18 +793,18 @@ div.admin-only {
   line-height: 130%;
 }
 
-/* line 436, ../sass/timeslots.scss */
+/* line 457, ../sass/timeslots.scss */
 .alert,
 .alert h4 {
   color: #c09853;
 }
 
-/* line 440, ../sass/timeslots.scss */
+/* line 461, ../sass/timeslots.scss */
 .alert h4 {
   margin: 0;
 }
 
-/* line 444, ../sass/timeslots.scss */
+/* line 465, ../sass/timeslots.scss */
 .alert .close {
   position: relative;
   top: -2px;
@@ -414,19 +812,19 @@ div.admin-only {
   line-height: 20px;
 }
 
-/* line 451, ../sass/timeslots.scss */
+/* line 472, ../sass/timeslots.scss */
 .alert-success {
   color: #468847;
   background-color: #dff0d8;
   border-color: #d6e9c6;
 }
 
-/* line 457, ../sass/timeslots.scss */
+/* line 478, ../sass/timeslots.scss */
 .alert-success h4 {
   color: #468847;
 }
 
-/* line 462, ../sass/timeslots.scss */
+/* line 483, ../sass/timeslots.scss */
 .alert-danger,
 .alert-error {
   color: #b94a48;
@@ -434,35 +832,35 @@ div.admin-only {
   border-color: #eed3d7;
 }
 
-/* line 469, ../sass/timeslots.scss */
+/* line 490, ../sass/timeslots.scss */
 .alert-danger h4,
 .alert-error h4 {
   color: #b94a48;
 }
 
-/* line 476, ../sass/timeslots.scss */
+/* line 497, ../sass/timeslots.scss */
 .data-table {
   display: table;
 }
 
-/* line 480, ../sass/timeslots.scss */
+/* line 501, ../sass/timeslots.scss */
 .data-row {
   display: table-row;
 }
 
-/* line 484, ../sass/timeslots.scss */
+/* line 505, ../sass/timeslots.scss */
 .data-cell {
   display: table-cell;
   padding-right: 10px;
   padding-bottom: 8px;
 }
 
-/* line 494, ../sass/timeslots.scss */
+/* line 515, ../sass/timeslots.scss */
 li.exception {
   text-decoration: line-through;
   color: #777;
 }
-/* line 498, ../sass/timeslots.scss */
+/* line 519, ../sass/timeslots.scss */
 li.exception a {
   color: #777;
 }
