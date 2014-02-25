@@ -9,9 +9,19 @@
 		{% display_address client %}
 
 		{% if instance.openingexception %}
+			<p>This visit is not required due to an exception.</p>
+				{% if user.is_staff %}
+					Need a visit on this day?
+					<form method="POST" action="{% opening_exception_delete_url instance %}" class="link-form">
+						{% csrf_token %}
+		    			{% include "timeslots/partials/form_snippet.html" with form=exception_form %}
+						<button>Remove the exception</button>
+					</form>
+				{% endif %}
+		{% elif instance.commitmentexception %}
 			<p>An exception has been made to the regularly scheduled visit; this day has been marked as open.</p>
 			{% if user.is_staff or is_my_commitment %}
-				{% if user.is_staff %}Is the original volunteer{% else %}Are you{% endif %} able to make the visit?
+				{% if user.is_staff %}Is the original volunteer{% else %}Are you{% endif %} able to make the visit after all?
 				<form method="POST" action="{% commitment_exception_delete_url commitment.id instance %}" class="link-form">
 					{% csrf_token %}
 	    			{% include "timeslots/partials/form_snippet.html" with form=exception_form %}

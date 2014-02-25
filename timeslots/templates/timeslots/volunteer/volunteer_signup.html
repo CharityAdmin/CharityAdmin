@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="alert">
+	<strong>Please Note: </strong>
+	This sign up form is for individuals who would like to become volunteers with PAWS NY. If you're interested in having PAWS volunteers visit you or a loved one, please call us at 1-800-555-5555.
+</div>
+<form method="post">
+	{{ form.non_field_errors }}
+	{% csrf_token %}
+    {% include "timeslots/partials/form_snippet.html" %}
+    
+    <!-- EXAMPLE FOR DEMO, REMOVE THIS -->
+    <div class="control-group control-group-example-field">
+		<label for="exampleField" class="control-label">Another Field</label>
+    	<div class="control">
+    		<input type="text" name="" value="This is an example field">
+    	</div>
+    </div>
+
+	<div class="control-group control-group-example-field">
+		<label for="exampleField" class="control-label">A Bigger Field</label>
+    	<div class="control">
+    		<textarea cols="100" rows="5" name="">This is a longer example field, in case we want some freeform text.</textarea>
+    	</div>
+    </div>
+    
+    <div class="control-group">
+    	<input type="submit" value="Sign Up" />
+   	</div>
+</form>
+<!-- <form method="post" action="{% url 'timeslots_volunteer_signup' %}">
+	
+	<div class="signup-form">
+		{% csrf_token %}
+		<div class="control-group">
+			<label for="username" class="control-label">Email Address</label>
+	    	<div class="control">{{ form.email }}</div>
+	    </div>
+
+		<div class="control-group">
+			<label for="confirmusername" class="control-label">Confirm Email Address</label>
+	    	<div class="control">{{ form.email }}</div>
+	    </div>
+
+	    {% if not volunteer %}
+		    <div class="control-group">
+				<label for="password" class="control-label">{{ form.password.label_tag }}</label>
+		    	<div class="control">{{ form.password }}</div>
+		    </div>
+	    {% else %}
+	    	<a href="/passwordreset">Change Your Password</a>
+	    {% endif %}
+
+		<input type="submit" value="login" />
+		<input type="hidden" name="next" value="{{ next }}" />
+	</div>
+</form> -->
+
+{% endblock content %}

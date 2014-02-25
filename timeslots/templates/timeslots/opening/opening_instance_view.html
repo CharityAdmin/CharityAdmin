@@ -4,11 +4,20 @@
 
 {% block content %}
 	<div class="block">
-		<h3>Visit <a href="{{ client.get_absolute_url }}">{{ client }}</a> on <span title="Based on opening pattern: {{ opening }}">{{ instance_date|date:"D, M j, Y, P" }}</span></h3>
+		<h3>Visit <a href="{{ client.get_absolute_url }}">{{ client }}</a> on {{ instance_date|date:"D, M j, Y, P" }}</h3>
 
 		{% display_address client %}
 
 		<div class="block">
+			{% if opening.is_filled %}
+				<p>The opening schedule that covers this date is filled.</p>
+			{% else %}
+				<p>
+					The opening schedule that covers this date is not filled. 
+					<a href="{% url 'timeslots_commitment_add' instance.openingid %}">Fill this opening schedule</a>
+				</p>
+			{% endif %}
+
 			{% if instance.openingexception %}
 				<p>This visit is not required due to an exception.</p>
 				{% if user.is_staff %}
@@ -21,13 +30,13 @@
 				{% endif %}
 			{% else %}
 				{% if instance.is_filled %}
-					<p>This opening is filled. <a href="{% commitment_instance_url instance %}">View the commitment</a>
+					<p>This opening date is filled. <a href="{% commitment_instance_url instance %}">View the commitment</a>
 	<!-- 				{% if user.is_staff %}
 						<a href="{% url 'timeslots_commitment_edit' instance.openingid %}">Edit the commitment</a>
 					{% endif %} -->
 					</p>
 				{% else %}
-					<p>This opening is unfilled. <a href="{% url 'timeslots_commitment_add' instance.openingid %}">Fill this opening</a></p>
+					<p>This opening date is unfilled. <a href="{% url 'timeslots_commitment_add' instance.openingid %}">Fill this opening date</a></p>
 				{% endif %}
 				{% if user.is_staff %}
 					Don't need a visit on this day?

@@ -1,47 +1,78 @@
 {% extends "base.html" %}
 
 {% block content %}
-	<div class="dashboard">
-		<h3>Dashboard</h3>
-		{% include "timeslots/partials/datepicker.html" %}
+	{% if user.is_staff or volunteer and volunteer.trained %}
+		<div class="dashboard">
+			<h3>Dashboard</h3>
+			{% include "timeslots/partials/datepicker.html" %}
 
-		{% if volunteer == None and not user.is_staff %}
-			<div class="alert alert-danger">
-				<strong>Minor Error</strong>
-				<br />
-				Nothing too major, but your account doesn't seem to be set up as a volunteer! Please ask an administrator to check your account configuration.
+			{% if volunteer == None and not user.is_staff %}
+				<div class="alert alert-danger">
+					<strong>Minor Error</strong>
+					<br />
+					Nothing too major, but your account doesn't seem to be set up as a volunteer! Please ask an administrator to check your account configuration.
+				</div>
+			{% endif %}
+
+			{% if commitment_instances %}
+				<div class="block">
+					<a href="{% url 'timeslots_commitments_view' %}">
+						<h4>Scheduled Visit Dates{% if not user.is_staff %} for You{% if clients and not multipleclients %} and {{ clients|first }}{% endif %}{% endif %}</h4>
+					</a>
+					<ul class="well">
+						{% for instance in commitment_instances %}
+							{% include "timeslots/partials/commitment_instance_row.html" with specify_volunteer=user.is_staff specify_client=multipleclients %}
+						{% empty %}
+							You haven't scheduled any visit dates.
+						{% endfor %}
+					</ul>
+				</div>
+			{% endif %}
+
+			<div class="block">
+				<a href="{% url 'timeslots_openings_view' %}">
+					<h4>Opening Schedules{% if not user.is_staff %} for {% if clients and not multipleclients %}{{ clients|first }}{% else %}Your Clients{% endif %}{% endif %}</h4>
+				</a>
+				<ul class="well">
+					{% for pattern in opening_patterns %}
+						{% include "timeslots/partials/opening_pattern_row.html" with show_status_label=True %}
+					{% empty %}
+						{% if user.volunteer and user.volunteer.clients %}
+							Your clients don't have any scheduled openings
+						{% elif user.volunteer and not user.volunteer.clients %}
+							You don't have any assigned clients; Please contact an administrator
+						{% else %}
+							No recurring openings scheduled
+						{% endif %}
+					{% endfor %}
+				</ul>
 			</div>
-		{% endif %}
 
-		<div class="block">
-			<a href="{% url 'timeslots_commitments_view' %}">
-				<h4>Upcoming Visits Scheduled{% if not user.is_staff %} for You{% if clients and not multipleclients %} and {{ clients|first }}{% endif %}{% endif %}</h4>
-			</a>
-			<ul class="well">
-				{% for instance in commitment_instances %}
-					{% include "timeslots/partials/commitment_instance_row.html" with specify_volunteer=user.is_staff specify_client=multipleclients %}
-				{% endfor %}
-			</ul>
-		</div>
+			{% if opening_instances %}
+				<div class="block">
+					<a href="{% url 'timeslots_openings_view' %}">
+						<h4>Unfilled Opening Dates{% if not user.is_staff %} for {% if clients and not multipleclients %}{{ clients|first }}{% else %}Your Clients{% endif %}{% endif %}</h4>
+					</a>
+					<ul class="well">
+						{% for instance in opening_instances %}
+							{% include "timeslots/partials/opening_instance_row.html" with specify_client=multipleclients %}
+						{% endfor %}
+					</ul>
+				</div>
+			{% endif %}
 
-		<div class="block">
-			<a href="{% url 'timeslots_openings_view' %}">
-				<h4>Upcoming Unfilled Openings{% if not user.is_staff %} for {% if clients and not multipleclients %}{{ clients|first }}{% else %}Your Clients{% endif %}{% endif %}</h4>
-			</a>
-			<ul class="well">
-				{% for instance in openings %}
-					{% include "timeslots/partials/opening_instance_row.html" with specify_client=multipleclients %}
-				{% endfor %}
-			</ul>
+			<div class="block">
+				<h4>{% if user.is_staff %}All{% else %}Your{% endif %} Clients</h4>
+				<ul class="well">
+					{% for client in clients %}
+						<li><a href="{% url 'timeslots_client_view' client.user.id %}">{{ client }}</a></li>
+					{% endfor %}
+				</ul>
+			</div>
 		</div>
-
-		<div class="block">
-			<h4>{% if user.is_staff %}All{% else %}Your{% endif %} Clients</h4>
-			<ul class="well">
-				{% for client in clients %}
-					<li><a href="{% url 'timeslots_client_view' client.user.id %}">{{ client }}</a></li>
-				{% endfor %}
-			</ul>
+	{% else %}
+		<div class="dashboard">
+			Thanks for signing up to be a volunteer. PAWS NY is reviewing your application and will be in touch with you.
 		</div>
-	</div>
+	{% endif %}
 {% endblock content %}
