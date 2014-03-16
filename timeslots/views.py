@@ -10,7 +10,7 @@ from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.contrib.auth.hashers import make_password
 from django.db.models import Q
-from timeslots.models import Client, ClientOpening, ClientOpeningException, ClientOpeningMetadata, Volunteer, VolunteerCommitment, VolunteerCommitmentException, VolunteerCommitmentMetadata
+from timeslots.models import Client, ClientOpening, ClientOpeningException, ClientOpeningMetadata, Volunteer, VolunteerCommitment, VolunteerCommitmentException, VolunteerCommitmentMetadata, Event
 from timeslots.forms import UserForm, ClientForm, VolunteerForm, VolunteerSignupForm, OpeningForm, CommitmentForm, OpeningExceptionForm, CommitmentExceptionForm
 
 ##
@@ -547,3 +547,45 @@ def volunteer_edit(request, userid):
 
     return render(request, 'timeslots/volunteer/volunteer_edit.html', { "volunteer": volunteer, "form": form })
 
+@login_required
+def event_add(request, clientid):
+    if not request.user.is_staff:
+        # only a staff member can create an opening for someone else
+        client = request.user.client
+    else:
+        client = Client.objects.get(user__id=clientid)
+    event = Event.objects.create(client=client)
+    return HttpResponseRedirect(reverse('timeslots_event_edit', kwargs={'eventid': event.id}))
+
+@login_required
+def event_edit(request, eventid):
+    event = Event.objects.get(id=eventid)
+
+    # only a staff member can edit an opening for someone else
+    if not (request.user.is_staff or event.client == request.user.client):
+        return HttpResponseForbidden()
+
+    if request.method == 'POST':
+        form = OpeningForm(request.POST, instance=event)
+        # metadataform = OpeningMetaDataForm(request.POST)
+        if form.is_valid():
+            # PROCESS DATA
+            o = form.save()
+            return HttpResponseRedirect(o.get_absolute_url())
+    else:
+        form = OpeningForm(instance=event)
+        # initial_metadata = {'clientOpening': opening.id, 'metadata': opening.get_all_metadata_string()}
+        # metadataform = OpeningMetaDataForm(initial_metadata)
+
+    return render(request, 'timeslots/event/event_edit.html', { 'event': event, 'form': form })
+
+@login_required
+def event_view(request, eventid):
+
+    event = get_object_or_404(Event, id=eventid)
+
+    # only a staff member can edit an opening for someone else
+    if not (request.user.is_staff or event.client == request.user.client):
+        return HttpResponseForbidden()
+
+    return render(request, 'timeslots/event/event_view.html', { "event": event })

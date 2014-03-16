@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{#{% block content %}#}
+{#	<h3>Edit Volunteer: {{ volunteer }}</h3>#}
+{#	{% if volunteer.commitments.all %}#}
+{#		<a class="edit-link" href="{% url 'timeslots_commitment_patterns_edit' volunteer.user.id %}">Edit Scheduled Visits</a>#}
+{#	{% endif %}#}
+{#	<div>#}
+{#		<form action="." method="post" class="form-edit-volunteer">#}
+{#			{{ form.non_field_errors }}#}
+{#			{% csrf_token %}#}
+{#		    {% include "timeslots/partials/form_snippet.html" %}#}
+{#		    <div class="control-group">#}
+{#		    	<input type="submit" value="Save Volunteer" />#}
+{#		   	</div>#}
+{#		</form>#}
+{#	</div>#}
+{#{% endblock %}#}

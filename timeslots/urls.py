@@ -25,6 +25,12 @@ urlpatterns = patterns(
     url(r'^volunteer/(?P<userid>\d+)/edit/$', 'timeslots.views.volunteer_edit', name='timeslots_volunteer_edit'),
     url(r'^volunteer/add/$', 'timeslots.views.user_add', {'usertype': 'volunteer'}, name='timeslots_volunteer_add'),
 
+    # Event Create/Edit
+    url(r'^events/$', 'timeslots.views.event_view', name='timeslots_event_view'),
+    url(r'^events/(?P<userid>\d+)/$', 'timeslots.views.event_view', name='timeslots_event_view'),
+    url(r'^events/(?P<userid>\d+)/edit/$', 'timeslots.views.event_edit', name='timeslots_event_edit'),
+    url(r'^events/add/$', 'timeslots.views.user_add', {'usertype': 'event'}, name='timeslots_event_add'),
+
     # Opening Instances/Patterns View & Edit
     url(r'^openings/$', 'timeslots.views.opening_instances_view', name='timeslots_openings_view'),
     url(r'^client/(?P<clientid>\d+)/openings/$', 'timeslots.views.opening_instances_view', name='timeslots_openings_view'),

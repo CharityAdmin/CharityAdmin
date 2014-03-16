@@ -4,9 +4,9 @@ from dateutil.rrule import *
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
-from django.contrib.localflavor.us.us_states import STATE_CHOICES
 from django.core.urlresolvers import reverse
 from django.db.models import Q
+from localflavor.us.us_states import STATE_CHOICES
 
 SCHEDULE_PATTERN_TYPE_CHOICES = (
     ('One-Off', 'One-Off'),
@@ -442,3 +442,22 @@ class VolunteerCommitmentException(models.Model):
 
     def get_instance(self):
         return self.volunteerCommitment.get_instance(self.date)
+
+#fixme: add actual types
+EVENT_TYPE_CHOICES = (
+    ('A', 'A'),
+    ('B', 'B'),
+    ('C', 'C'),
+)
+
+class Event(models.Model):
+    client = models.ForeignKey(Client, db_column='clientId', related_name='events', null=True)
+    volunteer = models.ForeignKey(Volunteer, db_column='volunteerId', related_name="events", null=True)
+    date = models.DateTimeField('Date', default=timezone.now().replace(hour=12, minute=0, second=0, microsecond=0))
+    durationInMinutes = models.PositiveIntegerField(null=True)
+    type = models.CharField(max_length=255, choices=EVENT_TYPE_CHOICES)
+    notes = models.CharField(max_length=255, blank=True, null=True)
+    metadata = models.CharField(max_length=255, null=True)
+
+    def __unicode__(self):
+        return "%s: %s, '%s' '%s'" % (self.type, self.date, self.client, self.volunteer)

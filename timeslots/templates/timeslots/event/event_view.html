@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{#{% block content %}#}
+{#	<h3>{{ event }}</h3>#}
+{##}
+{#    {% if user.is_staff %}#}
+{#        <a class="add-link" href="{% url 'timeslots_commitment_add_opening_select' volunteer.user.id %}">Add Scheduled Visit</a>#}
+{#        <a class="edit-link" href="{% url 'timeslots_volunteer_edit' volunteer.user.id %}">Edit Volunteer</a>#}
+{#    {% endif %}#}
+{##}
+{#	<div class="block">#}
+{#		<div class="phone">#}
+{#			Phone:#}
+{#			{% if volunteer.phone %}#}
+{#				{{ volunteer.phone }}#}
+{#			{% else %}#}
+{#				Not provided#}
+{#			{% endif %}#}
+{#		</div>#}
+{#	</div>#}
+{##}
+{#	<div class="block">#}
+{#		<h4>Clients</h4>#}
+{#		<ul class="well">#}
+{#			{% for client in volunteer.clients.all %}#}
+{#				<li>#}
+{#					<a href="{{ client.get_absolute_url }}">#}
+{#						{{ client }}#}
+{#					</a>#}
+{#				</li>#}
+{#			{% endfor %}#}
+{#		</ul>#}
+{#	</div>#}
+{##}
+{#	<div class="block">#}
+{#		<h4>Opening Schedules{% if not user.is_staff %} for Your Clients{% endif %}</h4>#}
+{#		<ul class="well">#}
+{#			{% for pattern in opening_patterns %}#}
+{#				{% include "timeslots/partials/opening_pattern_row.html" with show_status_label=True %}#}
+{#			{% endfor %}#}
+{#		</ul>#}
+{#	</div>#}
+{##}
+{#	<div class="block">#}
+{#		<h4>Commitment Schedules</h4>#}
+{#		<ul class="well">#}
+{#			{% for commitment in commitment_patterns %}#}
+{#				<!-- {% include "timeslots/partials/commitment_pattern_row.html" %} -->#}
+{#				<li>#}
+{#					<div>#}
+{#						Visit#}
+{#						<a href="{{ commitment.clientOpening.client.get_absolute_url }}">{{ commitment.clientOpening.client }}</a>#}
+{#						on#}
+{#						<a href="{{ commitment.get_absolute_url }}">{{ commitment.pattern_description }}</a>#}
+{#					</div>#}
+{#				</li>#}
+{#			{% endfor %}#}
+{#		</ul>#}
+{#	</div>#}
+{#	#}
+{#	<div class="block">#}
+{#		<h4>Commitment Dates</h4>#}
+{#		<ul class="well">#}
+{#			{% for instance in commitment_instances %}#}
+{#				{% include "timeslots/partials/commitment_instance_row.html" with specify_client=True %}#}
+{#			{% endfor %}#}
+{#		</ul>#}
+{#	</div>#}
+{##}
+{#{% endblock %}#}
