@@ -2,6 +2,8 @@
 
 {% load display_helpers %}
 
+{% block pagetitle %}{{ commitment.volunteer }} visits {{ client }} on {{ instance_date }} - {% endblock %}
+
 {% block content %}
 	<div class="block">
 		<h3><a href="{{ commitment.volunteer.get_absolute_url }}">{{ commitment.volunteer }}</a> visits <a href="{{ client.get_absolute_url }}">{{ client }}</a> on {{ instance_date }}</h3>

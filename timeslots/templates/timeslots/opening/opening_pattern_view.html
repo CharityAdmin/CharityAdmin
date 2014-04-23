@@ -1,5 +1,7 @@
 {% extends "base.html" %}
 
+{% block pagetitle %}Opening Schedule for {{ opening.client }} {{ opening.get_client_title }} - {% endblock %}
+
 {% block content %}
 	<div class="block">
 		<!-- {% include "timeslots/partials/breadcrumbs.html" with item=opening %} -->

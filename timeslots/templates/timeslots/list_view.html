@@ -1,5 +1,7 @@
 {% extends "base.html" %}
 
+{% block pagetitle %}{{ listObject }}{{ listItems|pluralize }} - {% endblock %}
+
 {% block content %}
 	<div class="block">
 		<h3>{{ listObject }}{{ listItems|pluralize }}</h3>

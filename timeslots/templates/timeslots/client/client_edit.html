@@ -1,5 +1,7 @@
 {% extends "base.html" %}
 
+{% block pagetitle %}Edit Client: {{ client }} - {% endblock %}
+
 {% block content %}
 	<h3>Edit Client: {{ client }}</h3>
 	{% if client.openings.all %}

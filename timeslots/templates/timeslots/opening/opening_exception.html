@@ -2,6 +2,8 @@
 
 {% load display_helpers %}
 
+{% block pagetitle %}Exception to Visit with {{ opening.client }} on {{ exception.date|date:"D, M j, Y, P" }} - {% endblock %}
+
 {% block content %}
 	<div class="block">
 		<h3>Exception to Visit with <a href="{{ opening.client.get_absolute_url }}">{{ opening.client }}</a> on

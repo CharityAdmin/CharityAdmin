@@ -2,6 +2,8 @@
 
 {% load display_helpers %}
 
+{% block pagetitle %}Exception to Scheduled Visit with {{ commitment.clientOpening.client }} on {{ exception.date|date:"D, M j, Y, P" }} - {% endblock %}
+
 {% block content %}
 	<div class="block">
 		<h3>Exception to Scheduled Visit with <a href="{{ commitment.clientOpening.client.get_absolute_url }}">{{ commitment.clientOpening.client }}</a> on <a href="{% commitment_instance_url exception.get_instance %}" title="For commitment pattern: {{ commitment }}">{{ exception.date|date:"D, M j, Y, P" }}</a></h3>

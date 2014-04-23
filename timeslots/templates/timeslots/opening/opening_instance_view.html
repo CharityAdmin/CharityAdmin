@@ -2,6 +2,8 @@
 
 {% load display_helpers %}
 
+{% block pagetitle %}Visit {{ client }} on {{ instance_date|date:"D, M j, Y, P" }} - {% endblock %}
+
 {% block content %}
 	<div class="block">
 		<h3>Visit <a href="{{ client.get_absolute_url }}">{{ client }}</a> on {{ instance_date|date:"D, M j, Y, P" }}</h3>

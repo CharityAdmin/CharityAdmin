@@ -1,5 +1,7 @@
 {% extends "base.html" %}
 
+{% block pagetitle %}Dashboard - {% endblock %}
+
 {% block content %}
 	{% if user.is_staff or volunteer and volunteer.trained %}
 		<div class="dashboard">

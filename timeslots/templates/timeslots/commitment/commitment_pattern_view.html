@@ -1,5 +1,7 @@
 {% extends "base.html" %}
 
+{% block pagetitle %}{{ commitment.volunteer }} visits {{ commitment.clientOpening.client }}, {{ commitment.pattern_description }} - {% endblock %}
+
 {% block content %}
 	<div class="block">
 		<!-- {% include "timeslots/partials/breadcrumbs.html" with item=commitment %} -->

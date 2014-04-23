@@ -1,5 +1,7 @@
 {% extends "base.html" %}
 
+{% block pagetitle %}Edit Volunteer: {{ volunteer }} - {% endblock %}
+
 {% block content %}
 	<h3>Edit Volunteer: {{ volunteer }}</h3>
 	{% if volunteer.commitments.all %}

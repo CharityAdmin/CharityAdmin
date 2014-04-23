@@ -1,6 +1,8 @@
 {% extends "base.html" %}
 {% load display_helpers %}
 
+{% block pagetitle %}{% if editlinks %}Select {% endif %}Opening Schedule{% if editlinks %} to Edit {% else %}s{% if client %} for {{ client }}{% endif %}{% endif %} - {% endblock %}
+
 {% block content %}
 	<div class="block">
 		<h3>{% if editlinks %}Select {% endif %}Opening Schedule{% if editlinks %} to Edit {% else %}s{% if client %} for {{ client }}{% endif %}{% endif %}</h3>

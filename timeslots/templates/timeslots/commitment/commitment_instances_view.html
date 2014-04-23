@@ -1,5 +1,7 @@
 {% extends "base.html" %}
 
+{% block pagetitle %}{% if not user.is_staff %}Your {% endif %}Scheduled Visits{% if client %} for {{ client }}{% endif %} - {% endblock %}
+
 {% block content %}
 	<div class="block">
 		<h3>{% if not user.is_staff %}Your {% endif %}Scheduled Visits{% if client %} for {{ client }}{% endif %}</h3>
