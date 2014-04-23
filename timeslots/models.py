@@ -28,6 +28,8 @@ days_of_week_choices = (('M', 'Mo'), ('Tu', 'Tu'), ('W', 'We'), ('Th', 'Th'), ('
 class Volunteer(models.Model):
     user = models.OneToOneField(User, db_column='userId')
     trained = models.BooleanField(default=False)
+    backgroundCheckCleared = models.BooleanField("Background Check Cleared", default=False)
+    refereceCheckCleared = models.BooleanField("Reference Check Cleared", default=False)
     clients = models.ManyToManyField('Client', blank=True)
     phone = models.CharField(max_length=20, null=True, blank=True)
 
