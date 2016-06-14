@@ -1,0 +1,17 @@
+django==1.9.7
+django-localflavor
+psycopg2
+python-dateutil
+django_extensions
+
+django-configurations
+dj-database-url
+django-cache-url
+dj-email-url
+
+ipdb
+ipython
+django-debug-toolbar
+envdir
+django-grappelli
+django-localflavor

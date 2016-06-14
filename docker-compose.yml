@@ -1,0 +1,23 @@
+# To be used with `docker-compose`. Start with `docker-compose up`
+# This is not meant for production use. Just a quick developer setup.
+version: '2'
+
+services:
+    db:
+        image: postgres:9.4
+        volumes:
+            - ./docker_volumes/db:/var/lib/postgresql/data:rw
+        environment:
+            - POSTGRES_PASSWORD=paws
+            - POSTGRES_USER=paws
+    web:
+        build: .
+        ports:
+            - "8080:8080"
+        volumes:
+            - ./docker_volumes/logs:/srv/pawsnyc/logs:rw
+        links:
+            - db
+            #- cache
+        #environment:
+        #    - CACHE_URL=memcached://cache:11211
