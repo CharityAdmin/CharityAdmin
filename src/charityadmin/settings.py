@@ -157,11 +157,14 @@ class Common(Configuration):
             },
         },
         'handlers': {
-            'syslog': {
-                'class': 'logging.handlers.SysLogHandler',
-                'facility': SysLogHandler.LOG_LOCAL7,
-                'address': '/dev/log',
-                'formatter': 'standard',
+            #'syslog': {
+            #    'class': 'logging.handlers.SysLogHandler',
+            #    'facility': SysLogHandler.LOG_LOCAL7,
+            #    'address': '/dev/log',
+            #    'formatter': 'standard',
+            #},
+            'console': {
+                        'class': 'logging.StreamHandler',
             },
             'stderr': {
                 'level': 'DEBUG',
@@ -179,7 +182,11 @@ class Common(Configuration):
         },
         'loggers': {
             '': {
-                'handlers': ['syslog', 'stderr'],
+                'handlers': [
+                    'console',
+                    #'syslog', 
+                    'stderr'
+                ],
                 'level': 'DEBUG',
                 'propagate': True
             },
