@@ -14,4 +14,3 @@ ipython
 django-debug-toolbar
 envdir
 django-grappelli
-django-localflavor

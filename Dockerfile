@@ -31,6 +31,11 @@ RUN apt-get install -y \
 RUN groupadd -r webapp && useradd -r -g webapp -d /srv/paws webapp && \
     mkdir -p /srv/paws/{src,logs,static} && chown -R webapp:webapp /srv/paws
 
+COPY django-configurations django-configurations
+#WORKDIR /srv/paws/src/django-configurations
+#RUN pwd && pip install setuptools_git && \
+#    ls -l && python setup.py install
+
 USER webapp
 WORKDIR /srv/paws/src
 
@@ -39,9 +44,22 @@ COPY requirements.txt requirements.txt
 # Install Python requirements
 RUN pip install --user -r requirements.txt uwsgi==2.0.13
 
+
 # Expose ports for HTTP and uWSGI stats
 EXPOSE 8080 1717
 VOLUME /srv/paws/logs
+
+# Add source files to container with correct permissions
+COPY . .
+USER root
+RUN chown -R webapp:webapp .
+USER webapp
+
+# Install Python project, link settings, build and collect staticfiles
+RUN pip install --user -e . && \
+    python manage.py migrate --noinput && \
+    python manage.py collectstatic --noinput
+
 
 # Clean up APT when done.
 USER root
@@ -49,5 +67,5 @@ RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 #CMD ["uwsgi", "--ini", "uwsgi.ini"]
 
-#RUN mkdir /etc/service/uwsgi
-#ADD uwsgi.sh /etc/service/uwsgi/run
+RUN mkdir /etc/service/uwsgi
+ADD uwsgi.sh /etc/service/uwsgi/run

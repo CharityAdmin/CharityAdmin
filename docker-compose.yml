@@ -19,5 +19,6 @@ services:
         links:
             - db
             #- cache
-        #environment:
+        environment:
+            - DJANGO_SECRET_KEY=a@62gb!m1f3(79-hx*7oa1nnmu+tp)__e=_afh#o=eia%&gi@t
         #    - CACHE_URL=memcached://cache:11211
