@@ -4,11 +4,11 @@ from django.core.urlresolvers import reverse
 from grappelli.dashboard import modules, Dashboard
 from grappelli.dashboard.utils import get_admin_site_name
 
-from lighthouse.apps.core.models import (
-    VirtualMachine,
-    Service,
-    VirtualHost,
-    Project,
+from charityadmin.apps.timeslots.models import (
+    Volunteer,
+    Client,
+    ClientOpening,
+    VolunteerCommitment,
 )
 
 import logging
@@ -25,37 +25,15 @@ class CustomIndexDashboard(Dashboard):
         req = context.get('request')
 
         self.children.append(modules.Group(
-            _('Manage Topology'),
+            _('Manage Volunteers and Clients'),
             column=2,
             children = [
                 modules.ModelList(
-                    _('VMs, services, virtual hosts, projects ...'),
+                    _('Volunteers and Clients'),
                     column=2,
-                    models=('lighthouse.apps.core.models.*',),
+                    models=('charityadmin.apps.timeslots.models.*',),
                 ),
             ]
         ))
 
-        for vm in VirtualMachine.objects.all():
-            vm_links =  ()
-            vm_links += ({
-                'title': vm.hostname,
-                'url': '/',
-                'external': False,
-                'description': 'description',
-            },)
-            self.children.append(modules.Group(
-                vm.hostname,
-                column=2,
-                children = [
-                    modules.LinkList(
-                        _("VMs"),
-                        collapsible=True,
-                        css_classes=('collapse closed',),
-                        layout='inline',
-                        column=1,
-                        children=vm_links,
-                    ),
-                ]
-            ))
 
