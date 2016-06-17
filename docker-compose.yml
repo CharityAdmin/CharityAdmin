@@ -16,12 +16,8 @@ services:
             - "8080:8080"
         volumes:
             - ./docker_volumes/logs:/srv/pawsnyc/logs:rw
+            - ./docker_volumes/static:/srv/pawsnyc/static:rw
+            - ./docker_volumes/uploads:/srv/pawsnyc/uploads:rw
         links:
             - db
-            #- cache
-        environment:
-            - DJANGO_SETTINGS_MODULE=charityadmin.settings
-            - DJANGO_SECRET_KEY=a@62gb!m1f3(79-hx*7oa1nnmu+tp)__e=_afh#o=eia%&gi@t
-            - DATABASE_URL=postgres://paws@db:5432/paws \
-            - DJANGO_CONFIGURATION=Dev
-        #    - CACHE_URL=memcached://cache:11211
+        #environment:

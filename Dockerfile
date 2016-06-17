@@ -29,7 +29,7 @@ RUN apt-get install -y \
 
 # http://blog.dscpl.com.au/2015/12/don-run-as-root-inside-of-docker.html
 RUN groupadd -r webapp && useradd -r -g webapp -d /srv/paws webapp && \
-    mkdir -p /srv/paws/{src,logs,static} && chown -R webapp:webapp /srv/paws
+    mkdir -p /srv/paws/{src,logs,static,uploads} && chown -R webapp:webapp /srv/paws
 
 USER webapp
 WORKDIR /srv/paws/src
