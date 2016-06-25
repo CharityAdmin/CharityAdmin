@@ -94,7 +94,7 @@ class Client(models.Model):
     city = models.CharField(max_length=255, blank=True, null=True)
     state = models.CharField(max_length=2, choices=STATE_CHOICES, blank=True, null=True)
     zipcode = models.CharField(max_length=10, blank=True, null=True)
-    phone = models.CharField(max_length=20, null=True, blank=True)
+    phone = models.CharField(max_length=100, null=True, blank=True)
     volunteers = models.ManyToManyField('Volunteer', through=Volunteer.clients.through, blank=True)
 
 
