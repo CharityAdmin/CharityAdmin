@@ -18,6 +18,7 @@ urlpatterns = patterns(
 
     # Uncomment the next line to enable the admin:
     url(r'^admin/', include(admin.site.urls)),
+    url(r'^grappelli/', include('grappelli.urls')),
     url(r'^', include(timeslots_urls)),
 
     url(r'^login/$', 'django.contrib.auth.views.login', {'template_name': 'paws/login.html'}, name='paws_login'),
