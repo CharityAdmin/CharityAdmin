@@ -1,7 +1,7 @@
 from __future__ import with_statement
 
-import distribute_setup
-distribute_setup.use_setuptools()
+#import distribute_setup
+#distribute_setup.use_setuptools()
 
 import os
 
