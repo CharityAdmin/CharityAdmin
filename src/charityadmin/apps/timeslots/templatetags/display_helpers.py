@@ -29,8 +29,6 @@ def commitment_exception_add_url(commitmentid, instance):
 
 @register.simple_tag()
 def commitment_exception_delete_url(commitmentid, instance):
-    print "COMMITMENTID"
-    print commitmentid
     return reverse('timeslots_commitment_exception_delete', kwargs={'commitmentid': commitmentid, 'year': instance['date'].year, 'month': instance['date'].month, 'day': instance['date'].day, 'time': instance['date'].strftime('%H%M')})
 
 
